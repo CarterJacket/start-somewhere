@@ -9003,9 +9003,9 @@ var CAREER_DATA =
 
   // Community icons
   function communityIcon(type) {
-    if (type === 'Reddit') return '<div class="community-icon">💬</div>';
-    if (type === 'YouTube') return '<div class="community-icon">▶️</div>';
-    return '<div class="community-icon">🔗</div>';
+    if (type === 'Reddit') return '<div class="community-icon"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></div>';
+    if (type === 'YouTube') return '<div class="community-icon"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em"><polygon points="6 4 20 12 6 20 6 4"/></svg></div>';
+    return '<div class="community-icon"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></div>';
   }
 
   // Build skills HTML
@@ -9054,8 +9054,8 @@ var CAREER_DATA =
           '<span class="trajectory-title">' + lvl.title + '</span>' +
         '</div>' +
         '<div class="trajectory-meta">' +
-          '<span>⏱️ ' + lvl.timeline + '</span>' +
-          '<span>💰 ' + lvl.salary + '</span>' +
+          '<span><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M9 2h6"/></svg> ' + lvl.timeline + '</span>' +
+          '<span><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em"><line x1="12" y1="2" x2="12" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> ' + lvl.salary + '</span>' +
         '</div>' +
         '<div class="trajectory-focus">' + lvl.focus + '</div>' +
       '</div>';
@@ -9065,10 +9065,10 @@ var CAREER_DATA =
   // Build official links
   var officialHTML = '';
   if (career.bls_url) {
-    officialHTML += '<a class="official-link" href="' + career.bls_url + '" target="_blank" rel="noopener">📊 Bureau of Labor Statistics</a>';
+    officialHTML += '<a class="official-link" href="' + career.bls_url + '" target="_blank" rel="noopener"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> Bureau of Labor Statistics</a>';
   }
   if (career.onet_url) {
-    officialHTML += '<a class="official-link" href="' + career.onet_url + '" target="_blank" rel="noopener">📋 O*NET Career Profile</a>';
+    officialHTML += '<a class="official-link" href="' + career.onet_url + '" target="_blank" rel="noopener"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg> O*NET Career Profile</a>';
   }
 
   container.innerHTML =
@@ -9077,40 +9077,40 @@ var CAREER_DATA =
       '<h1>' + jobName + '</h1>' +
       '<p class="description">' + career.description + '</p>' +
       '<div class="quick-stats">' +
-        '<div class="stat-pill"><span class="stat-icon">💰</span><span class="stat-label">Salary:</span><span class="stat-value">' + career.salary + '</span></div>' +
-        '<div class="stat-pill"><span class="stat-icon">🎓</span><span class="stat-label">Education:</span><span class="stat-value">' + career.education + '</span></div>' +
-        '<div class="stat-pill"><span class="stat-icon">🔧</span><span class="stat-label">Skills:</span><span class="stat-value">' + career.skills.length + ' key skills</span></div>' +
+        '<div class="stat-pill"><span class="stat-icon"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em"><line x1="12" y1="2" x2="12" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span><span class="stat-label">Salary:</span><span class="stat-value">' + career.salary + '</span></div>' +
+        '<div class="stat-pill"><span class="stat-icon"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1 2 3 6 3s6-2 6-3v-5"/></svg></span><span class="stat-label">Education:</span><span class="stat-value">' + career.education + '</span></div>' +
+        '<div class="stat-pill"><span class="stat-icon"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.1 2.1-2.8-2.8 2.1-2.1z"/></svg></span><span class="stat-label">Skills:</span><span class="stat-value">' + career.skills.length + ' key skills</span></div>' +
       '</div>' +
     '</div>' +
 
     '<div class="career-content">' +
       '<div class="career-section">' +
-        '<div class="section-header"><span class="section-icon">🎯</span><span class="section-title">Key Skills</span></div>' +
+        '<div class="section-header"><span class="section-icon"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg></span><span class="section-title">Key Skills</span></div>' +
         '<div class="skills-grid">' + skillsHTML + '</div>' +
       '</div>' +
 
       '<div class="career-section">' +
-        '<div class="section-header"><span class="section-icon">📈</span><span class="section-title">Career Trajectory</span></div>' +
+        '<div class="section-header"><span class="section-icon"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></span><span class="section-title">Career Trajectory</span></div>' +
         '<div class="trajectory-timeline">' + trajectoryHTML + '</div>' +
       '</div>' +
 
             '<div class="career-section">' +
-        '<div class="section-header"><span class="section-icon">📚</span><span class="section-title">Recommended Courses</span></div>' +
+        '<div class="section-header"><span class="section-icon"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></span><span class="section-title">Recommended Courses</span></div>' +
         '<div class="course-list">' + coursesHTML + '</div>' +
       '</div>' +
 
       '<div class="career-section">' +
-        '<div class="section-header"><span class="section-icon">📖</span><span class="section-title">Books to Read</span></div>' +
+        '<div class="section-header"><span class="section-icon"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span><span class="section-title">Books to Read</span></div>' +
         '<div class="book-list">' + booksHTML + '</div>' +
       '</div>' +
 
       '<div class="career-section">' +
-        '<div class="section-header"><span class="section-icon">👥</span><span class="section-title">Communities</span></div>' +
+        '<div class="section-header"><span class="section-icon"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span><span class="section-title">Communities</span></div>' +
         '<div class="community-list">' + commHTML + '</div>' +
       '</div>' +
 
       '<div class="career-section">' +
-        '<div class="section-header"><span class="section-icon">🏛️</span><span class="section-title">Official Resources</span></div>' +
+        '<div class="section-header"><span class="section-icon"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.125em"><line x1="3" y1="22" x2="21" y2="22"/><line x1="6" y1="18" x2="6" y2="11"/><line x1="10" y1="18" x2="10" y2="11"/><line x1="14" y1="18" x2="14" y2="11"/><line x1="18" y1="18" x2="18" y2="11"/><polygon points="12 2 21 7 3 7"/></svg></span><span class="section-title">Official Resources</span></div>' +
         '<div class="official-links">' + officialHTML + '</div>' +
       '</div>' +
     '</div>' +
@@ -9139,16 +9139,16 @@ function toggleMobileMenu(){var h=document.getElementById('navHamburger'),m=docu
   ];
 
   var BADGES = {
-    first_step:     { icon: "🚀", name: "First Step",      desc: "Did something. That's the whole point.", check: function(s) { return s.totalActions >= 1; } },
-    sprint_star:    { icon: "⚡", name: "Sprint Star",      desc: "Completed 5 skill sprints.", check: function(s) { return s.sprintsCompleted >= 5; } },
-    scholar:        { icon: "📚", name: "Scholar",          desc: "Clicked through to 10 courses.", check: function(s) { return s.coursesClicked >= 10; } },
-    cartographer:   { icon: "🗺️", name: "Cartographer",    desc: "Explored the Skill Map.", check: function(s) { return s.visitedPages.indexOf("skill-map") >= 0; } },
-    deep_diver:     { icon: "🔍", name: "Deep Diver",       desc: "Checked out 3 different careers.", check: function(s) { return s.careersViewed >= 3; } },
-    full_send:      { icon: "🎯", name: "Full Send",        desc: "Visited Explore, Build, and Apply.", check: function(s) { var p = s.visitedPages; return p.indexOf("explore") >= 0 && p.indexOf("build") >= 0 && p.indexOf("apply") >= 0; } },
-    roulette:       { icon: "🎲", name: "Roulette Roller",  desc: "Spun the roulette 3 times.", check: function(s) { return s.rouletteSpins >= 3; } },
-    completionist:  { icon: "👑", name: "Completionist",    desc: "Finished all 18 sprints.", check: function(s) { return s.sprintsCompleted >= 18; } },
-    skill_hunter:   { icon: "🎪", name: "Skill Hunter",     desc: "Explored 10 different skills.", check: function(s) { return s.skillsExplored >= 10; } },
-    analyzer:       { icon: "🔬", name: "Analyzer",         desc: "Used the Job Analyzer.", check: function(s) { return s.jobsAnalyzed >= 1; } }
+    first_step:     { icon: "<svg width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='#C4652A' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z'/><path d='M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z'/><path d='M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0'/><path d='M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5'/></svg>", name: "First Step",      desc: "Did something. That's the whole point.", check: function(s) { return s.totalActions >= 1; } },
+    sprint_star:    { icon: "<svg width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='#C4652A' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polygon points='13 2 3 14 12 14 11 22 21 10 12 10 13 2'/></svg>", name: "Sprint Star",      desc: "Completed 5 skill sprints.", check: function(s) { return s.sprintsCompleted >= 5; } },
+    scholar:        { icon: "<svg width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='#C4652A' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z'/><path d='M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z'/></svg>", name: "Scholar",          desc: "Clicked through to 10 courses.", check: function(s) { return s.coursesClicked >= 10; } },
+    cartographer:   { icon: "<svg width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='#C4652A' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polygon points='3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21'/><line x1='9' y1='3' x2='9' y2='18'/><line x1='15' y1='6' x2='15' y2='21'/></svg>", name: "Cartographer",    desc: "Explored the Skill Map.", check: function(s) { return s.visitedPages.indexOf("skill-map") >= 0; } },
+    deep_diver:     { icon: "<svg width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='#C4652A' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='11' cy='11' r='8'/><line x1='21' y1='21' x2='16.65' y2='16.65'/></svg>", name: "Deep Diver",       desc: "Checked out 3 different careers.", check: function(s) { return s.careersViewed >= 3; } },
+    full_send:      { icon: "<svg width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='#C4652A' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='10'/><circle cx='12' cy='12' r='6'/><circle cx='12' cy='12' r='2'/></svg>", name: "Full Send",        desc: "Visited Explore, Build, and Apply.", check: function(s) { var p = s.visitedPages; return p.indexOf("explore") >= 0 && p.indexOf("build") >= 0 && p.indexOf("apply") >= 0; } },
+    roulette:       { icon: "<svg width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='#C4652A' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='3' width='18' height='18' rx='2'/><circle cx='8' cy='8' r='1' fill='#C4652A'/><circle cx='16' cy='8' r='1' fill='#C4652A'/><circle cx='12' cy='12' r='1' fill='#C4652A'/><circle cx='8' cy='16' r='1' fill='#C4652A'/><circle cx='16' cy='16' r='1' fill='#C4652A'/></svg>", name: "Roulette Roller",  desc: "Spun the roulette 3 times.", check: function(s) { return s.rouletteSpins >= 3; } },
+    completionist:  { icon: "<svg width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='#C4652A' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7z'/><path d='M5 20h14'/></svg>", name: "Completionist",    desc: "Finished all 18 sprints.", check: function(s) { return s.sprintsCompleted >= 18; } },
+    skill_hunter:   { icon: "<svg width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='#C4652A' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M3.5 21 14 3'/><path d='M20.5 21 10 3'/><path d='M15.5 21 12 15l-3.5 6'/><path d='M2 21h20'/></svg>", name: "Skill Hunter",     desc: "Explored 10 different skills.", check: function(s) { return s.skillsExplored >= 10; } },
+    analyzer:       { icon: "<svg width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='#C4652A' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M6 18h8'/><path d='M3 22h18'/><path d='M14 22a7 7 0 1 0 0-14h-1'/><path d='M9 14h2'/><path d='M9 12a2 2 0 0 1-2-2V6h6v4a2 2 0 0 1-2 2z'/><path d='M12 6V3a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v3'/></svg>", name: "Analyzer",         desc: "Used the Job Analyzer.", check: function(s) { return s.jobsAnalyzed >= 1; } }
   };
 
   // ---- State management ----
@@ -9259,10 +9259,10 @@ function toggleMobileMenu(){var h=document.getElementById('navHamburger'),m=docu
         updateWidget(s);
 
         if (newLevel.name !== oldLevel.name) {
-          showToast("Level up! You're now " + newLevel.name + " 🎉", newLevel.color);
+          showToast("Level up! You're now " + newLevel.name + "!", newLevel.color);
         } else if (newBadges.length > 0) {
           var b = BADGES[newBadges[0]];
-          showToast(b.icon + " " + b.name + " unlocked!", "#C4652A");
+          showToast(b.name + " unlocked!", "#C4652A");
         } else if (xpGain >= 10) {
           showToast("+" + xpGain + " XP", "#1D9E75");
         }
@@ -9331,8 +9331,7 @@ function toggleMobileMenu(){var h=document.getElementById('navHamburger'),m=docu
       ".ss-badge-locked .ss-badge-name{color:#918E85;}",
       ".ss-badge-desc{font-size:11px;color:#918E85;line-height:1.3;}",
       "@media(max-width:480px){.ss-panel{width:280px;right:-5px;}.ss-widget{bottom:12px;right:12px;}}"
-    ].join("
-");
+    ].join("\n");
     document.head.appendChild(css);
 
     var widget = document.createElement("div");
@@ -9475,6 +9474,6 @@ function toggleMobileMenu(){var h=document.getElementById('navHamburger'),m=docu
 })();
 </script>
 
-<footer style="padding:2.5rem 2rem;text-align:center;border-top:1px solid rgba(0,0,0,0.08);margin-top:3rem;"><p style="font-size:13px;color:#918E85;font-family:DM Sans,-apple-system,sans-serif;">Built by <a href="https://carterjacket.github.io" style="color:#C4652A;text-decoration:none;font-weight:500;">Carter Jaquette</a> </body>middot; <a href="start-somewhere.html" style="color:#C4652A;text-decoration:none;font-weight:500;">Start Somewhere</a></p></footer>
+<footer style="padding:2.5rem 2rem;text-align:center;border-top:1px solid rgba(0,0,0,0.08);margin-top:3rem;"><p style="font-size:13px;color:#918E85;font-family:DM Sans,-apple-system,sans-serif;">Built by <a href="https://carterjacket.github.io" style="color:#C4652A;text-decoration:none;font-weight:500;">Carter Jaquette</a> &middot; <a href="start-somewhere.html" style="color:#C4652A;text-decoration:none;font-weight:500;">Start Somewhere</a></p></footer>
 </body>
 </html>
