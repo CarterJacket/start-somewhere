@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Start Somewhere</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+nav { position: sticky; top: 0; z-index: 100; background: rgba(250,249,246,0.95); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(0,0,0,0.08); }
+.nav-inner { display: flex; align-items: center; justify-content: space-between; padding: 14px 2rem; max-width: 1200px; margin: 0 auto; }
+.nav-logo { font-family: 'DM Serif Display', Georgia, serif; font-size: 20px; text-decoration: none; }
+.nav-logo .s { color: #1A1A18; }
+.nav-logo .sw { color: #C4652A; }
+.nav-links { display: flex; gap: 1.75rem; align-items: center; }
+.nav-links a { font-size: 14px; color: #6B6860; text-decoration: none; font-weight: 500; transition: color 0.2s; }
+.nav-links a:hover { color: #1A1A18; }
+.nav-links a.active { color: #C4652A; font-weight: 600; }
+:root {
+  --bg: #FAF9F6;
+  --bg-warm: #F5F0E8;
+  --bg-card: #FFFFFF;
+  --text: #1A1A18;
+  --text-muted: #6B6860;
+  --text-soft: #918E85;
+  --accent: #C4652A;
+  --accent-light: #FAECE7;
+  --accent-hover: #A8521F;
+  --teal: #1D9E75;
+  --teal-light: #E1F5EE;
+  --purple: #534AB7;
+  --purple-light: #EEEDFE;
+  --border: rgba(0,0,0,0.08);
+  --serif: 'DM Serif Display', Georgia, serif;
+  --sans: 'DM Sans', -apple-system, sans-serif;
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { font-family: var(--sans); background: var(--bg); color: var(--text); line-height: 1.7; }
+
+/* NAV */
+
+.nav-cta {
+  background: var(--accent); color: white; border: none; padding: 8px 20px;
+  border-radius: 999px; font-size: 13px; font-weight: 600; cursor: pointer;
+  font-family: var(--sans); transition: background 0.2s;
+}
+.nav-cta:hover { background: var(--accent-hover); }
+
+/* HERO */
+.hero {
+  min-height: 100vh; padding: 140px 2rem 80px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center; position: relative; overflow: hidden;
+}
+.hero::before {
+  content: ''; position: absolute; top: -200px; left: 50%; transform: translateX(-50%);
+  width: 800px; height: 800px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(196,101,42,0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero-eyebrow {
+  font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.15em;
+  color: var(--accent); margin-bottom: 1.5rem;
+  display: flex; align-items: center; gap: 8px;
+}
+.hero-eyebrow::before, .hero-eyebrow::after {
+  content: ''; width: 24px; height: 1px; background: var(--accent); opacity: 0.5;
+}
+.hero h1 {
+  font-family: var(--serif); font-size: clamp(42px, 6vw, 72px);
+  line-height: 1.1; max-width: 800px; margin-bottom: 1.5rem; letter-spacing: -0.02em;
+}
+.hero h1 em { font-style: italic; color: var(--accent); }
+.hero-sub {
+  font-size: 19px; color: var(--text-muted); max-width: 560px; line-height: 1.7;
+  margin-bottom: 2.5rem;
+}
+.hero-actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+.btn-primary {
+  background: var(--accent); color: white; border: none; padding: 14px 32px;
+  border-radius: 999px; font-size: 15px; font-weight: 600; cursor: pointer;
+  font-family: var(--sans); transition: all 0.2s; text-decoration: none;
+}
+.btn-primary:hover { background: var(--accent-hover); transform: translateY(-1px); }
+.btn-ghost {
+  background: transparent; color: var(--text); border: 1.5px solid var(--border);
+  padding: 14px 32px; border-radius: 999px; font-size: 15px; font-weight: 500;
+  cursor: pointer; font-family: var(--sans); transition: all 0.2s; text-decoration: none;
+}
+.btn-ghost:hover { border-color: var(--text-muted); background: var(--bg-card); }
+.scroll-hint {
+  position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%);
+  font-size: 12px; color: var(--text-soft); display: flex; flex-direction: column;
+  align-items: center; gap: 6px; animation: pulse 2s infinite;
+}
+@keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+.scroll-arrow { font-size: 18px; }
+
+/* SECTIONS */
+section { padding: 80px 2rem; }
+.section-inner { max-width: 960px; margin: 0 auto; }
+.section-label {
+  font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.15em;
+  color: var(--accent); margin-bottom: 1rem;
+}
+.section-title {
+  font-family: var(--serif); font-size: clamp(28px, 4vw, 40px); line-height: 1.2;
+  margin-bottom: 1.5rem;
+}
+
+/* TRUTH SECTION */
+.truth { background: var(--bg-warm); }
+.truth-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-top: 2rem; }
+.truth-card {
+  background: var(--bg-card); border-radius: var(--radius); padding: 2rem;
+  border: 1px solid var(--border); position: relative; overflow: hidden;
+}
+.truth-card::before {
+  content: attr(data-number); position: absolute; top: -4px; right: 16px;
+  font-family: var(--serif); font-size: 64px; color: rgba(0,0,0,0.04); line-height: 1;
+  pointer-events: none;
+}
+.truth-card h3 { font-size: 16px; font-weight: 600; margin-bottom: 0.75rem; }
+.truth-card p { font-size: 14px; color: var(--text-muted); line-height: 1.65; }
+
+/* STORY */
+.story-container {
+  background: var(--bg-card); border-radius: 16px; border: 1px solid var(--border);
+  padding: 3rem; margin-top: 2rem; position: relative;
+}
+.story-container::before {
+  content: '"'; font-family: var(--serif); font-size: 120px; color: var(--accent);
+  opacity: 0.12; position: absolute; top: -10px; left: 20px; line-height: 1;
+}
+.story-timeline { display: flex; flex-direction: column; gap: 2rem; position: relative; padding-left: 32px; }
+.story-timeline::before {
+  content: ''; position: absolute; left: 11px; top: 12px; bottom: 12px;
+  width: 2px; background: linear-gradient(to bottom, var(--accent), var(--teal));
+  border-radius: 2px;
+}
+.story-step { position: relative; }
+.story-step::before {
+  content: ''; position: absolute; left: -26px; top: 6px;
+  width: 12px; height: 12px; border-radius: 50%;
+  border: 2.5px solid var(--accent); background: var(--bg-card);
+  z-index: 1;
+}
+.story-step:last-child::before { border-color: var(--teal); background: var(--teal); }
+.story-step .step-label {
+  font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em;
+  color: var(--text-soft); margin-bottom: 4px;
+}
+.story-step p { font-size: 15px; color: var(--text-muted); line-height: 1.65; }
+.story-step p strong { color: var(--text); font-weight: 600; }
+.story-result {
+  background: var(--teal-light); border-radius: var(--radius-sm); padding: 1rem 1.25rem;
+  margin-top: 1.5rem; margin-left: 32px;
+  font-size: 15px; color: #0F6E56; font-weight: 500; line-height: 1.55;
+}
+
+/* WHERE ARE YOU */
+.where { background: var(--bg-warm); }
+.stage-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; margin-top: 2rem; }
+.stage-card {
+  background: var(--bg-card); border-radius: var(--radius); padding: 1.5rem;
+  border: 1px solid var(--border); cursor: pointer; transition: all 0.25s;
+  text-decoration: none; color: inherit; display: flex; flex-direction: column;
+}
+.stage-card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.06); }
+.stage-emoji { font-size: 28px; margin-bottom: 0.75rem; display: block; }
+.stage-card h3 { font-size: 16px; font-weight: 600; margin-bottom: 0.5rem; }
+.stage-card p { font-size: 13px; color: var(--text-muted); line-height: 1.55; }
+.stage-arrow { font-size: 13px; color: var(--accent); font-weight: 600; margin-top: auto; padding-top: 0.75rem; display: inline-block; transition: transform 0.2s; }
+.stage-card:hover .stage-arrow { transform: translateX(4px); }
+
+/* LUCKY */
+.lucky-section { text-align: center; padding: 60px 2rem; }
+.lucky-box {
+  max-width: 580px; margin: 0 auto; background: var(--bg-card);
+  border-radius: 16px; border: 1px solid var(--border); padding: 3rem;
+}
+.lucky-box p { font-size: 15px; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.65; }
+.lucky-btn {
+  background: linear-gradient(135deg, var(--accent), var(--purple));
+  color: white; border: none; padding: 16px 36px;
+  border-radius: 999px; font-size: 16px; font-weight: 600; cursor: pointer;
+  font-family: var(--sans); transition: all 0.3s; position: relative;
+}
+.lucky-btn:hover { transform: scale(1.04); box-shadow: 0 8px 24px rgba(196,101,42,0.3); }
+.lucky-btn:active { transform: scale(0.97); }
+.lucky-result {
+  margin-top: 1.5rem; padding: 1.25rem; border-radius: var(--radius-sm);
+  background: var(--purple-light); display: none; text-align: left;
+}
+.lucky-result.show { display: block; animation: slideUp 0.3s ease; }
+@keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+.lucky-result h4 { font-size: 15px; font-weight: 600; color: var(--purple); margin-bottom: 4px; }
+.lucky-result p { font-size: 13px; color: var(--text-muted); margin: 0; }
+.lucky-result a { color: var(--purple); font-weight: 500; }
+
+/* RESOURCE DIRECTORY */
+.directory { background: var(--bg-warm); }
+.dir-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 1rem; }
+.dir-card {
+  background: var(--bg-card); border-radius: var(--radius); padding: 1.25rem;
+  border: 1px solid var(--border); text-decoration: none; color: inherit;
+  transition: all 0.2s; display: flex; flex-direction: column;
+}
+.dir-card:hover { border-color: var(--accent); }
+.dir-card h4 { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+.dir-card p { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+.dir-tag {
+  display: inline-block; font-size: 10px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.08em; padding: 2px 8px; border-radius: 4px; margin-top: auto; padding-top: 8px;
+}
+.dir-tag-free { background: var(--teal-light); color: #0F6E56; }
+.dir-tag-paid { background: var(--accent-light); color: var(--accent); }
+
+/* FOOTER */
+footer {
+  padding: 3.5rem 2rem; text-align: center; border-top: 1px solid var(--border);
+}
+footer p { font-size: 13px; color: var(--text-soft); }
+footer .footer-logo { font-family: var(--serif); font-size: 18px; color: var(--accent); margin-bottom: 0.5rem; }
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .nav-inner { padding: 12px 1rem; }
+  .nav-links { gap: 1rem; flex-wrap: wrap; }
+  .nav-row2 { display: none !important; }
+  .truth-grid, .stage-grid, .dir-grid { grid-template-columns: 1fr; }
+  
+  section { padding: 60px 1.25rem; }
+  .story-container { padding: 1.5rem; }
+  .story-timeline { padding-left: 24px; }
+  .story-step::before { left: -20px; width: 10px; height: 10px; }
+  .story-timeline::before { left: 8px; }
+  .story-result { margin-left: 24px; }
+}
+@media (max-width: 480px) {
+  .hero { padding: 120px 1.25rem 60px; }
+  .hero-actions { flex-direction: column; width: 100%; }
+  .hero-actions a, .hero-actions button { width: 100%; text-align: center; }
+}
+
+/* SEARCH */
+.search-wrap { position: relative; max-width: 480px; margin: 1.5rem auto; }
+.search-input {
+  width: 100%; padding: 14px 20px 14px 44px; border-radius: 999px;
+  border: 1.5px solid var(--border); background: var(--bg-card);
+  font-size: 15px; font-family: var(--sans); color: var(--text);
+  outline: none; transition: all 0.2s;
+}
+.search-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(196,101,42,0.1); }
+.search-input::placeholder { color: var(--text-soft); }
+.search-icon {
+  position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+  color: var(--text-soft); font-size: 16px; pointer-events: none;
+}
+.search-results {
+  position: absolute; top: calc(100% + 6px); left: 0; right: 0;
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.1); display: none; max-height: 320px;
+  overflow-y: auto; z-index: 200;
+}
+.search-results.open { display: block; }
+.search-group-label {
+  font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--text-soft); padding: 10px 16px 4px; 
+}
+.search-item {
+  display: flex; align-items: center; gap: 10px; padding: 10px 16px;
+  text-decoration: none; color: var(--text); transition: background 0.15s; cursor: pointer;
+}
+.search-item:hover, .search-item.active { background: var(--bg-warm); }
+.search-item-icon { font-size: 14px; width: 24px; text-align: center; flex-shrink: 0; }
+.search-item-text { font-size: 14px; }
+.search-item-type { font-size: 11px; color: var(--text-soft); margin-left: auto; flex-shrink: 0; }
+
+.search-item-text strong { color: var(--accent); font-weight: 600; }
+.search-empty { padding: 20px 16px; text-align: center; font-size: 14px; color: var(--text-soft); }
+
+
+/* MOBILE HAMBURGER NAV */
+.nav-hamburger {
+  display: none; align-items: center; justify-content: center;
+  width: 36px; height: 36px; cursor: pointer; border: none;
+  background: transparent; padding: 0; flex-direction: column; gap: 5px;
+}
+.nav-hamburger span {
+  display: block; width: 20px; height: 2px; background: #1A1A18;
+  transition: all 0.3s; border-radius: 1px;
+}
+.nav-hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.nav-hamburger.open span:nth-child(2) { opacity: 0; }
+.nav-hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+.mobile-menu {
+  display: none; position: fixed; top: 53px; left: 0; right: 0; bottom: 0;
+  background: rgba(250,249,246,0.98); backdrop-filter: blur(20px);
+  z-index: 99; padding: 2rem 1.5rem; overflow-y: auto;
+}
+.mobile-menu.open { display: flex; flex-direction: column; gap: 0; }
+.mobile-menu a {
+  display: block; padding: 14px 0; font-size: 16px; color: #6B6860;
+  text-decoration: none; font-weight: 500; border-bottom: 1px solid rgba(0,0,0,0.08);
+  transition: color 0.2s;
+}
+.mobile-menu a:hover, .mobile-menu a.active { color: #C4652A; }
+@media (max-width: 768px) { .nav-hamburger { display: flex; } .nav-links { display: none !important; } }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a href="start-somewhere.html" class="nav-logo"><span class="s">start</span><span class="sw">somewhere.</span></a>
+    <button class="nav-hamburger" id="navHamburger" onclick="toggleMobileMenu()"><span></span><span></span><span></span></button>
+    <div class="nav-links">
+      <a href="start-somewhere.html" class="active">Home</a>
+      <a href="explore.html">Explore</a>
+      <a href="build.html">Build</a>
+      <a href="apply.html">Apply</a>
+      <a href="skill-explorer-production.html">Skill Explorer</a>
+      <a href="job-analyzer.html">Job Analyzer</a>
+      <a href="skill-roulette.html">Skill Roulette</a>
+      <a href="skill-sprints.html">Skill Sprints</a>
+      <a href="skill-map.html">Skill Map</a>
+    </div>
+  </div>
+  <div class="nav-row2" style="display:flex;align-items:center;padding:6px 2rem 8px;border-top:1px solid var(--border);background:rgba(245,240,232,0.5);gap:1.5rem;max-width:1200px;margin:0 auto;justify-content:center;flex-wrap:wrap;">
+    <a href="#truth" style="font-size:13px;color:var(--text-soft);text-decoration:none;font-weight:500;">The truth</a>
+    <a href="#story" style="font-size:13px;color:var(--text-soft);text-decoration:none;font-weight:500;">Proof</a>
+    <a href="#where" style="font-size:13px;color:var(--text-soft);text-decoration:none;font-weight:500;">Where are you?</a>
+    <a href="#lucky" style="font-size:13px;color:var(--text-soft);text-decoration:none;font-weight:500;">I'm feeling lucky</a>
+    <a href="#directory" style="font-size:13px;color:var(--text-soft);text-decoration:none;font-weight:500;">Resources</a>
+  </div>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="start-somewhere.html" class="active">Home</a>
+  <a href="explore.html">Explore</a>
+  <a href="build.html">Build</a>
+  <a href="apply.html">Apply</a>
+  <a href="skill-explorer-production.html">Skill Explorer</a>
+  <a href="job-analyzer.html">Job Analyzer</a>
+  <a href="skill-roulette.html">Skill Roulette</a>
+  <a href="skill-sprints.html">Skill Sprints</a>
+  <a href="skill-map.html">Skill Map</a>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-eyebrow">a career momentum engine</div>
+  <h1>You don't need a plan.<br>You need <em>momentum.</em></h1>
+  <p class="hero-sub">
+    Everyone says figure out your path first, then start moving. That's backwards. Start building something, anything, and the path shows up on its own.
+  </p>
+
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input type="text" class="search-input" id="siteSearch" placeholder="Search skills, careers, or tools..." autocomplete="off">
+    <div class="search-results" id="searchResults"></div>
+  </div>
+  <div class="hero-actions">
+    <a href="#where" class="btn-primary">Find your starting point</a>
+    <a href="#lucky" class="btn-ghost">Pick something random</a>
+  </div>
+  <div class="scroll-hint">
+    <span>The truth no one tells you</span>
+    <span class="scroll-arrow">↓</span>
+  </div>
+</div>
+
+<!-- TRUTH SECTION -->
+<section class="truth" id="truth">
+  <div class="section-inner">
+    <div class="section-label">What nobody tells you</div>
+    <h2 class="section-title">Action creates motivation.<br>Not the other way around.</h2>
+    <p style="font-size: 16px; color: var(--text-muted); max-width: 640px; margin-bottom: 1rem;">
+      You're waiting to feel ready. To find your passion. To know for sure. But that certainty you're looking for? It only comes after you start, not before. The people with fulfilling careers didn't have it figured out. They just moved first.
+    </p>
+    <div class="truth-grid">
+      <div class="truth-card" data-number="01">
+        <h3>The readiness trap</h3>
+        <p>You think you need to decide before you begin. So you take quizzes, read articles, ask advice. Nothing feels certain. That's not a failure of research. You just can't know what you like until you've tried it.</p>
+      </div>
+      <div class="truth-card" data-number="02">
+        <h3>There are no wrong skills</h3>
+        <p>That "irrelevant" course you're eyeing? Every skill you build changes how you think. It gives you an angle nobody else in the room has. The most interesting people in any field got there by combining things that didn't obviously go together.</p>
+      </div>
+      <div class="truth-card" data-number="03">
+        <h3>Pivoting is the feature</h3>
+        <p>Changing directions isn't quitting. It's iterating. Every pivot carries forward everything you've already learned. You're not starting over. You're starting from a better spot than last time.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STORY -->
+<section id="story">
+  <div class="section-inner">
+    <div class="section-label">Proof it works</div>
+    <h2 class="section-title">Electric vehicles → Case competition winner.<br>Nobody saw that coming.</h2>
+    <div class="story-container">
+      <div class="story-timeline">
+        <div class="story-step">
+          <div class="step-label">The "irrelevant" interest</div>
+          <p>A curiosity about electric vehicles. Not for a career. Not for a course. Just genuine fascination. <strong>Charging hours, battery swapping, infrastructure challenges</strong>. The kind of deep knowledge you only build when you're following interest instead of a plan.</p>
+        </div>
+        <div class="story-step">
+          <div class="step-label">The career path</div>
+          <p>Meanwhile, the actual career direction was <strong>consulting</strong>. The two worlds seemed totally disconnected. Nobody would put "EV nerd" and "business consultant" on the same resume. On paper, all that time spent learning about electric vehicles looked like a detour.</p>
+        </div>
+        <div class="story-step">
+          <div class="step-label">The collision</div>
+          <p>Then the first round of the <strong>CPABC case competition</strong> landed: plan TransLink's transition from diesel buses to electric vehicles. Suddenly, all that "irrelevant" knowledge (charging logistics, battery swapping economics, infrastructure constraints) became the exact edge no one else in the competition had.</p>
+        </div>
+        <div class="story-step">
+          <div class="step-label">The result</div>
+          <p><strong>Contributions nobody else could make. Insights nobody else had. Stuff you can't just Google in a weekend.</strong></p>
+        </div>
+      </div>
+      <div class="story-result">
+        🏆 &nbsp;Went on to win the finals of that case competition. All because of a "waste of time."
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHERE ARE YOU -->
+<section class="where" id="where">
+  <div class="section-inner">
+    <div class="section-label">No wrong answers</div>
+    <h2 class="section-title">Where are you right now?</h2>
+    <p style="font-size: 16px; color: var(--text-muted); max-width: 560px; margin-bottom: 1rem;">
+      Don't overthink it. Pick what feels closest.
+    </p>
+    <div class="stage-grid" >
+      <a class="stage-card" href="explore.html" style="border-top: 3px solid var(--accent);">
+        <h3 style="font-size: 18px; margin-bottom: 0.5rem;">Explore</h3>
+        <p style="font-size: 14px;">I have no idea what I want, or I have some interests but no clear direction. I need to figure out what's out there.</p>
+        <div style="margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--border);">
+          <div style="font-size: 12px; color: var(--text-soft); margin-bottom: 6px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">You'll get:</div>
+          <div style="font-size: 13px; color: var(--text-muted); line-height: 1.6;">Career assessments, interest profilers, personality tools, and career databases to help you figure out what fits.</div>
+        </div>
+        <span class="stage-arrow">Start exploring &#8594;</span>
+      </a>
+      <a class="stage-card" href="build.html" style="border-top: 3px solid var(--teal);">
+        <h3 style="font-size: 18px; margin-bottom: 0.5rem;">Build</h3>
+        <p style="font-size: 14px;">I know my general direction, or I'm pivoting to something new. I need to build the right skills.</p>
+        <div style="margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--border);">
+          <div style="font-size: 12px; color: var(--text-soft); margin-bottom: 6px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">You'll get:</div>
+          <div style="font-size: 13px; color: var(--text-muted); line-height: 1.6;">Free courses, job simulations, project ideas, and the Skill Explorer to see which skills cover the most ground.</div>
+        </div>
+        <span class="stage-arrow" style="color: var(--teal);">Start building &#8594;</span>
+      </a>
+      <a class="stage-card" href="apply.html" style="border-top: 3px solid var(--purple);">
+        <h3 style="font-size: 18px; margin-bottom: 0.5rem;">Apply</h3>
+        <p style="font-size: 14px;">I'm ready to go after roles, or I need to sharpen my resume, interview skills, and job search strategy.</p>
+        <div style="margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--border);">
+          <div style="font-size: 12px; color: var(--text-soft); margin-bottom: 6px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">You'll get:</div>
+          <div style="font-size: 13px; color: var(--text-muted); line-height: 1.6;">ATS resume optimization, AI mock interviews, job boards, and the Job Analyzer to break down any posting.</div>
+        </div>
+        <span class="stage-arrow" style="color: var(--purple);">Get prepared &#8594;</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- LUCKY -->
+<section class="lucky-section" id="lucky">
+  <div class="lucky-box">
+    <div class="section-label">Zero stakes, maximum curiosity</div>
+    <h2 class="section-title" style="margin-bottom: 1rem;">Can't decide? Let fate choose.</h2>
+    <p>Some of the best career moves start with random curiosity. Click the button. Learn something you weren't planning to. The point isn't to find your calling. It's to start moving.</p>
+    <button class="lucky-btn" onclick="spinLucky()">✦ &nbsp;I'm feeling lucky</button>
+    <div class="lucky-result" id="lucky-result"></div>
+  </div>
+</section>
+
+<!-- RESOURCE DIRECTORY -->
+<section class="directory" id="directory">
+  <div class="section-inner">
+    <div class="section-label">Your starting points</div>
+    <h2 class="section-title">Resources that meet you where you are</h2>
+    <p style="font-size: 15px; color: var(--text-muted); max-width: 560px; margin-bottom: 1rem;">
+      Real tools, not another listicle. Each one gets you doing something within minutes.
+    </p>
+
+    <h3 style="font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-soft); margin-top: 1.25rem; margin-bottom: 0.75rem;">Discover what fits</h3>
+    <div class="dir-grid">
+      <a class="dir-card" href="https://www.mynextmove.org/explore/ip" target="_blank">
+        <h4>O*NET Interest Profiler</h4>
+        <p>900+ careers matched to your interests. Takes 10 minutes. No sign-up.</p>
+        <span class="dir-tag dir-tag-free">Free</span>
+      </a>
+      <a class="dir-card" href="https://www.truity.com/test/career-personality-profiler-test" target="_blank">
+        <h4>Truity Career Profiler</h4>
+        <p>Combines personality science with career matching. Better than most quizzes out there.</p>
+        <span class="dir-tag dir-tag-free">Free tier</span>
+      </a>
+      <a class="dir-card" href="https://www.theforage.com" target="_blank">
+        <h4>Forage</h4>
+        <p>Free virtual work experience at real companies. Try a career before you commit.</p>
+        <span class="dir-tag dir-tag-free">Free</span>
+      </a>
+    </div>
+
+    <h3 style="font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-soft); margin-top: 2rem; margin-bottom: 0.75rem;">Build something new</h3>
+    <div class="dir-grid">
+      <a class="dir-card" href="https://www.coursera.org" target="_blank">
+        <h4>Coursera</h4>
+        <p>University-backed courses in anything from Python to philosophy. Free to audit.</p>
+        <span class="dir-tag dir-tag-free">Free to audit</span>
+      </a>
+      <a class="dir-card" href="https://www.skillshare.com" target="_blank">
+        <h4>Skillshare</h4>
+        <p>Creative skills: design, photography, writing, animation. Great for exploring.</p>
+        <span class="dir-tag dir-tag-paid">Free trial</span>
+      </a>
+      <a class="dir-card" href="https://www.edx.org" target="_blank">
+        <h4>edX</h4>
+        <p>MIT, Harvard, and more. MicroMasters programs if you want to go deep.</p>
+        <span class="dir-tag dir-tag-free">Free to audit</span>
+      </a>
+    </div>
+
+    <h3 style="font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-soft); margin-top: 2rem; margin-bottom: 0.75rem;">Get hired</h3>
+    <div class="dir-grid">
+      <a class="dir-card" href="https://www.jobscan.co" target="_blank">
+        <h4>Jobscan</h4>
+        <p>AI that matches your resume to job descriptions. Shows you exactly what to fix.</p>
+        <span class="dir-tag dir-tag-free">Free tier</span>
+      </a>
+      <a class="dir-card" href="https://interviewing.io" target="_blank">
+        <h4>Interviewing.io</h4>
+        <p>Anonymous mock interviews with engineers at top companies. Tough but effective.</p>
+        <span class="dir-tag dir-tag-free">Free tier</span>
+      </a>
+      <a class="dir-card" href="https://joinhandshake.com" target="_blank">
+        <h4>Handshake</h4>
+        <p>Built for early-career job seekers. Employers come to you.</p>
+        <span class="dir-tag dir-tag-free">Free</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">startsomewhere.</div>
+  <p>You don't need a plan. You need to move. &nbsp;·&nbsp; For the undecided, the curious, and the stuck.</p>
+</footer>
+
+<script>
+const luckySkills = [
+  { skill: "Learn basic Python", why: "The most versatile skill in tech. Automate boring stuff, analyze data, or build a side project.", link: "https://www.coursera.org/search?query=python", source: "Coursera" },
+  { skill: "Take a free writing course", why: "Clear writing is clear thinking. This skill transfers to every career that exists.", link: "https://www.coursera.org/search?query=sciwrite", source: "Coursera" },
+  { skill: "Learn the basics of UX design", why: "Understanding how people interact with things makes you better at literally any job.", link: "https://www.coursera.org/search?query=google+ux+design", source: "Google / Coursera" },
+  { skill: "Try a Forage virtual experience", why: "Simulate a real job for a day. Consulting, engineering, marketing. No application, no risk.", link: "https://www.theforage.com", source: "Forage" },
+  { skill: "Learn basic data analysis", why: "Every industry runs on data now. Even a beginner understanding gives you superpowers.", link: "https://www.coursera.org/search?query=google+data+analytics", source: "Google / Coursera" },
+  { skill: "Start learning public speaking", why: "The ability to communicate ideas clearly is the most underrated career accelerator.", link: "https://www.coursera.org/search?query=public+speaking", source: "Coursera" },
+  { skill: "Learn graphic design fundamentals", why: "Visual communication matters everywhere. Pitch decks, social media, side hustles.", link: "https://www.skillshare.com", source: "Skillshare" },
+  { skill: "Take a negotiation course", why: "You'll use this skill for the rest of your life. Salaries, contracts, everyday decisions.", link: "https://www.coursera.org/search?query=negotiation", source: "Yale / Coursera" },
+  { skill: "Build a personal website", why: "Even a simple one-page site teaches you HTML, design thinking, and self-presentation.", link: "https://pages.github.com", source: "GitHub Pages" },
+  { skill: "Learn basic financial literacy", why: "Understanding money isn't just a career skill. It changes how you make life decisions.", link: "https://www.edx.org", source: "edX" },
+  { skill: "Try a photography fundamentals course", why: "Trains your eye for composition, light, and storytelling. Useful far beyond cameras.", link: "https://www.skillshare.com", source: "Skillshare" },
+  { skill: "Learn spreadsheet power moves", why: "Advanced Excel/Sheets skills are quietly one of the most employable abilities on earth.", link: "https://www.coursera.org", source: "Coursera" },
+  { skill: "Study intro to psychology", why: "Understanding why people behave the way they do is relevant in every single career path.", link: "https://www.coursera.org/search?query=introduction+psychology", source: "Yale / Coursera" },
+  { skill: "Learn the basics of video editing", why: "Content is king everywhere. Even rough skills here open surprising doors.", link: "https://www.skillshare.com", source: "Skillshare" },
+  { skill: "Take a project management intro", why: "The ability to organize and execute plans is valuable whether you're running a team or freelancing.", link: "https://www.coursera.org/search?query=google+project+management", source: "Google / Coursera" },
+];
+
+let lastLucky = -1;
+function spinLucky() {
+  const btn = document.querySelector('.lucky-btn');
+  btn.textContent = '✦  Shuffling...';
+  btn.disabled = true;
+
+  setTimeout(() => {
+    let idx;
+    do { idx = Math.floor(Math.random() * luckySkills.length); } while (idx === lastLucky);
+    lastLucky = idx;
+    const s = luckySkills[idx];
+    const el = document.getElementById('lucky-result');
+    el.innerHTML = `<h4>→ ${s.skill}</h4><p>${s.why}</p><p style="margin-top: 8px;"><a href="${s.link}" target="_blank">Start on ${s.source} ↗</a></p>`;
+    el.className = 'lucky-result show';
+    btn.textContent = '✦  Spin again';
+    btn.disabled = false;
+  }, 600);
+}
+</script>
+
+
+
+<script>
+// Site search
+(function() {
+  var SEARCH_DATA = {"skills": ["Active Learning", "Active Listening", "Administration and Management", "Administrative", "Biology", "Building and Construction", "Chemistry", "Communications and Media", "Complex Problem Solving", "Computers and Electronics", "Coordination", "Critical Thinking", "Customer and Personal Service", "Design", "Economics and Accounting", "Education and Training", "Engineering and Technology", "English Language", "Fine Arts", "Food Production", "Foreign Language", "Geography", "History and Archeology", "Instructing", "Judgment and Decision Making", "Law and Government", "Learning Strategies", "Management of Personnel Resources", "Mathematics", "Mechanical", "Medicine and Dentistry", "Monitoring", "Negotiation", "Operations Analysis", "Operations Monitoring", "Personnel and Human Resources", "Persuasion", "Philosophy and Theology", "Physics", "Production and Processing", "Programming", "Psychology", "Public Safety and Security", "Reading Comprehension", "Sales and Marketing", "Science", "Service Orientation", "Social Perceptiveness", "Sociology and Anthropology", "Speaking", "Systems Analysis", "Telecommunications", "Therapy and Counseling", "Time Management", "Transportation", "Writing"], "careers": ["Accountants and Auditors", "Actors", "Acute Care Nurses", "Administrative Law Judges, Adjudicators, and Hearing Officers", "Administrative Services Managers", "Advanced Practice Psychiatric Nurses", "Advertising and Promotions Managers", "Aerospace Engineers", "Agricultural Sciences Teachers, Postsecondary", "Agricultural Technicians", "Anesthesiologists", "Animal Scientists", "Anthropologists and Archeologists", "Anthropology and Archeology Teachers, Postsecondary", "Appraisers and Assessors of Real Estate", "Architects, Except Landscape and Naval", "Architectural and Civil Drafters", "Architectural and Engineering Managers", "Art Directors", "Art, Drama, and Music Teachers, Postsecondary", "Athletic Trainers", "Atmospheric, Earth, Marine, and Space Sciences Teachers, Postsecondary", "Automotive Engineers", "Biochemists and Biophysicists", "Bioengineers and Biomedical Engineers", "Biological Science Teachers, Postsecondary", "Biological Technicians", "Biostatisticians", "Budget Analysts", "Business Intelligence Analysts", "Business Teachers, Postsecondary", "Camera Operators, Television, Video, and Film", "Career/Technical Education Teachers, Secondary School", "Cashiers", "Chefs and Head Cooks", "Chemical Engineers", "Chemical Technicians", "Chemistry Teachers, Postsecondary", "Chemists", "Chief Executives", "Child, Family, and School Social Workers", "Civil Engineering Technologists and Technicians", "Civil Engineers", "Clergy", "Clinical and Counseling Psychologists", "Commercial and Industrial Designers", "Community Health Workers", "Compliance Officers", "Computer Network Support Specialists", "Computer Systems Analysts", "Computer Systems Engineers/Architects", "Computer and Information Research Scientists", "Conservation Scientists", "Construction Managers", "Correctional Officers and Jailers", "Critical Care Nurses", "Curators", "Detectives and Criminal Investigators", "Dietitians and Nutritionists", "Editors", "Educational, Guidance, and Career Counselors and Advisors", "Electrical Engineers", "Electrical and Electronic Engineering Technologists and Technicians", "Electronics Engineers, Except Computer", "Elementary School Teachers, Except Special Education", "English Language and Literature Teachers, Postsecondary", "Exercise Physiologists", "Facilities Managers", "Family Medicine Physicians", "Film and Video Editors", "Financial Examiners", "Financial Managers", "First-Line Supervisors of Helpers, Laborers, and Material Movers, Hand", "First-Line Supervisors of Office and Administrative Support Workers", "Fundraisers", "General Internal Medicine Physicians", "General and Operations Managers", "Healthcare Social Workers", "Historians", "History Teachers, Postsecondary", "Human Resources Managers", "Industrial Engineers", "Instructional Coordinators", "Interpreters and Translators", "Lawyers", "Management Analysts", "Network and Computer Systems Administrators", "Philosophy and Religion Teachers, Postsecondary", "Producers and Directors", "Social and Community Service Managers", "Special Effects Artists and Animators", "Urban and Regional Planners", "Writers and Authors"], "pages": [{"name": "Explore", "desc": "Career assessments and exploration tools", "url": "explore.html"}, {"name": "Build", "desc": "Courses, simulations, and skill building", "url": "build.html"}, {"name": "Apply", "desc": "Resumes, interviews, and job search", "url": "apply.html"}, {"name": "Skill Explorer", "desc": "Find which skills cover the most ground for your major", "url": "skill-explorer-production.html"}, {"name": "Job Analyzer", "desc": "Paste a job posting, get a skill breakdown", "url": "job-analyzer.html"}, {"name": "Skill Roulette", "desc": "Random 5-minute skill challenge", "url": "skill-roulette.html"}, {"name": "Skill Sprints", "desc": "18 five-minute skill challenges", "url": "skill-sprints.html"}, {"name": "Skill Map", "desc": "Interactive map of skills, connections, and careers", "url": "skill-map.html"}]};
+  
+  var input = document.getElementById('siteSearch');
+  var results = document.getElementById('searchResults');
+  var activeIdx = -1;
+  var currentItems = [];
+
+  // Fuzzy matching: split query into words, each word must appear somewhere in the target
+  function fuzzyMatch(text, query) {
+    var textLower = text.toLowerCase();
+    var words = query.split(/\s+/);
+    // Every query word must match somewhere in the text
+    for (var i = 0; i < words.length; i++) {
+      if (words[i].length === 0) continue;
+      if (textLower.indexOf(words[i]) < 0) return -1;
+    }
+    // Score: prefer starts-with, then word-boundary matches, then substring
+    var score = 0;
+    if (textLower.indexOf(query) === 0) score += 100; // exact start
+    else if (textLower.indexOf(query) >= 0) score += 50; // exact substring
+    // Bonus for each word that starts a word boundary
+    var textWords = textLower.split(/[\s,\/&]+/);
+    words.forEach(function(w) {
+      if (!w) return;
+      for (var j = 0; j < textWords.length; j++) {
+        if (textWords[j].indexOf(w) === 0) { score += 20; break; }
+      }
+    });
+    // Shorter results rank higher (more specific)
+    score += Math.max(0, 50 - text.length);
+    return score;
+  }
+
+  function highlightMatch(text, query) {
+    var words = query.split(/\s+/).filter(function(w) { return w.length > 0; });
+    var result = text;
+    words.forEach(function(w) {
+      var regex = new RegExp('(' + w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi');
+      result = result.replace(regex, '<strong>$1</strong>');
+    });
+    return result;
+  }
+
+  input.addEventListener('input', function() {
+    var q = this.value.trim().toLowerCase();
+    if (q.length < 2) { results.classList.remove('open'); return; }
+
+    var html = '';
+    var count = 0;
+    currentItems = [];
+
+    // Search pages
+    var pageMatches = [];
+    SEARCH_DATA.pages.forEach(function(p) {
+      var score = Math.max(fuzzyMatch(p.name, q), fuzzyMatch(p.desc, q));
+      if (score >= 0) pageMatches.push({ item: p, score: score });
+    });
+    pageMatches.sort(function(a, b) { return b.score - a.score; });
+    if (pageMatches.length > 0) {
+      html += '<div class="search-group-label">Tools</div>';
+      pageMatches.forEach(function(m) {
+        var p = m.item;
+        currentItems.push({ url: p.url });
+        html += '<a class="search-item" href="' + p.url + '" data-idx="' + (currentItems.length-1) + '">' +
+          '<span class="search-item-icon">🛠️</span>' +
+          '<span class="search-item-text">' + highlightMatch(p.name, q) + '</span>' +
+          '<span class="search-item-type">' + p.desc.substring(0, 40) + '</span></a>';
+        count++;
+      });
+    }
+
+    // Search skills
+    var skillMatches = [];
+    SEARCH_DATA.skills.forEach(function(s) {
+      var score = fuzzyMatch(s, q);
+      if (score >= 0) skillMatches.push({ item: s, score: score });
+    });
+    skillMatches.sort(function(a, b) { return b.score - a.score; });
+    skillMatches = skillMatches.slice(0, 6);
+    if (skillMatches.length > 0) {
+      html += '<div class="search-group-label">Skills</div>';
+      skillMatches.forEach(function(m) {
+        currentItems.push({ url: 'skill-map.html' });
+        html += '<a class="search-item" href="skill-map.html" data-idx="' + (currentItems.length-1) + '">' +
+          '<span class="search-item-icon">💡</span>' +
+          '<span class="search-item-text">' + highlightMatch(m.item, q) + '</span>' +
+          '<span class="search-item-type">Skill Map</span></a>';
+        count++;
+      });
+    }
+
+    // Search careers
+    var careerMatches = [];
+    SEARCH_DATA.careers.forEach(function(c) {
+      var score = fuzzyMatch(c, q);
+      if (score >= 0) careerMatches.push({ item: c, score: score });
+    });
+    careerMatches.sort(function(a, b) { return b.score - a.score; });
+    careerMatches = careerMatches.slice(0, 6);
+    if (careerMatches.length > 0) {
+      html += '<div class="search-group-label">Careers</div>';
+      careerMatches.forEach(function(m) {
+        var cr = m.item;
+        var url = 'career.html?job=' + encodeURIComponent(cr);
+        currentItems.push({ url: url });
+        html += '<a class="search-item" href="' + url + '" data-idx="' + (currentItems.length-1) + '">' +
+          '<span class="search-item-icon">💼</span>' +
+          '<span class="search-item-text">' + highlightMatch(cr, q) + '</span>' +
+          '<span class="search-item-type">Career page</span></a>';
+        count++;
+      });
+    }
+
+    if (count === 0) {
+      html = '<div class="search-empty">No results for "' + q.replace(/</g,'&lt;') + '"</div>';
+    }
+
+    results.innerHTML = html;
+    results.classList.add('open');
+    activeIdx = -1;
+  });
+
+  // Keyboard navigation
+  input.addEventListener('keydown', function(e) {
+    var items = results.querySelectorAll('.search-item');
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      activeIdx = Math.min(activeIdx + 1, items.length - 1);
+      items.forEach(function(el, i) { el.classList.toggle('active', i === activeIdx); });
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      activeIdx = Math.max(activeIdx - 1, 0);
+      items.forEach(function(el, i) { el.classList.toggle('active', i === activeIdx); });
+    } else if (e.key === 'Enter' && activeIdx >= 0 && currentItems[activeIdx]) {
+      window.location.href = currentItems[activeIdx].url;
+    } else if (e.key === 'Escape') {
+      results.classList.remove('open');
+      input.blur();
+    }
+  });
+
+  // Close on outside click
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.search-wrap')) results.classList.remove('open');
+  });
+})();
+</script>
+
+<script>
+function toggleMobileMenu(){var h=document.getElementById('navHamburger'),m=document.getElementById('mobileMenu');h.classList.toggle('open');m.classList.toggle('open');document.body.style.overflow=m.classList.contains('open')?'hidden':'';}
+</script>
+<!-- SS_PROGRESS_TRACKER -->
+<script>
+// ========== START SOMEWHERE PROGRESS TRACKER ==========
+// Self-contained gamified progress system using localStorage
+(function() {
+  var LEVELS = [
+    { name: "Curious", xp: 0, color: "#918E85" },
+    { name: "Explorer", xp: 25, color: "#534AB7" },
+    { name: "Builder", xp: 75, color: "#1D9E75" },
+    { name: "Momentum", xp: 150, color: "#C4652A" },
+    { name: "Unstoppable", xp: 300, color: "#B8336A" }
+  ];
+
+  var BADGES = {
+    first_step:     { icon: "🚀", name: "First Step",      desc: "Did something. That's the whole point.", check: function(s) { return s.totalActions >= 1; } },
+    sprint_star:    { icon: "⚡", name: "Sprint Star",      desc: "Completed 5 skill sprints.", check: function(s) { return s.sprintsCompleted >= 5; } },
+    scholar:        { icon: "📚", name: "Scholar",          desc: "Clicked through to 10 courses.", check: function(s) { return s.coursesClicked >= 10; } },
+    cartographer:   { icon: "🗺️", name: "Cartographer",    desc: "Explored the Skill Map.", check: function(s) { return s.visitedPages.indexOf("skill-map") >= 0; } },
+    deep_diver:     { icon: "🔍", name: "Deep Diver",       desc: "Checked out 3 different careers.", check: function(s) { return s.careersViewed >= 3; } },
+    full_send:      { icon: "🎯", name: "Full Send",        desc: "Visited Explore, Build, and Apply.", check: function(s) { var p = s.visitedPages; return p.indexOf("explore") >= 0 && p.indexOf("build") >= 0 && p.indexOf("apply") >= 0; } },
+    roulette:       { icon: "🎲", name: "Roulette Roller",  desc: "Spun the roulette 3 times.", check: function(s) { return s.rouletteSpins >= 3; } },
+    completionist:  { icon: "👑", name: "Completionist",    desc: "Finished all 18 sprints.", check: function(s) { return s.sprintsCompleted >= 18; } },
+    skill_hunter:   { icon: "🎪", name: "Skill Hunter",     desc: "Explored 10 different skills.", check: function(s) { return s.skillsExplored >= 10; } },
+    analyzer:       { icon: "🔬", name: "Analyzer",         desc: "Used the Job Analyzer.", check: function(s) { return s.jobsAnalyzed >= 1; } }
+  };
+
+  // ---- State management ----
+  function getState() {
+    try {
+      var raw = localStorage.getItem("ss_progress");
+      if (raw) return JSON.parse(raw);
+    } catch(e) {}
+    return {
+      xp: 0,
+      totalActions: 0,
+      sprintsCompleted: 0,
+      coursesClicked: 0,
+      careersViewed: 0,
+      skillsExplored: 0,
+      rouletteSpins: 0,
+      jobsAnalyzed: 0,
+      visitedPages: [],
+      earnedBadges: [],
+      completedSprintIds: [],
+      viewedCareerNames: [],
+      clickedCourseNames: [],
+      exploredSkillNames: []
+    };
+  }
+
+  function saveState(s) {
+    try { localStorage.setItem("ss_progress", JSON.stringify(s)); } catch(e) {}
+  }
+
+  function getLevel(xp) {
+    var level = LEVELS[0];
+    for (var i = 0; i < LEVELS.length; i++) {
+      if (xp >= LEVELS[i].xp) level = LEVELS[i];
+    }
+    return level;
+  }
+
+  function getNextLevel(xp) {
+    for (var i = 0; i < LEVELS.length; i++) {
+      if (xp < LEVELS[i].xp) return LEVELS[i];
+    }
+    return null;
+  }
+
+  function checkBadges(state) {
+    var newBadges = [];
+    var keys = Object.keys(BADGES);
+    for (var i = 0; i < keys.length; i++) {
+      var key = keys[i];
+      if (state.earnedBadges.indexOf(key) < 0 && BADGES[key].check(state)) {
+        state.earnedBadges.push(key);
+        newBadges.push(key);
+      }
+    }
+    return newBadges;
+  }
+
+  // ---- Public API ----
+  window.SSProgress = {
+    award: function(type, detail) {
+      var s = getState();
+      var xpGain = 0;
+
+      if (type === "sprint") {
+        if (detail && s.completedSprintIds.indexOf(detail) >= 0) return; // already done
+        if (detail) s.completedSprintIds.push(detail);
+        s.sprintsCompleted++;
+        xpGain = 15;
+      } else if (type === "course") {
+        if (detail && s.clickedCourseNames.indexOf(detail) < 0) {
+          s.clickedCourseNames.push(detail);
+        }
+        s.coursesClicked++;
+        xpGain = 5;
+      } else if (type === "career") {
+        if (detail && s.viewedCareerNames.indexOf(detail) < 0) {
+          s.viewedCareerNames.push(detail);
+          s.careersViewed++;
+          xpGain = 5;
+        }
+      } else if (type === "skill") {
+        if (detail && s.exploredSkillNames.indexOf(detail) < 0) {
+          s.exploredSkillNames.push(detail);
+          s.skillsExplored++;
+          xpGain = 3;
+        }
+      } else if (type === "roulette") {
+        s.rouletteSpins++;
+        xpGain = 5;
+      } else if (type === "job_analyze") {
+        s.jobsAnalyzed++;
+        xpGain = 10;
+      } else if (type === "page") {
+        if (detail && s.visitedPages.indexOf(detail) < 0) {
+          s.visitedPages.push(detail);
+          xpGain = 1;
+        }
+      }
+
+      if (xpGain > 0) {
+        s.xp += xpGain;
+        s.totalActions++;
+        var oldLevel = getLevel(s.xp - xpGain);
+        var newLevel = getLevel(s.xp);
+        var newBadges = checkBadges(s);
+        saveState(s);
+        updateWidget(s);
+
+        if (newLevel.name !== oldLevel.name) {
+          showToast("Level up! You're now " + newLevel.name + " 🎉", newLevel.color);
+        } else if (newBadges.length > 0) {
+          var b = BADGES[newBadges[0]];
+          showToast(b.icon + " " + b.name + " unlocked!", "#C4652A");
+        } else if (xpGain >= 10) {
+          showToast("+" + xpGain + " XP", "#1D9E75");
+        }
+      }
+    },
+
+    getState: getState,
+    getLevel: function() { return getLevel(getState().xp); },
+
+    reset: function() {
+      localStorage.removeItem("ss_progress");
+      updateWidget(getState());
+    }
+  };
+
+  // ---- Toast notification ----
+  function showToast(msg, color) {
+    var toast = document.createElement("div");
+    toast.className = "ss-toast";
+    toast.style.cssText = "position:fixed;bottom:80px;right:20px;z-index:10001;background:" + (color || "#C4652A") + ";color:white;padding:10px 18px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;opacity:0;transform:translateY(10px);transition:all 0.3s;box-shadow:0 4px 12px rgba(0,0,0,0.15);pointer-events:none;";
+    toast.textContent = msg;
+    document.body.appendChild(toast);
+    requestAnimationFrame(function() {
+      toast.style.opacity = "1";
+      toast.style.transform = "translateY(0)";
+    });
+    setTimeout(function() {
+      toast.style.opacity = "0";
+      toast.style.transform = "translateY(10px)";
+      setTimeout(function() { toast.remove(); }, 300);
+    }, 2500);
+  }
+
+  // ---- Widget ----
+  function createWidget() {
+    var css = document.createElement("style");
+    css.textContent = [
+      ".ss-widget{position:fixed;bottom:20px;right:20px;z-index:10000;font-family:'DM Sans',sans-serif;}",
+      ".ss-pill{display:flex;align-items:center;gap:8px;background:#FFFFFF;border:1px solid rgba(0,0,0,0.1);border-radius:40px;padding:6px 14px 6px 8px;cursor:pointer;box-shadow:0 2px 12px rgba(0,0,0,0.08);transition:all 0.2s;}",
+      ".ss-pill:hover{box-shadow:0 4px 20px rgba(0,0,0,0.12);transform:translateY(-1px);}",
+      ".ss-pill-xp{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:white;}",
+      ".ss-pill-info{display:flex;flex-direction:column;line-height:1.2;}",
+      ".ss-pill-level{font-size:11px;font-weight:600;color:#1A1A18;}",
+      ".ss-pill-bar{width:60px;height:4px;background:#F0EDE6;border-radius:2px;overflow:hidden;margin-top:2px;}",
+      ".ss-pill-fill{height:100%;border-radius:2px;transition:width 0.5s ease;}",
+      ".ss-panel{position:absolute;bottom:50px;right:0;width:300px;background:#FFFFFF;border:1px solid rgba(0,0,0,0.1);border-radius:16px;box-shadow:0 8px 30px rgba(0,0,0,0.12);padding:20px;display:none;max-height:70vh;overflow-y:auto;}",
+      ".ss-panel.open{display:block;animation:ss-fadeIn 0.2s ease;}",
+      "@keyframes ss-fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}",
+      ".ss-panel-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}",
+      ".ss-panel-title{font-family:'DM Serif Display',Georgia,serif;font-size:20px;}",
+      ".ss-panel-xp{font-size:13px;color:#6B6860;font-weight:500;}",
+      ".ss-progress-bar{width:100%;height:8px;background:#F0EDE6;border-radius:4px;overflow:hidden;margin-bottom:4px;}",
+      ".ss-progress-fill{height:100%;border-radius:4px;transition:width 0.5s ease;}",
+      ".ss-progress-label{display:flex;justify-content:space-between;font-size:11px;color:#918E85;margin-bottom:20px;}",
+      ".ss-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px;}",
+      ".ss-stat{background:#FAF9F6;border-radius:8px;padding:10px;text-align:center;}",
+      ".ss-stat-num{font-size:20px;font-weight:700;color:#1A1A18;}",
+      ".ss-stat-label{font-size:11px;color:#6B6860;margin-top:2px;}",
+      ".ss-badges-title{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:#918E85;margin-bottom:10px;}",
+      ".ss-badge{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(0,0,0,0.04);}",
+      ".ss-badge:last-child{border-bottom:none;}",
+      ".ss-badge-icon{font-size:20px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;background:#FAF9F6;border-radius:8px;flex-shrink:0;}",
+      ".ss-badge-locked .ss-badge-icon{filter:grayscale(1);opacity:0.3;}",
+      ".ss-badge-info{flex:1;min-width:0;}",
+      ".ss-badge-name{font-size:13px;font-weight:600;color:#1A1A18;}",
+      ".ss-badge-locked .ss-badge-name{color:#918E85;}",
+      ".ss-badge-desc{font-size:11px;color:#918E85;line-height:1.3;}",
+      "@media(max-width:480px){.ss-panel{width:280px;right:-5px;}.ss-widget{bottom:12px;right:12px;}}"
+    ].join("
+");
+    document.head.appendChild(css);
+
+    var widget = document.createElement("div");
+    widget.className = "ss-widget";
+    widget.id = "ss-widget";
+    widget.innerHTML = '<div class="ss-pill" id="ss-pill">' +
+      '<div class="ss-pill-xp" id="ss-pill-icon"></div>' +
+      '<div class="ss-pill-info">' +
+        '<div class="ss-pill-level" id="ss-pill-level"></div>' +
+        '<div class="ss-pill-bar"><div class="ss-pill-fill" id="ss-pill-fill"></div></div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="ss-panel" id="ss-panel"></div>';
+    document.body.appendChild(widget);
+
+    document.getElementById("ss-pill").addEventListener("click", function(e) {
+      e.stopPropagation();
+      var panel = document.getElementById("ss-panel");
+      panel.classList.toggle("open");
+      if (panel.classList.contains("open")) renderPanel(getState());
+    });
+
+    document.addEventListener("click", function(e) {
+      var panel = document.getElementById("ss-panel");
+      if (panel && panel.classList.contains("open") && !e.target.closest(".ss-widget")) {
+        panel.classList.remove("open");
+      }
+    });
+  }
+
+  function updateWidget(state) {
+    var level = getLevel(state.xp);
+    var next = getNextLevel(state.xp);
+    var pct = 100;
+    if (next) {
+      pct = Math.round(((state.xp - level.xp) / (next.xp - level.xp)) * 100);
+    }
+
+    var icon = document.getElementById("ss-pill-icon");
+    var levelEl = document.getElementById("ss-pill-level");
+    var fill = document.getElementById("ss-pill-fill");
+
+    if (icon) {
+      icon.style.background = level.color;
+      icon.textContent = state.xp;
+    }
+    if (levelEl) levelEl.textContent = level.name;
+    if (fill) {
+      fill.style.width = pct + "%";
+      fill.style.background = level.color;
+    }
+  }
+
+  function renderPanel(state) {
+    var level = getLevel(state.xp);
+    var next = getNextLevel(state.xp);
+    var pct = 100;
+    var nextLabel = "Max level!";
+    if (next) {
+      pct = Math.round(((state.xp - level.xp) / (next.xp - level.xp)) * 100);
+      nextLabel = next.xp + " XP to " + next.name;
+    }
+
+    var badgesHTML = "";
+    var badgeKeys = Object.keys(BADGES);
+    for (var i = 0; i < badgeKeys.length; i++) {
+      var key = badgeKeys[i];
+      var b = BADGES[key];
+      var earned = state.earnedBadges.indexOf(key) >= 0;
+      badgesHTML += '<div class="ss-badge ' + (earned ? "" : "ss-badge-locked") + '">' +
+        '<div class="ss-badge-icon">' + b.icon + '</div>' +
+        '<div class="ss-badge-info">' +
+          '<div class="ss-badge-name">' + b.name + '</div>' +
+          '<div class="ss-badge-desc">' + (earned ? b.desc : "???") + '</div>' +
+        '</div>' +
+      '</div>';
+    }
+
+    document.getElementById("ss-panel").innerHTML =
+      '<div class="ss-panel-header">' +
+        '<div class="ss-panel-title">Your Progress</div>' +
+        '<div class="ss-panel-xp">' + state.xp + ' XP</div>' +
+      '</div>' +
+      '<div class="ss-progress-bar"><div class="ss-progress-fill" style="width:' + pct + '%;background:' + level.color + '"></div></div>' +
+      '<div class="ss-progress-label"><span>' + level.name + '</span><span>' + nextLabel + '</span></div>' +
+      '<div class="ss-stats">' +
+        '<div class="ss-stat"><div class="ss-stat-num">' + state.sprintsCompleted + '</div><div class="ss-stat-label">Sprints</div></div>' +
+        '<div class="ss-stat"><div class="ss-stat-num">' + state.coursesClicked + '</div><div class="ss-stat-label">Courses</div></div>' +
+        '<div class="ss-stat"><div class="ss-stat-num">' + state.careersViewed + '</div><div class="ss-stat-label">Careers</div></div>' +
+        '<div class="ss-stat"><div class="ss-stat-num">' + state.earnedBadges.length + '/' + badgeKeys.length + '</div><div class="ss-stat-label">Badges</div></div>' +
+      '</div>' +
+      '<div class="ss-badges-title">Badges</div>' +
+      badgesHTML;
+  }
+
+  // ---- Auto-detect page and track visit ----
+  function detectPage() {
+    var path = window.location.pathname.split("/").pop().replace(".html", "");
+    var pageMap = {
+      "start-somewhere": "home",
+      "explore": "explore",
+      "build": "build",
+      "apply": "apply",
+      "skill-explorer-production": "skill-explorer",
+      "job-analyzer": "job-analyzer",
+      "skill-roulette": "skill-roulette",
+      "skill-sprints": "skill-sprints",
+      "skill-map": "skill-map",
+      "career": "career"
+    };
+    return pageMap[path] || path;
+  }
+
+  // ---- Init ----
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
+
+  function init() {
+    createWidget();
+    var state = getState();
+
+    // Track page visit
+    var page = detectPage();
+    if (page) {
+      SSProgress.award("page", page);
+    }
+
+    // Auto-track career page views
+    if (page === "career") {
+      var params = new URLSearchParams(window.location.search);
+      var job = params.get("job");
+      if (job) SSProgress.award("career", job);
+    }
+
+    updateWidget(getState());
+  }
+})();
+</script>
+
+</body>
+</html>

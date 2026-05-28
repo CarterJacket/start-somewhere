@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Start Somewhere — Skill Hedge Explorer</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #FAF9F6;
+  --bg-warm: #F5F0E8;
+  --bg-card: #FFFFFF;
+  --text: #1A1A18;
+  --text-muted: #6B6860;
+  --text-soft: #918E85;
+  --accent: #C4652A;
+  --accent-light: #FAECE7;
+  --accent-hover: #A8521F;
+  --teal: #1D9E75;
+  --teal-light: #E1F5EE;
+  --purple: #534AB7;
+  --purple-light: #EEEDFE;
+  --blue: #2E6BC6;
+  --blue-light: #E6F1FB;
+  --border: rgba(0,0,0,0.08);
+  --serif: 'DM Serif Display', Georgia, serif;
+  --sans: 'DM Sans', -apple-system, sans-serif;
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { font-family: var(--sans); background: var(--bg); color: var(--text); line-height: 1.7; }
+
+/* NAV */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(250,249,246,0.85); backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 2rem; height: 60px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.nav-logo { font-family: var(--serif); font-size: 20px; color: var(--accent); text-decoration: none; }
+.nav-logo span { color: var(--text); }
+.nav-tabs { display: flex; gap: 0; height: 100%; align-items: stretch; }
+.nav-tab {
+  display: flex; align-items: center; padding: 0 1.25rem;
+  font-size: 14px; font-weight: 500; color: var(--text-muted);
+  text-decoration: none; border-bottom: 2px solid transparent;
+  transition: all 0.2s; cursor: pointer;
+}
+.nav-tab:hover { color: var(--text); }
+.nav-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+/* HEADER */
+.page-header {
+  padding: 100px 2rem 40px; text-align: center;
+}
+.page-header h1 {
+  font-family: var(--serif); font-size: clamp(32px, 5vw, 48px);
+  line-height: 1.15; margin-bottom: 1rem;
+}
+.page-header h1 em { font-style: italic; color: var(--accent); }
+.page-header p {
+  font-size: 17px; color: var(--text-muted); max-width: 600px;
+  margin: 0 auto; line-height: 1.65;
+}
+
+/* EXPLORER */
+.explorer { max-width: 1060px; margin: 0 auto; padding: 0 2rem 4rem; }
+
+/* MODE TOGGLE */
+.mode-toggle {
+  display: flex; gap: 0; margin-bottom: 2rem;
+  background: var(--bg-warm); border-radius: 999px; padding: 4px;
+  width: fit-content;
+}
+.mode-btn {
+  padding: 10px 24px; border-radius: 999px; border: none;
+  font-family: var(--sans); font-size: 14px; font-weight: 500;
+  cursor: pointer; transition: all 0.2s; background: transparent;
+  color: var(--text-muted);
+}
+.mode-btn.active {
+  background: var(--bg-card); color: var(--text);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+
+/* SELECTOR */
+.selector-section { margin-bottom: 2rem; }
+.selector-label {
+  font-size: 12px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.12em; color: var(--text-soft); margin-bottom: 0.75rem;
+}
+.pill-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+.pill {
+  padding: 8px 18px; border-radius: 999px; border: 1.5px solid var(--border);
+  background: var(--bg-card); font-family: var(--sans); font-size: 14px;
+  font-weight: 500; color: var(--text-muted); cursor: pointer;
+  transition: all 0.2s; white-space: nowrap;
+}
+.pill:hover { border-color: var(--text-soft); color: var(--text); }
+.pill.active { border-color: var(--accent); background: var(--accent-light); color: var(--accent); }
+
+/* RESULTS */
+.results { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+
+/* SKILL RANKINGS */
+.result-panel {
+  background: var(--bg-card); border-radius: 16px; border: 1px solid var(--border);
+  padding: 1.75rem; overflow: hidden;
+}
+.panel-header {
+  display: flex; align-items: baseline; justify-content: space-between;
+  margin-bottom: 1.25rem;
+}
+.panel-title { font-size: 16px; font-weight: 600; }
+.panel-subtitle { font-size: 12px; color: var(--text-soft); }
+
+.skill-row {
+  display: flex; align-items: center; gap: 12px; padding: 10px 0;
+  border-bottom: 1px solid rgba(0,0,0,0.04);
+}
+.skill-row:last-child { border-bottom: none; }
+.skill-rank {
+  font-family: var(--serif); font-size: 18px; color: rgba(0,0,0,0.1);
+  width: 28px; text-align: right; flex-shrink: 0;
+}
+.skill-info { flex: 1; min-width: 0; }
+.skill-name { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+.skill-desc { font-size: 12px; color: var(--text-soft); line-height: 1.4; }
+.skill-bar-wrap {
+  width: 100%; height: 6px; background: rgba(0,0,0,0.04);
+  border-radius: 3px; margin-top: 6px; overflow: hidden;
+}
+.skill-bar {
+  height: 100%; border-radius: 3px; transition: width 0.6s ease;
+}
+.skill-pct {
+  font-size: 13px; font-weight: 600; white-space: nowrap; flex-shrink: 0; min-width: 40px; text-align: right;
+}
+
+/* CAREER LIST */
+.career-item {
+  padding: 10px 0; border-bottom: 1px solid rgba(0,0,0,0.04);
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: 12px;
+}
+.career-item:last-child { border-bottom: none; }
+.career-title { font-size: 14px; font-weight: 500; }
+.career-meta { font-size: 12px; color: var(--text-soft); white-space: nowrap; }
+
+/* INSIGHT BOX */
+.insight-box {
+  background: var(--purple-light); border-radius: var(--radius-sm);
+  padding: 1rem 1.25rem; margin-top: 1.5rem;
+}
+.insight-box p { font-size: 13px; color: #3C3489; line-height: 1.55; margin: 0; }
+.insight-box strong { color: #26215C; }
+
+/* HEDGE METER */
+.hedge-meter { margin-top: 1.5rem; }
+.hedge-label { font-size: 12px; color: var(--text-soft); margin-bottom: 6px; }
+.hedge-track {
+  width: 100%; height: 32px; background: rgba(0,0,0,0.03);
+  border-radius: 8px; position: relative; overflow: hidden;
+}
+.hedge-fill {
+  height: 100%; border-radius: 8px; display: flex;
+  align-items: center; padding-left: 12px;
+  font-size: 13px; font-weight: 600; color: white;
+  transition: width 0.8s ease;
+}
+.hedge-caption { font-size: 12px; color: var(--text-muted); margin-top: 6px; line-height: 1.5; }
+
+/* FOOTER MINI */
+.mini-footer {
+  text-align: center; padding: 2rem; font-size: 12px; color: var(--text-soft);
+  border-top: 1px solid var(--border); margin-top: 2rem;
+}
+
+@media (max-width: 768px) {
+  .results { grid-template-columns: 1fr; }
+  .nav-tabs { display: none; }
+  .mode-toggle { width: 100%; }
+  .mode-btn { flex: 1; text-align: center; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="start-somewhere.html"><span>start</span>somewhere.</a>
+  <div class="nav-tabs">
+    <a class="nav-tab" href="start-somewhere.html">Home</a>
+    <a class="nav-tab active">Skill Explorer</a>
+  </div>
+</nav>
+
+<div class="page-header">
+  <h1>Learn the skills that <em>hedge your bets.</em></h1>
+  <p>Pick a major or sector. We'll show you which skills appear in the most jobs — so you can learn what covers the widest ground, no matter where you land.</p>
+</div>
+
+<div class="explorer">
+  <!-- MODE TOGGLE -->
+  <div class="mode-toggle">
+    <button class="mode-btn active" onclick="setMode('major')">By major</button>
+    <button class="mode-btn" onclick="setMode('sector')">By sector</button>
+  </div>
+
+  <!-- SELECTOR -->
+  <div class="selector-section">
+    <div class="selector-label" id="selector-label">Choose a major</div>
+    <div class="pill-grid" id="pill-grid"></div>
+  </div>
+
+  <!-- RESULTS -->
+  <div class="results" id="results" style="display: none;">
+    <!-- Left: Skill Rankings -->
+    <div class="result-panel">
+      <div class="panel-header">
+        <div class="panel-title" id="skills-title">Top skills</div>
+        <div class="panel-subtitle">by job coverage</div>
+      </div>
+      <div id="skills-list"></div>
+
+      <div class="hedge-meter" id="hedge-meter">
+        <div class="hedge-label">If you learn the top 3 skills:</div>
+        <div class="hedge-track">
+          <div class="hedge-fill" id="hedge-fill" style="width: 0%"></div>
+        </div>
+        <div class="hedge-caption" id="hedge-caption"></div>
+      </div>
+
+      <div class="insight-box" id="insight-box">
+        <p id="insight-text"></p>
+      </div>
+    </div>
+
+    <!-- Right: Career List -->
+    <div class="result-panel">
+      <div class="panel-header">
+        <div class="panel-title" id="careers-title">Careers</div>
+        <div class="panel-subtitle" id="careers-count"></div>
+      </div>
+      <div id="careers-list"></div>
+    </div>
+  </div>
+</div>
+
+<div class="mini-footer">
+  Prototype · Skill data modeled on O*NET occupation database · <a href="start-somewhere.html" style="color:var(--accent)">← Back to Start Somewhere</a>
+</div>
+
+<script>
+const DATA = {
+  major: {
+    "Economics": {
+      skills: [
+        { name: "Financial Analysis", desc: "DCF models, valuations, financial statement analysis", pct: 82, color: "var(--accent)" },
+        { name: "Data Analysis & Statistics", desc: "Regression, forecasting, quantitative modeling", pct: 78, color: "var(--accent)" },
+        { name: "Excel & Spreadsheet Modeling", desc: "Advanced formulas, pivot tables, financial models", pct: 75, color: "var(--accent)" },
+        { name: "Critical Thinking", desc: "Evaluating arguments, identifying assumptions, logical reasoning", pct: 71, color: "var(--teal)" },
+        { name: "Written Communication", desc: "Reports, memos, policy briefs, research papers", pct: 68, color: "var(--teal)" },
+        { name: "SQL & Database Querying", desc: "Extracting and manipulating structured datasets", pct: 54, color: "var(--blue)" },
+        { name: "Python / R Programming", desc: "Statistical computing, automation, data visualization", pct: 48, color: "var(--blue)" },
+        { name: "Presentation Skills", desc: "Translating analysis into clear, persuasive narratives", pct: 45, color: "var(--purple)" },
+      ],
+      careers: [
+        { title: "Financial Analyst", salary: "$85K–$120K" },
+        { title: "Management Consultant", salary: "$90K–$160K" },
+        { title: "Data Analyst", salary: "$65K–$95K" },
+        { title: "Policy Analyst", salary: "$60K–$90K" },
+        { title: "Investment Banking Analyst", salary: "$100K–$150K" },
+        { title: "Market Research Analyst", salary: "$55K–$85K" },
+        { title: "Actuary", salary: "$75K–$130K" },
+        { title: "Corporate Strategist", salary: "$95K–$140K" },
+        { title: "Risk Analyst", salary: "$70K–$110K" },
+        { title: "Economic Researcher", salary: "$60K–$100K" },
+        { title: "Revenue Analyst", salary: "$65K–$95K" },
+      ],
+      hedgePct: 78,
+      hedgeColor: "var(--teal)",
+      insight: "Financial analysis and data skills dominate. If you learn <strong>DCF modeling + SQL + Excel</strong>, you're competitive for roughly 4 out of 5 economics-adjacent jobs — from consulting to investment banking to policy work."
+    },
+    "Computer Science": {
+      skills: [
+        { name: "Programming Fundamentals", desc: "Python, Java, JavaScript — core syntax and problem solving", pct: 95, color: "var(--accent)" },
+        { name: "Data Structures & Algorithms", desc: "Arrays, trees, graphs, sorting, complexity analysis", pct: 88, color: "var(--accent)" },
+        { name: "Version Control (Git)", desc: "Branching, merging, pull requests, collaboration workflows", pct: 85, color: "var(--accent)" },
+        { name: "Database Management", desc: "SQL, NoSQL, schema design, query optimization", pct: 74, color: "var(--teal)" },
+        { name: "System Design", desc: "Architecture, scalability, API design, distributed systems", pct: 68, color: "var(--teal)" },
+        { name: "Testing & Debugging", desc: "Unit tests, integration tests, systematic debugging", pct: 65, color: "var(--blue)" },
+        { name: "Cloud Platforms", desc: "AWS, GCP, Azure — deployment, infrastructure basics", pct: 58, color: "var(--blue)" },
+        { name: "Communication & Documentation", desc: "Technical writing, code reviews, cross-team collaboration", pct: 52, color: "var(--purple)" },
+      ],
+      careers: [
+        { title: "Software Engineer", salary: "$90K–$160K" },
+        { title: "Data Scientist", salary: "$95K–$150K" },
+        { title: "DevOps Engineer", salary: "$100K–$145K" },
+        { title: "Product Manager (Technical)", salary: "$110K–$170K" },
+        { title: "Machine Learning Engineer", salary: "$120K–$200K" },
+        { title: "Full-Stack Developer", salary: "$80K–$140K" },
+        { title: "Security Engineer", salary: "$100K–$160K" },
+        { title: "Cloud Architect", salary: "$130K–$190K" },
+        { title: "QA / Test Engineer", salary: "$70K–$110K" },
+        { title: "Systems Engineer", salary: "$85K–$135K" },
+      ],
+      hedgePct: 89,
+      hedgeColor: "var(--teal)",
+      insight: "Programming + algorithms + Git are nearly universal. If you're solid in those three, you qualify for the vast majority of CS roles. <strong>Database skills</strong> are the biggest differentiator after that — they unlock both backend and data-focused paths."
+    },
+    "Psychology": {
+      skills: [
+        { name: "Research Methods", desc: "Study design, surveys, qualitative & quantitative methods", pct: 79, color: "var(--accent)" },
+        { name: "Data Analysis & Statistics", desc: "SPSS, hypothesis testing, correlation, regression", pct: 72, color: "var(--accent)" },
+        { name: "Written Communication", desc: "Reports, case studies, grant proposals, documentation", pct: 70, color: "var(--accent)" },
+        { name: "Active Listening & Empathy", desc: "Client interaction, interviews, counseling frameworks", pct: 65, color: "var(--teal)" },
+        { name: "Critical Thinking", desc: "Evaluating evidence, identifying bias, reasoning under uncertainty", pct: 62, color: "var(--teal)" },
+        { name: "Presentation & Teaching", desc: "Workshops, trainings, public speaking, group facilitation", pct: 55, color: "var(--blue)" },
+        { name: "Program Evaluation", desc: "Measuring intervention outcomes, metrics design", pct: 44, color: "var(--blue)" },
+        { name: "UX Research Methods", desc: "Usability testing, user interviews, personas, journey mapping", pct: 38, color: "var(--purple)" },
+      ],
+      careers: [
+        { title: "UX Researcher", salary: "$80K–$130K" },
+        { title: "Human Resources Specialist", salary: "$55K–$80K" },
+        { title: "Market Research Analyst", salary: "$55K–$85K" },
+        { title: "Clinical Research Coordinator", salary: "$50K–$70K" },
+        { title: "School Counselor", salary: "$50K–$75K" },
+        { title: "Behavioral Health Technician", salary: "$35K–$50K" },
+        { title: "Organizational Development Specialist", salary: "$70K–$110K" },
+        { title: "Social Worker (with MSW)", salary: "$50K–$70K" },
+        { title: "Survey Researcher", salary: "$55K–$80K" },
+        { title: "Training & Development Manager", salary: "$75K–$115K" },
+      ],
+      hedgePct: 74,
+      hedgeColor: "var(--accent)",
+      insight: "Psychology's top skills are deceptively portable. <strong>Research methods + statistics + writing</strong> unlock paths most psych students don't consider — UX research, market analysis, and organizational consulting all value these over clinical skills."
+    },
+    "Business Admin": {
+      skills: [
+        { name: "Financial Literacy", desc: "Reading financial statements, budgeting, P&L analysis", pct: 80, color: "var(--accent)" },
+        { name: "Project Management", desc: "Planning, timelines, resource allocation, stakeholder management", pct: 76, color: "var(--accent)" },
+        { name: "Excel & Data Modeling", desc: "Forecasting, scenario analysis, dashboards", pct: 74, color: "var(--accent)" },
+        { name: "Communication & Persuasion", desc: "Presentations, proposals, executive summaries", pct: 72, color: "var(--teal)" },
+        { name: "Strategic Thinking", desc: "Competitive analysis, market positioning, long-term planning", pct: 65, color: "var(--teal)" },
+        { name: "Sales & CRM Fundamentals", desc: "Pipeline management, Salesforce, customer lifecycle", pct: 52, color: "var(--blue)" },
+        { name: "Basic SQL / BI Tools", desc: "Tableau, Power BI, querying for business intelligence", pct: 45, color: "var(--blue)" },
+        { name: "People Management", desc: "Hiring, feedback, team development, performance reviews", pct: 40, color: "var(--purple)" },
+      ],
+      careers: [
+        { title: "Operations Manager", salary: "$65K–$110K" },
+        { title: "Project Manager", salary: "$75K–$120K" },
+        { title: "Business Analyst", salary: "$65K–$100K" },
+        { title: "Account Manager", salary: "$55K–$90K" },
+        { title: "Marketing Manager", salary: "$70K–$120K" },
+        { title: "Product Manager", salary: "$90K–$150K" },
+        { title: "Supply Chain Analyst", salary: "$60K–$90K" },
+        { title: "Management Consultant", salary: "$80K–$150K" },
+        { title: "Human Resources Manager", salary: "$65K–$100K" },
+        { title: "Financial Planner", salary: "$60K–$100K" },
+      ],
+      hedgePct: 77,
+      hedgeColor: "var(--teal)",
+      insight: "Business admin is broad by design — and that's the advantage. <strong>Financial literacy + project management + Excel</strong> are the trifecta. Add SQL or a BI tool and you jump from 'generalist' to 'generalist who can actually touch data,' which is a different tier."
+    },
+    "Biology": {
+      skills: [
+        { name: "Lab Techniques & Protocols", desc: "PCR, gel electrophoresis, cell culture, microscopy", pct: 72, color: "var(--accent)" },
+        { name: "Scientific Writing", desc: "Research papers, lab reports, grant applications", pct: 70, color: "var(--accent)" },
+        { name: "Data Analysis & Statistics", desc: "Biostatistics, experimental design, R / Python", pct: 68, color: "var(--accent)" },
+        { name: "Research Methodology", desc: "Hypothesis testing, controls, reproducibility", pct: 65, color: "var(--teal)" },
+        { name: "Regulatory Knowledge", desc: "FDA, GLP, GMP, clinical trial phases, compliance", pct: 48, color: "var(--teal)" },
+        { name: "Bioinformatics Basics", desc: "Sequence analysis, genomic databases, computational biology", pct: 40, color: "var(--blue)" },
+        { name: "Project / Lab Management", desc: "Inventory, scheduling, team coordination, budgeting", pct: 35, color: "var(--blue)" },
+        { name: "Communication & Teaching", desc: "Presenting findings, mentoring, public science communication", pct: 32, color: "var(--purple)" },
+      ],
+      careers: [
+        { title: "Research Scientist", salary: "$65K–$110K" },
+        { title: "Clinical Research Associate", salary: "$60K–$90K" },
+        { title: "Biotech Lab Technician", salary: "$45K–$65K" },
+        { title: "Pharmaceutical Sales Rep", salary: "$70K–$120K" },
+        { title: "Environmental Scientist", salary: "$55K–$85K" },
+        { title: "Genetic Counselor (with MS)", salary: "$75K–$100K" },
+        { title: "Medical Science Liaison", salary: "$120K–$170K" },
+        { title: "Quality Assurance Specialist", salary: "$55K–$80K" },
+        { title: "Science Writer / Communicator", salary: "$55K–$85K" },
+        { title: "Bioinformatics Analyst", salary: "$70K–$110K" },
+      ],
+      hedgePct: 70,
+      hedgeColor: "var(--accent)",
+      insight: "Lab skills are table stakes for bench roles, but <strong>scientific writing + statistics</strong> transfer far beyond the lab. If you're unsure about academia, adding regulatory knowledge or bioinformatics dramatically widens your options into industry."
+    },
+  },
+  sector: {
+    "Finance & Banking": {
+      skills: [
+        { name: "Financial Modeling (DCF, LBO)", desc: "Valuation, forecasting, scenario analysis in Excel", pct: 85, color: "var(--accent)" },
+        { name: "Excel / Spreadsheet Mastery", desc: "VBA, macros, complex formulas, data manipulation", pct: 82, color: "var(--accent)" },
+        { name: "Accounting Fundamentals", desc: "GAAP, financial statements, debits/credits, reconciliation", pct: 76, color: "var(--accent)" },
+        { name: "Data Analysis & SQL", desc: "Querying financial databases, trend analysis, reporting", pct: 62, color: "var(--teal)" },
+        { name: "Regulatory Compliance", desc: "SEC, SOX, AML/KYC, risk frameworks", pct: 55, color: "var(--teal)" },
+        { name: "Communication & Client Management", desc: "Pitch decks, client reporting, relationship building", pct: 50, color: "var(--blue)" },
+        { name: "Python / R for Finance", desc: "Quantitative modeling, backtesting, data pipelines", pct: 38, color: "var(--blue)" },
+        { name: "Bloomberg Terminal", desc: "Market data, securities analysis, trading workflows", pct: 35, color: "var(--purple)" },
+      ],
+      careers: [
+        { title: "Financial Analyst", salary: "$70K–$110K" },
+        { title: "Investment Banking Analyst", salary: "$100K–$150K" },
+        { title: "Portfolio Manager", salary: "$100K–$200K" },
+        { title: "Risk Analyst", salary: "$70K–$110K" },
+        { title: "Credit Analyst", salary: "$55K–$85K" },
+        { title: "Compliance Officer", salary: "$65K–$110K" },
+        { title: "FP&A Analyst", salary: "$70K–$100K" },
+        { title: "Wealth Advisor", salary: "$60K–$130K" },
+        { title: "Quantitative Analyst", salary: "$120K–$200K" },
+        { title: "Internal Auditor", salary: "$60K–$90K" },
+      ],
+      hedgePct: 81,
+      hedgeColor: "var(--teal)",
+      insight: "Financial modeling, Excel mastery, and accounting are the backbone. <strong>Learn DCF modeling alone and you're relevant to 85% of these roles.</strong> SQL is the emerging differentiator — it separates 'can analyze' from 'can only read what others prepared.'"
+    },
+    "Technology": {
+      skills: [
+        { name: "Programming (Python, JS, etc.)", desc: "Core development across languages and paradigms", pct: 90, color: "var(--accent)" },
+        { name: "System Design & Architecture", desc: "Scalability, APIs, microservices, distributed systems", pct: 72, color: "var(--accent)" },
+        { name: "Cloud Platforms (AWS/GCP/Azure)", desc: "Deployment, infrastructure, serverless, containers", pct: 68, color: "var(--accent)" },
+        { name: "Database Design & SQL", desc: "Relational + NoSQL, query optimization, data modeling", pct: 65, color: "var(--teal)" },
+        { name: "Version Control & CI/CD", desc: "Git workflows, automated testing, deployment pipelines", pct: 62, color: "var(--teal)" },
+        { name: "Data Analysis & ML Basics", desc: "Statistics, modeling, feature engineering, evaluation", pct: 48, color: "var(--blue)" },
+        { name: "Product Thinking", desc: "User stories, prioritization, metrics, cross-functional collaboration", pct: 42, color: "var(--blue)" },
+        { name: "Security Fundamentals", desc: "Auth, encryption, OWASP, threat modeling", pct: 38, color: "var(--purple)" },
+      ],
+      careers: [
+        { title: "Software Engineer", salary: "$90K–$170K" },
+        { title: "Product Manager", salary: "$100K–$160K" },
+        { title: "Data Engineer", salary: "$95K–$150K" },
+        { title: "DevOps / SRE", salary: "$100K–$155K" },
+        { title: "Frontend Developer", salary: "$75K–$140K" },
+        { title: "Machine Learning Engineer", salary: "$120K–$200K" },
+        { title: "Cloud Engineer", salary: "$95K–$145K" },
+        { title: "Security Engineer", salary: "$100K–$165K" },
+        { title: "Technical Writer", salary: "$65K–$105K" },
+        { title: "Solutions Architect", salary: "$120K–$180K" },
+      ],
+      hedgePct: 77,
+      hedgeColor: "var(--teal)",
+      insight: "Programming is essentially universal in tech — but <strong>system design + cloud + databases</strong> are what separate junior from mid-level. You don't need all of them. Pick two, go deep, and you'll have options across most of these roles."
+    },
+    "Healthcare": {
+      skills: [
+        { name: "Patient Communication", desc: "Empathy, health literacy, informed consent, de-escalation", pct: 82, color: "var(--accent)" },
+        { name: "Medical Terminology", desc: "Anatomy, pharmacology, diagnostic and procedural language", pct: 78, color: "var(--accent)" },
+        { name: "Clinical Documentation", desc: "EHR systems (Epic, Cerner), charting, compliance notes", pct: 74, color: "var(--accent)" },
+        { name: "Regulatory & Compliance Knowledge", desc: "HIPAA, OSHA, FDA, CMS guidelines, accreditation standards", pct: 65, color: "var(--teal)" },
+        { name: "Data & Evidence Interpretation", desc: "Lab results, imaging, research literature, clinical guidelines", pct: 58, color: "var(--teal)" },
+        { name: "Team-Based Care Coordination", desc: "Interdisciplinary rounds, referrals, handoffs, care plans", pct: 52, color: "var(--blue)" },
+        { name: "Basic Life Support / First Aid", desc: "CPR, AED, emergency response protocols", pct: 48, color: "var(--blue)" },
+        { name: "Quality Improvement Methods", desc: "Lean, Six Sigma, root cause analysis, process mapping", pct: 35, color: "var(--purple)" },
+      ],
+      careers: [
+        { title: "Registered Nurse", salary: "$60K–$95K" },
+        { title: "Physician Assistant", salary: "$100K–$140K" },
+        { title: "Healthcare Administrator", salary: "$70K–$120K" },
+        { title: "Medical Lab Technologist", salary: "$50K–$75K" },
+        { title: "Public Health Analyst", salary: "$55K–$85K" },
+        { title: "Health Informatics Specialist", salary: "$70K–$110K" },
+        { title: "Occupational Therapist", salary: "$75K–$100K" },
+        { title: "Clinical Research Coordinator", salary: "$50K–$70K" },
+        { title: "Pharmacy Technician", salary: "$35K–$50K" },
+        { title: "Medical Device Sales Rep", salary: "$75K–$150K" },
+      ],
+      hedgePct: 78,
+      hedgeColor: "var(--teal)",
+      insight: "Patient communication and medical terminology are foundational across clinical and non-clinical roles alike. <strong>EHR documentation skills</strong> are increasingly the bridge between clinical and administrative/informatics paths — high leverage for career flexibility."
+    },
+    "Consulting": {
+      skills: [
+        { name: "Structured Problem Solving", desc: "Frameworks, issue trees, MECE thinking, hypothesis-driven analysis", pct: 92, color: "var(--accent)" },
+        { name: "Slide Storytelling", desc: "Executive-ready decks, data visualization, narrative flow", pct: 88, color: "var(--accent)" },
+        { name: "Excel Modeling", desc: "Financial analysis, scenario planning, sensitivity tables", pct: 82, color: "var(--accent)" },
+        { name: "Client Communication", desc: "Stakeholder management, workshop facilitation, exec updates", pct: 78, color: "var(--teal)" },
+        { name: "Research & Synthesis", desc: "Market sizing, competitive intelligence, interview-based research", pct: 72, color: "var(--teal)" },
+        { name: "Data Analysis & Visualization", desc: "Tableau, Python, statistical reasoning, dashboards", pct: 55, color: "var(--blue)" },
+        { name: "Industry Knowledge", desc: "Domain expertise in 1-2 sectors (finance, tech, healthcare, etc.)", pct: 48, color: "var(--blue)" },
+        { name: "Change Management", desc: "Implementation planning, org design, adoption frameworks", pct: 40, color: "var(--purple)" },
+      ],
+      careers: [
+        { title: "Management Consultant", salary: "$80K–$160K" },
+        { title: "Strategy Consultant", salary: "$90K–$170K" },
+        { title: "Business Analyst", salary: "$65K–$100K" },
+        { title: "Operations Consultant", salary: "$75K–$130K" },
+        { title: "Technology Consultant", salary: "$80K–$140K" },
+        { title: "HR / People Consultant", salary: "$70K–$120K" },
+        { title: "Risk & Compliance Consultant", salary: "$75K–$125K" },
+        { title: "Due Diligence Analyst", salary: "$70K–$110K" },
+        { title: "Internal Strategy (Corporate)", salary: "$90K–$140K" },
+      ],
+      hedgePct: 87,
+      hedgeColor: "var(--teal)",
+      insight: "Consulting is one of the most skill-concentrated fields. <strong>Structured thinking + slides + Excel</strong> cover nearly 90% of what entry-level roles demand. This is also why consulting skills transfer so well to other industries — they're fundamentally about clear thinking."
+    },
+    "Creative & Design": {
+      skills: [
+        { name: "Visual Design Fundamentals", desc: "Typography, color theory, composition, layout", pct: 82, color: "var(--accent)" },
+        { name: "Design Software (Figma, Adobe)", desc: "Figma, Photoshop, Illustrator, InDesign, After Effects", pct: 78, color: "var(--accent)" },
+        { name: "Portfolio Development", desc: "Curating work, case studies, presenting design rationale", pct: 72, color: "var(--accent)" },
+        { name: "User-Centered Thinking", desc: "Empathy mapping, usability, accessibility, user flows", pct: 65, color: "var(--teal)" },
+        { name: "Brand & Identity Systems", desc: "Logo design, style guides, brand voice, visual consistency", pct: 55, color: "var(--teal)" },
+        { name: "Prototyping & Interaction", desc: "Interactive mockups, micro-interactions, design systems", pct: 48, color: "var(--blue)" },
+        { name: "Basic Front-End Code", desc: "HTML, CSS, responsive design, handoff to developers", pct: 38, color: "var(--blue)" },
+        { name: "Motion & Video", desc: "Animation principles, video editing, motion graphics", pct: 32, color: "var(--purple)" },
+      ],
+      careers: [
+        { title: "UX/UI Designer", salary: "$70K–$130K" },
+        { title: "Graphic Designer", salary: "$45K–$75K" },
+        { title: "Brand Designer", salary: "$60K–$100K" },
+        { title: "Product Designer", salary: "$90K–$150K" },
+        { title: "Motion Designer", salary: "$65K–$110K" },
+        { title: "Art Director", salary: "$80K–$130K" },
+        { title: "Web Designer", salary: "$50K–$85K" },
+        { title: "Content Designer", salary: "$70K–$110K" },
+        { title: "Creative Director", salary: "$100K–$170K" },
+      ],
+      hedgePct: 77,
+      hedgeColor: "var(--accent)",
+      insight: "Design fundamentals + Figma + a portfolio are the trifecta. Notice how <strong>user-centered thinking</strong> shows up at 65% — this is the skill that separates designers who make things look good from designers who solve problems. The latter get paid more."
+    },
+  }
+};
+
+let currentMode = "major";
+let currentSelection = null;
+
+function setMode(mode) {
+  currentMode = mode;
+  currentSelection = null;
+  document.querySelectorAll('.mode-btn').forEach((b, i) => {
+    b.classList.toggle('active', (mode === 'major' && i === 0) || (mode === 'sector' && i === 1));
+  });
+  document.getElementById('selector-label').textContent = mode === 'major' ? 'Choose a major' : 'Choose a sector';
+  document.getElementById('results').style.display = 'none';
+  renderPills();
+}
+
+function renderPills() {
+  const keys = Object.keys(DATA[currentMode]);
+  document.getElementById('pill-grid').innerHTML = keys.map(k =>
+    `<button class="pill${currentSelection === k ? ' active' : ''}" onclick="select('${k}')">${k}</button>`
+  ).join('');
+}
+
+function select(key) {
+  currentSelection = key;
+  renderPills();
+  renderResults();
+}
+
+function renderResults() {
+  const d = DATA[currentMode][currentSelection];
+  if (!d) return;
+
+  document.getElementById('results').style.display = 'grid';
+  document.getElementById('skills-title').textContent = `Top skills for ${currentSelection}`;
+  document.getElementById('careers-title').textContent = `${currentSelection} careers`;
+  document.getElementById('careers-count').textContent = `${d.careers.length} paths`;
+
+  // Skills
+  let skillsHTML = '';
+  d.skills.forEach((s, i) => {
+    skillsHTML += `
+      <div class="skill-row">
+        <div class="skill-rank">${i + 1}</div>
+        <div class="skill-info">
+          <div class="skill-name">${s.name}</div>
+          <div class="skill-desc">${s.desc}</div>
+          <div class="skill-bar-wrap">
+            <div class="skill-bar" style="width:${s.pct}%; background:${s.color}"></div>
+          </div>
+        </div>
+        <div class="skill-pct" style="color:${s.color}">${s.pct}%</div>
+      </div>`;
+  });
+  document.getElementById('skills-list').innerHTML = skillsHTML;
+
+  // Careers
+  let careersHTML = '';
+  d.careers.forEach(c => {
+    careersHTML += `
+      <div class="career-item">
+        <div class="career-title">${c.title}</div>
+        <div class="career-meta">${c.salary}</div>
+      </div>`;
+  });
+  document.getElementById('careers-list').innerHTML = careersHTML;
+
+  // Hedge meter
+  setTimeout(() => {
+    const fill = document.getElementById('hedge-fill');
+    fill.style.width = d.hedgePct + '%';
+    fill.style.background = d.hedgeColor;
+    fill.textContent = d.hedgePct + '% of jobs covered';
+  }, 100);
+  document.getElementById('hedge-caption').textContent =
+    `Learning the top 3 skills prepares you for roughly ${d.hedgePct}% of ${currentSelection} jobs.`;
+
+  // Insight
+  document.getElementById('insight-text').innerHTML = d.insight;
+
+  // Smooth scroll to results on mobile
+  if (window.innerWidth < 768) {
+    document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+
+// Init
+renderPills();
+</script>
+
+</body>
+</html>

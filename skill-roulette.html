@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Start Somewhere — Skill Roulette</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+nav { position: sticky; top: 0; z-index: 100; background: rgba(250,249,246,0.95); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(0,0,0,0.08); }
+.nav-inner { display: flex; align-items: center; justify-content: space-between; padding: 14px 2rem; max-width: 1200px; margin: 0 auto; }
+.nav-logo { font-family: 'DM Serif Display', Georgia, serif; font-size: 20px; text-decoration: none; }
+.nav-logo .s { color: #1A1A18; }
+.nav-logo .sw { color: #C4652A; }
+.nav-links { display: flex; gap: 1.75rem; align-items: center; }
+.nav-links a { font-size: 14px; color: #6B6860; text-decoration: none; font-weight: 500; transition: color 0.2s; }
+.nav-links a:hover { color: #1A1A18; }
+.nav-links a.active { color: #C4652A; font-weight: 600; }
+:root {
+  --bg: #FAF9F6; --bg-warm: #F5F0E8; --bg-card: #FFFFFF;
+  --text: #1A1A18; --text-muted: #6B6860; --text-soft: #918E85;
+  --accent: #C4652A; --accent-hover: #A8521F; --accent-light: #FAECE7;
+  --teal: #1D9E75; --teal-light: #E1F5EE;
+  --purple: #534AB7; --purple-light: #EEEDFE;
+  --border: rgba(0,0,0,0.08);
+  --serif: 'DM Serif Display', Georgia, serif;
+  --sans: 'DM Sans', -apple-system, sans-serif;
+  --radius: 12px; --radius-sm: 8px;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: var(--sans); background: var(--bg); color: var(--text); line-height: 1.7; }
+
+/* NAV */
+
+/* HERO */
+.page-hero { text-align: center; padding: 60px 2rem 48px; max-width: 680px; margin: 0 auto; }
+.page-hero .eyebrow { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; color: var(--accent); margin-bottom: 1rem; }
+.page-hero h1 { font-family: var(--serif); font-size: 40px; line-height: 1.15; margin-bottom: 1rem; }
+.page-hero h1 em { font-style: italic; color: var(--accent); }
+.page-hero p { font-size: 17px; color: var(--text-muted); line-height: 1.6; }
+
+/* FILTERS */
+.filter-bar { display: flex; justify-content: center; gap: 10px; margin-bottom: 40px; flex-wrap: wrap; padding: 0 2rem; }
+.filter-pill {
+  font-family: var(--sans); font-size: 13px; font-weight: 600; padding: 8px 18px;
+  border-radius: 999px; border: 1px solid var(--border); background: transparent;
+  color: var(--text-muted); cursor: pointer; transition: all 0.2s;
+}
+.filter-pill:hover { border-color: var(--accent); color: var(--accent); }
+.filter-pill.active { background: var(--accent); color: white; border-color: var(--accent); }
+
+/* ROULETTE AREA */
+.roulette-area { text-align: center; padding: 0 2rem 20px; }
+
+.ticker-window {
+  width: 320px; height: 100px; margin: 0 auto 32px; overflow: hidden;
+  border-radius: var(--radius); border: 2px solid var(--border);
+  background: var(--bg-card); position: relative;
+  display: flex; align-items: center; justify-content: center;
+}
+.ticker-window::before, .ticker-window::after {
+  content: ''; position: absolute; left: 0; right: 0; height: 30px; z-index: 2; pointer-events: none;
+}
+.ticker-window::before { top: 0; background: linear-gradient(to bottom, var(--bg-card), transparent); }
+.ticker-window::after { bottom: 0; background: linear-gradient(to top, var(--bg-card), transparent); }
+
+.ticker-content {
+  font-family: var(--serif); font-size: 24px; transition: none;
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+}
+.ticker-item { white-space: nowrap; text-align: center; line-height: 1.3; }
+.ticker-item .t-emoji { font-size: 28px; margin-right: 8px; }
+
+.spin-btn {
+  display: inline-block; background: var(--accent); color: white; border: none;
+  font-family: var(--sans); font-size: 16px; font-weight: 600;
+  padding: 14px 40px; border-radius: 999px; cursor: pointer;
+  transition: background 0.2s, transform 0.1s; margin-bottom: 20px;
+}
+.spin-btn:hover { background: var(--accent-hover); }
+.spin-btn:active { transform: scale(0.97); }
+.spin-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* RESULT CARD */
+.result-area { max-width: 720px; margin: 0 auto; padding: 0 2rem 80px; }
+.result-card {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 2.5rem 2rem; opacity: 0; transform: translateY(24px);
+  transition: opacity 0.5s ease, transform 0.5s ease; pointer-events: none;
+}
+.result-card.visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
+
+.result-header { text-align: center; margin-bottom: 2rem; }
+.result-emoji { font-size: 48px; margin-bottom: 8px; }
+.result-skill { font-family: var(--serif); font-size: 28px; margin-bottom: 10px; }
+.category-badge {
+  display: inline-block; font-size: 12px; font-weight: 600; padding: 4px 14px;
+  border-radius: 20px; text-transform: capitalize;
+}
+.badge-technical { background: var(--teal-light); color: var(--teal); }
+.badge-creative { background: var(--purple-light); color: var(--purple); }
+.badge-people { background: var(--accent-light); color: var(--accent); }
+
+.challenge-section { margin-bottom: 2rem; }
+.challenge-label {
+  font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--accent); margin-bottom: 10px;
+}
+.challenge-text { font-size: 16px; line-height: 1.7; color: var(--text); margin-bottom: 16px; }
+.challenge-btn {
+  display: inline-block; background: var(--accent); color: white; padding: 10px 24px;
+  border-radius: 999px; text-decoration: none; font-size: 14px; font-weight: 600;
+  transition: background 0.2s;
+}
+.challenge-btn:hover { background: var(--accent-hover); }
+
+.why-section { font-size: 14px; color: var(--text-muted); font-style: italic; line-height: 1.6; margin-bottom: 2rem; }
+
+.divider { height: 1px; background: var(--border); margin: 0 0 2rem; }
+
+.keep-going-label {
+  font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--accent); margin-bottom: 6px;
+}
+.keep-going-desc { font-size: 14px; color: var(--text-muted); margin-bottom: 1.25rem; }
+
+.keep-going-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem; }
+.kg-card {
+  background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-sm);
+  padding: 1.1rem; text-decoration: none; color: inherit; transition: all 0.25s; display: block;
+}
+a.kg-card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 4px 14px rgba(0,0,0,0.05); }
+.kg-card h4 { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+.kg-card p { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
+
+.course-card {
+  background: var(--bg-warm); border-radius: var(--radius-sm); padding: 1.25rem;
+  margin-bottom: 2rem;
+}
+.course-card .course-eyebrow { font-size: 12px; font-weight: 600; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+.course-card a { font-family: var(--serif); font-size: 18px; color: var(--accent); text-decoration: none; transition: color 0.2s; }
+.course-card a:hover { color: var(--accent-hover); text-decoration: underline; }
+.course-card .course-meta { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+
+.bottom-actions { text-align: center; padding-top: 8px; }
+.spin-again-btn {
+  display: inline-block; background: white; color: var(--accent); border: 2px solid var(--accent);
+  font-family: var(--sans); font-size: 15px; font-weight: 600;
+  padding: 12px 32px; border-radius: 999px; cursor: pointer;
+  transition: all 0.2s; margin-right: 16px;
+}
+.spin-again-btn:hover { background: var(--accent); color: white; }
+.try-all-link {
+  font-size: 14px; color: var(--text-muted); text-decoration: underline;
+  text-underline-offset: 3px; transition: color 0.2s;
+}
+.try-all-link:hover { color: var(--accent); }
+
+@media (max-width: 640px) {
+  .nav-inner { padding: 12px 1rem; }
+  .nav-links { gap: 1rem; flex-wrap: wrap; }
+  
+  
+  .page-hero { padding: 40px 1.5rem 32px; }
+  .page-hero h1 { font-size: 30px; }
+  .ticker-window { width: 260px; height: 80px; }
+  .ticker-content { font-size: 20px; }
+  .result-area { padding: 0 1.5rem 60px; }
+  .result-card { padding: 2rem 1.5rem; }
+  .result-skill { font-size: 24px; }
+  .keep-going-grid { grid-template-columns: 1fr; }
+  .bottom-actions { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+  .spin-again-btn { margin-right: 0; }
+}
+
+/* Two-button course UI */
+.course-buttons { display: flex; gap: 8px; margin-top: 8px; }
+.btn-start { display: inline-flex; align-items: center; gap: 4px; padding: 6px 14px; background: #C4652A; color: white; border-radius: 99px; font-size: 13px; font-weight: 600; text-decoration: none; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+.btn-start:hover { background: #A8511F; }
+.btn-keep { display: inline-flex; align-items: center; gap: 4px; padding: 6px 14px; background: transparent; color: #6B6860; border: 1px solid #D3D1C7; border-radius: 99px; font-size: 13px; font-weight: 500; text-decoration: none; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+.btn-keep:hover { border-color: #888780; color: #444441; }
+.keep-going-dropdown { display: none; margin-top: 8px; padding: 10px 12px; background: rgba(245,240,232,0.5); border-radius: 8px; }
+.keep-going-dropdown.open { display: block; }
+.keep-going-dropdown .kg-item { display: flex; align-items: center; gap: 8px; padding: 5px 0; flex-wrap: wrap; }
+.keep-going-dropdown .kg-step { font-size: 11px; color: #6B6860; background: rgba(0,0,0,0.05); padding: 2px 8px; border-radius: 99px; white-space: nowrap; }
+.keep-going-dropdown .kg-item a { font-size: 13px; color: #1a6fb5; text-decoration: none; }
+.keep-going-dropdown .kg-item a:hover { text-decoration: underline; }
+.keep-going-dropdown .kg-meta { font-size: 12px; color: #9C9A93; }
+
+
+/* MOBILE HAMBURGER NAV */
+.nav-hamburger {
+  display: none; align-items: center; justify-content: center;
+  width: 36px; height: 36px; cursor: pointer; border: none;
+  background: transparent; padding: 0; flex-direction: column; gap: 5px;
+}
+.nav-hamburger span {
+  display: block; width: 20px; height: 2px; background: #1A1A18;
+  transition: all 0.3s; border-radius: 1px;
+}
+.nav-hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.nav-hamburger.open span:nth-child(2) { opacity: 0; }
+.nav-hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+.mobile-menu {
+  display: none; position: fixed; top: 53px; left: 0; right: 0; bottom: 0;
+  background: rgba(250,249,246,0.98); backdrop-filter: blur(20px);
+  z-index: 99; padding: 2rem 1.5rem; overflow-y: auto;
+}
+.mobile-menu.open { display: flex; flex-direction: column; gap: 0; }
+.mobile-menu a {
+  display: block; padding: 14px 0; font-size: 16px; color: #6B6860;
+  text-decoration: none; font-weight: 500; border-bottom: 1px solid rgba(0,0,0,0.08);
+  transition: color 0.2s;
+}
+.mobile-menu a:hover, .mobile-menu a.active { color: #C4652A; }
+@media (max-width: 768px) { .nav-hamburger { display: flex; } .nav-links { display: none !important; } }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="start-somewhere.html" class="nav-logo"><span class="s">start</span><span class="sw">somewhere.</span></a>
+    <button class="nav-hamburger" id="navHamburger" onclick="toggleMobileMenu()"><span></span><span></span><span></span></button>
+    <div class="nav-links">
+      <a href="start-somewhere.html">Home</a>
+      <a href="explore.html">Explore</a>
+      <a href="build.html">Build</a>
+      <a href="apply.html">Apply</a>
+      <a href="skill-explorer-production.html">Skill Explorer</a>
+      <a href="job-analyzer.html">Job Analyzer</a>
+      <a href="skill-roulette.html" class="active">Skill Roulette</a>
+      <a href="skill-sprints.html">Skill Sprints</a>
+      <a href="skill-map.html">Skill Map</a>
+    </div>
+  </div>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="start-somewhere.html">Home</a>
+  <a href="explore.html">Explore</a>
+  <a href="build.html">Build</a>
+  <a href="apply.html">Apply</a>
+  <a href="skill-explorer-production.html">Skill Explorer</a>
+  <a href="job-analyzer.html">Job Analyzer</a>
+  <a href="skill-roulette.html" class="active">Skill Roulette</a>
+  <a href="skill-sprints.html">Skill Sprints</a>
+  <a href="skill-map.html">Skill Map</a>
+</div>
+
+<div class="page-hero">
+  <div class="eyebrow">STOP OVERTHINKING.</div>
+  <h1>Spin. Start. <em>Surprise yourself.</em></h1>
+  <p>Can't decide what to learn? Let us pick for you. Every spin gives you a 5-minute challenge you can do right now, plus a path to keep going if you want.</p>
+</div>
+
+<div class="filter-bar">
+  <button class="filter-pill active" data-filter="all">Anything</button>
+  <button class="filter-pill" data-filter="technical">Technical</button>
+  <button class="filter-pill" data-filter="creative">Creative</button>
+  <button class="filter-pill" data-filter="people">People-oriented</button>
+</div>
+
+<div class="roulette-area">
+  <div class="ticker-window">
+    <div class="ticker-content" id="ticker">
+      <div class="ticker-item"><span class="t-emoji">🎯</span> Ready to spin?</div>
+    </div>
+  </div>
+  <button class="spin-btn" id="spinBtn" onclick="spin()">Spin the wheel</button>
+</div>
+
+<div class="result-area">
+  <div class="result-card" id="resultCard"></div>
+  <div class="bottom-actions" id="bottomActions" style="display:none;">
+    <button class="spin-again-btn" onclick="spin()">Spin again</button>
+    <a class="try-all-link" href="skill-sprints.html">Try all 18 sprints &rarr;</a>
+  </div>
+</div>
+
+<script>
+const SPRINTS = [{"skill": "Python Basics", "category": "technical", "emoji": "\ud83d\udc0d", "challenge": "Open a Python editor and write a script that asks for your name and prints 'Hello, [name]! You just wrote your first Python.'", "challengeUrl": "https://www.online-python.com/", "challengeLabel": "Open Python editor", "why": "Python is the most in-demand programming language in the world. And you just wrote your first script.", "course": {"title": "Python for Everybody", "provider": "University of Michigan / Coursera", "url": "https://www.coursera.org/search?query=Python+for+Everybody", "duration": "8 months", "cost": "Free to audit", "next": [{"title": "Python Data Structures", "provider": "University of Michigan / Coursera", "url": "https://www.coursera.org/search?query=Python+Data+Structures", "duration": "7 weeks"}, {"title": "Introduction to Computer Science and Programming Using Python", "provider": "MIT / edX", "url": "https://www.edx.org/search?q=Introduction+to+Computer+Science+and+Programming+Using+Python", "duration": "9 weeks"}, {"title": "100 Days of Code: The Complete Python Pro Bootcamp", "provider": "Coursera", "url": "https://www.coursera.org/search?query=100+Days+of+Code%3A+The+Complete+Python+Pro+Bootcamp", "duration": "4 months"}]}, "keepGoing": [{"label": "Make a calculator", "desc": "Write a script that adds two numbers the user types in."}, {"label": "Try a loop", "desc": "Print the numbers 1 to 10 using a for loop."}, {"label": "Take the full course", "desc": "Python for Everybody covers everything from basics to databases.", "url": "https://www.coursera.org/search?query=python"}]}, {"skill": "Spreadsheet Formulas", "category": "technical", "emoji": "\ud83d\udcca", "challenge": "Open Google Sheets, type 5 numbers in column A, then use =SUM(A1:A5) in cell B1 and =AVERAGE(A1:A5) in cell B2.", "challengeUrl": "https://sheets.google.com/", "challengeLabel": "Open Google Sheets", "why": "Spreadsheets are the most underrated superpower in business. Every industry uses them, and most people barely scratch the surface.", "course": {"title": "Google Sheets - Complete Course", "provider": "Google / Coursera", "url": "https://www.coursera.org/search?query=Google+Sheets+-+Complete+Course", "duration": "4 weeks", "cost": "Free to audit", "next": [{"title": "Advanced Google Sheets Functions", "provider": "Coursera", "url": "https://www.coursera.org/search?query=Advanced+Google+Sheets+Functions", "duration": "3 weeks"}, {"title": "Excel Skills for Business", "provider": "Macquarie University / Coursera", "url": "https://www.coursera.org/search?query=Excel+Skills+for+Business", "duration": "6 months"}, {"title": "Data Analysis with Spreadsheets", "provider": "Coursera", "url": "https://www.coursera.org/search?query=Data+Analysis+with+Spreadsheets", "duration": "4 weeks"}]}, "keepGoing": [{"label": "Try VLOOKUP", "desc": "Create a second sheet with names and prices. Use VLOOKUP to pull a price by name."}, {"label": "Build a budget", "desc": "Track a week of spending with categories and totals."}, {"label": "Learn pivot tables", "desc": "The single most powerful spreadsheet feature. Google 'pivot table tutorial' and try one."}]}, {"skill": "Public Speaking", "category": "people", "emoji": "\ud83c\udfa4", "challenge": "Record yourself on your phone giving a 60-second introduction: who you are, what you're interested in, and one thing you learned recently.", "challengeUrl": "https://www.coursera.org/search?query=Public+Speaking", "challengeLabel": "Course: Public Speaking", "why": "Every career requires communicating ideas. The difference between good and great is just practice \u2014 starting with a 60-second recording.", "course": {"title": "Introduction to Public Speaking", "provider": "University of Washington / Coursera", "url": "https://www.coursera.org/search?query=Introduction+to+Public+Speaking", "duration": "10 weeks", "cost": "Free to audit", "next": [{"title": "Dynamic Public Speaking Specialization", "provider": "University of Washington / Coursera", "url": "https://www.coursera.org/search?query=Dynamic+Public+Speaking+Specialization", "duration": "5 months"}, {"title": "Presentation Skills: Speechwriting and Storytelling", "provider": "National Research Tomsk State University / Coursera", "url": "https://www.coursera.org/search?query=Presentation+Skills%3A+Speechwriting+and+Storytelling", "duration": "4 weeks"}, {"title": "Successful Negotiation: Essential Strategies and Skills", "provider": "University of Michigan / Coursera", "url": "https://www.coursera.org/search?query=Successful+Negotiation%3A+Essential+Strategies+and+Skills", "duration": "7 weeks"}]}, "keepGoing": [{"label": "Watch yourself back", "desc": "Note one thing you liked and one thing to improve. That's the whole feedback loop."}, {"label": "Try a 2-minute version", "desc": "Expand your intro with a story about something you learned the hard way."}, {"label": "Record for someone", "desc": "Send your 60-second intro to a friend and ask for honest feedback."}]}, {"skill": "Data Analysis", "category": "technical", "emoji": "\ud83d\udcc8", "challenge": "Go to Google Trends, search for 3 topics you're curious about, and screenshot the comparison chart. What surprised you?", "challengeUrl": "https://trends.google.com/", "challengeLabel": "Open Google Trends", "why": "Data analysis starts with curiosity and a question \u2014 not a degree. You just did real data exploration.", "course": {"title": "Google Data Analytics Certificate", "provider": "Google / Coursera", "url": "https://www.coursera.org/search?query=Google+Data+Analytics+Certificate", "duration": "6 months", "cost": "Free to audit", "next": [{"title": "Google Data Analytics Professional Certificate", "provider": "Google / Coursera", "url": "https://www.coursera.org/search?query=Google+Data+Analytics+Professional+Certificate", "duration": "6 months"}, {"title": "Data Analysis with Python", "provider": "IBM / Coursera", "url": "https://www.coursera.org/search?query=Data+Analysis+with+Python", "duration": "5 weeks"}, {"title": "Statistics with Python Specialization", "provider": "University of Michigan / Coursera", "url": "https://www.coursera.org/search?query=Statistics+with+Python+Specialization", "duration": "5 months"}]}, "keepGoing": [{"label": "Compare 5 topics", "desc": "Pick a broader category and compare 5 related terms. Look for seasonal patterns."}, {"label": "Export the data", "desc": "Download the CSV from Google Trends and open it in a spreadsheet. Sort by date."}, {"label": "Try a dataset", "desc": "Go to Kaggle.com, find a beginner dataset, and just look at it. What patterns do you notice?", "url": "https://www.kaggle.com/datasets"}]}, {"skill": "Graphic Design", "category": "creative", "emoji": "\ud83c\udfa8", "challenge": "Open Canva, pick any template, and change the colors, fonts, and text to make it yours. Save it as a PNG.", "challengeUrl": "https://www.canva.com/", "challengeLabel": "Open Canva", "why": "Visual communication shows up everywhere \u2014 presentations, social media, side projects. You just made your first design.", "course": {"title": "Graphic Design Specialization", "provider": "CalArts / Coursera", "url": "https://www.coursera.org/search?query=Graphic+Design+Specialization", "duration": "5 months", "cost": "Free to audit", "next": [{"title": "UI / UX Design Specialization", "provider": "CalArts / Coursera", "url": "https://www.coursera.org/search?query=UI+%2F+UX+Design+Specialization", "duration": "4 months"}, {"title": "Visual Elements of User Interface Design", "provider": "CalArts / Coursera", "url": "https://www.coursera.org/search?query=Visual+Elements+of+User+Interface+Design", "duration": "4 weeks"}, {"title": "Google UX Design Professional Certificate", "provider": "Google / Coursera", "url": "https://www.coursera.org/search?query=Google+UX+Design+Professional+Certificate", "duration": "6 months"}]}, "keepGoing": [{"label": "Design a social post", "desc": "Create an Instagram-sized graphic for something you care about."}, {"label": "Try a logo", "desc": "Design a simple logo for a fake company or a personal brand."}, {"label": "Learn color theory", "desc": "Google 'color wheel complementary colors' and try a design using only complementary pairs."}]}, {"skill": "Writing", "category": "creative", "emoji": "\u270d\ufe0f", "challenge": "Set a timer for 5 minutes and write about the last thing that genuinely surprised you. Don't edit \u2014 just write.", "challengeUrl": "https://hemingwayapp.com/", "challengeLabel": "Open Hemingway Editor", "why": "Clear writing is clear thinking. Every profession rewards people who can put ideas into words.", "course": {"title": "Writing in the Sciences", "provider": "Stanford / Coursera", "url": "https://www.coursera.org/search?query=Writing+in+the+Sciences", "duration": "8 weeks", "cost": "Free to audit", "next": [{"title": "Good with Words: Writing and Editing", "provider": "University of Michigan / Coursera", "url": "https://www.coursera.org/search?query=Good+with+Words%3A+Writing+and+Editing", "duration": "5 months"}, {"title": "Creative Writing Specialization", "provider": "Wesleyan / Coursera", "url": "https://www.coursera.org/search?query=Creative+Writing+Specialization", "duration": "6 months"}, {"title": "Business Writing", "provider": "University of Colorado / Coursera", "url": "https://www.coursera.org/search?query=Business+Writing", "duration": "4 weeks"}]}, "keepGoing": [{"label": "Edit what you wrote", "desc": "Paste it into Hemingway Editor. Can you cut it by 30% without losing meaning?"}, {"label": "Write an explanation", "desc": "Pick something you know well and explain it to a 12-year-old in 200 words."}, {"label": "Start a daily habit", "desc": "Write 200 words every morning for a week. Topic doesn't matter \u2014 the habit does."}]}, {"skill": "SQL Basics", "category": "technical", "emoji": "\ud83d\uddc4\ufe0f", "challenge": "Open SQLBolt, complete Lesson 1 (SELECT queries). It takes 5 minutes and you'll write real database queries.", "challengeUrl": "https://sqlbolt.com/", "challengeLabel": "Open SQLBolt", "why": "SQL is the language of data. If you can write SELECT, FROM, and WHERE, you can pull insights from any database in the world.", "course": {"title": "SQL for Data Science", "provider": "UC Davis / Coursera", "url": "https://www.coursera.org/search?query=SQL+for+Data+Science", "duration": "4 weeks", "cost": "Free to audit", "next": [{"title": "SQL for Data Science", "provider": "UC Davis / Coursera", "url": "https://www.coursera.org/search?query=SQL+for+Data+Science", "duration": "4 weeks"}, {"title": "Advanced SQL for Data Scientists", "provider": "Coursera", "url": "https://www.coursera.org/search?query=Advanced+SQL+for+Data+Scientists", "duration": "4 weeks"}, {"title": "Database Management Essentials", "provider": "University of Colorado / Coursera", "url": "https://www.coursera.org/search?query=Database+Management+Essentials", "duration": "7 weeks"}]}, "keepGoing": [{"label": "Finish Lessons 2-3", "desc": "Learn filtering with WHERE and sorting with ORDER BY."}, {"label": "Try JOINs", "desc": "Lesson 6 on SQLBolt teaches you to combine tables \u2014 that's where SQL gets powerful."}, {"label": "Query real data", "desc": "Go to Mode Analytics' SQL tutorial and practice on real datasets.", "url": "https://mode.com/sql-tutorial/"}]}, {"skill": "Negotiation", "category": "people", "emoji": "\ud83e\udd1d", "challenge": "Think of the last time you agreed to something you weren't thrilled about. Write down what you would say differently in 3 bullet points.", "challengeUrl": "https://www.coursera.org/search?query=Negotiation", "challengeLabel": "Course: Negotiation", "why": "Negotiation isn't about winning \u2014 it's about understanding what both sides actually need. You use it every single day.", "course": {"title": "Introduction to Negotiation", "provider": "Yale / Coursera", "url": "https://www.coursera.org/search?query=Introduction+to+Negotiation", "duration": "9 weeks", "cost": "Free to audit", "next": [{"title": "Successful Negotiation: Essential Strategies and Skills", "provider": "University of Michigan / Coursera", "url": "https://www.coursera.org/search?query=Successful+Negotiation%3A+Essential+Strategies+and+Skills", "duration": "7 weeks"}, {"title": "Negotiation, Mediation, and Conflict Resolution", "provider": "ESSEC / Coursera", "url": "https://www.coursera.org/search?query=Negotiation%2C+Mediation%2C+and+Conflict+Resolution", "duration": "5 months"}, {"title": "International Business Negotiation", "provider": "University of London / Coursera", "url": "https://www.coursera.org/search?query=International+Business+Negotiation", "duration": "4 weeks"}]}, "keepGoing": [{"label": "Practice the mirror technique", "desc": "In your next conversation, repeat the last 3 words the other person said as a question. Notice what happens."}, {"label": "Negotiate something small", "desc": "Ask for a discount somewhere \u2014 a coffee shop, a subscription. The practice matters more than the outcome."}, {"label": "Watch a master", "desc": "Search 'Chris Voss negotiation' on YouTube. His FBI hostage techniques work in everyday life."}]}, {"skill": "Video Editing", "category": "creative", "emoji": "\ud83c\udfac", "challenge": "Record a 15-second video on your phone, import it into CapCut, add one text overlay and one transition. Export it.", "challengeUrl": "https://www.capcut.com/", "challengeLabel": "Open CapCut", "why": "Video is the dominant medium. Even rough editing skills open doors in content, marketing, and personal projects.", "course": {"title": "Video Editing with DaVinci Resolve", "provider": "Skillshare", "url": "https://www.skillshare.com/en/search?query=Video+Editing+with+DaVinci+Resolve", "duration": "2-4 hours", "cost": "Free trial", "next": [{"title": "DaVinci Resolve Masterclass", "provider": "Skillshare", "url": "https://www.skillshare.com/en/search?query=DaVinci+Resolve+Masterclass", "duration": "4 hours"}, {"title": "Film Production Specialization", "provider": "Wesleyan / Coursera", "url": "https://www.coursera.org/search?query=Film+Production+Specialization", "duration": "6 months"}, {"title": "Motion Graphics with After Effects", "provider": "Coursera", "url": "https://www.coursera.org/search?query=Motion+Graphics+with+After+Effects", "duration": "4 weeks"}]}, "keepGoing": [{"label": "Add music", "desc": "Import a royalty-free track and sync a cut to the beat."}, {"label": "Make a 30-second story", "desc": "Record 3 clips and edit them into a mini-narrative with text and transitions."}, {"label": "Try color grading", "desc": "Apply a LUT or manually adjust the color \u2014 it's what makes amateur video look professional."}]}, {"skill": "HTML & CSS", "category": "technical", "emoji": "\ud83c\udf10", "challenge": "Open CodePen, type '<h1>Hello World</h1><p>I just wrote HTML.</p>' in the HTML panel and watch it appear. Now change the color with CSS.", "challengeUrl": "https://codepen.io/pen/", "challengeLabel": "Open CodePen", "why": "Every website you've ever visited is HTML and CSS. You just wrote your first one.", "course": {"title": "HTML, CSS, and Javascript for Web Developers", "provider": "Johns Hopkins / Coursera", "url": "https://www.coursera.org/search?query=HTML%2C+CSS%2C+and+Javascript+for+Web+Developers", "duration": "5 weeks", "cost": "Free to audit", "next": [{"title": "JavaScript for Beginners", "provider": "UC Davis / Coursera", "url": "https://www.coursera.org/search?query=JavaScript+for+Beginners", "duration": "4 weeks"}, {"title": "Responsive Web Design", "provider": "Coursera", "url": "https://www.coursera.org/search?query=Responsive+Web+Design", "duration": "4 weeks"}, {"title": "Web Design for Everybody: Basics of Web Development and Coding", "provider": "University of Michigan / Coursera", "url": "https://www.coursera.org/search?query=Web+Design+for+Everybody%3A+Basics+of+Web+Development+and+Coding", "duration": "5 months"}]}, "keepGoing": [{"label": "Style it up", "desc": "Add a background color, change the font, center the text. CSS is surprisingly fun."}, {"label": "Build a personal page", "desc": "Add your name, a short bio, and 3 links to things you like. That's a website."}, {"label": "Learn Flexbox", "desc": "Google 'Flexbox Froggy' \u2014 it's a game that teaches CSS layout in 20 minutes.", "url": "https://flexboxfroggy.com/"}]}, {"skill": "Financial Literacy", "category": "technical", "emoji": "\ud83d\udcb0", "challenge": "Open a compound interest calculator, type in $100/month for 30 years at 7%. Look at the total. Now try $200/month.", "challengeUrl": "https://www.investor.gov/financial-tools-calculators/calculators/compound-interest-calculator", "challengeLabel": "Open calculator", "why": "Understanding compound interest changes how you think about every financial decision for the rest of your life.", "course": {"title": "Finance for Non-Finance Professionals", "provider": "Rice University / Coursera", "url": "https://www.coursera.org/search?query=Finance+for+Non-Finance+Professionals", "duration": "4 weeks", "cost": "Free to audit", "next": [{"title": "Financial Accounting", "provider": "University of Illinois / Coursera", "url": "https://www.coursera.org/search?query=Financial+Accounting", "duration": "4 weeks"}, {"title": "Corporate Finance Essentials", "provider": "IESE / Coursera", "url": "https://www.coursera.org/search?query=Corporate+Finance+Essentials", "duration": "4 weeks"}, {"title": "Financial Planning for Young Adults", "provider": "University of Illinois / Coursera", "url": "https://www.coursera.org/search?query=Financial+Planning+for+Young+Adults", "duration": "4 weeks"}]}, "keepGoing": [{"label": "Calculate your own", "desc": "Put in your actual savings amount and see where you'll be in 10, 20, 30 years."}, {"label": "Compare investments", "desc": "Try 5% vs 7% vs 10% return rates. Small differences in rate create massive differences over time."}, {"label": "Learn the basics", "desc": "The Rice University course covers everything you need in 4 weeks \u2014 budgeting, investing, debt."}]}, {"skill": "Project Management", "category": "people", "emoji": "\ud83d\udccb", "challenge": "Pick something you've been putting off. Break it into 3 steps. Write a deadline for each. Congratulations \u2014 you just made a project plan.", "challengeUrl": "https://trello.com/", "challengeLabel": "Open Trello", "why": "Project management is just 'break big things into small things and do them in order.' That skill transfers to literally everything.", "course": {"title": "Google Project Management Certificate", "provider": "Google / Coursera", "url": "https://www.coursera.org/search?query=Google+Project+Management+Certificate", "duration": "6 months", "cost": "Free to audit", "next": [{"title": "Agile Project Management", "provider": "Google / Coursera", "url": "https://www.coursera.org/search?query=Agile+Project+Management", "duration": "5 weeks"}, {"title": "Leading Teams", "provider": "University of Michigan / Coursera", "url": "https://www.coursera.org/search?query=Leading+Teams", "duration": "4 weeks"}, {"title": "Organizational Behavior: How to Manage People", "provider": "IESE / Coursera", "url": "https://www.coursera.org/search?query=Organizational+Behavior%3A+How+to+Manage+People", "duration": "4 weeks"}]}, "keepGoing": [{"label": "Move it to a board", "desc": "Open Trello and create a board with To Do, Doing, and Done columns. Move your 3 tasks through them."}, {"label": "Add dependencies", "desc": "Which tasks need to happen before others? Mark those. You just learned critical path thinking."}, {"label": "Try a bigger project", "desc": "Pick a personal goal and break it into 10+ tasks with deadlines across a month."}]}, {"skill": "UX Thinking", "category": "creative", "emoji": "\ud83e\udde9", "challenge": "Pick an app you use daily. Find one thing that annoys you about it. Sketch (on paper) how you'd redesign that one screen.", "challengeUrl": "https://excalidraw.com/", "challengeLabel": "Open Excalidraw", "why": "UX design is just noticing friction and fixing it. You've been doing user research your whole life \u2014 you just didn't call it that.", "course": {"title": "Google UX Design Certificate", "provider": "Google / Coursera", "url": "https://www.coursera.org/search?query=Google+UX+Design+Certificate", "duration": "6 months", "cost": "Free to audit", "next": [{"title": "Google UX Design Professional Certificate", "provider": "Google / Coursera", "url": "https://www.coursera.org/search?query=Google+UX+Design+Professional+Certificate", "duration": "6 months"}, {"title": "User Research and Design", "provider": "University of Michigan / Coursera", "url": "https://www.coursera.org/search?query=User+Research+and+Design", "duration": "4 weeks"}, {"title": "Visual Elements of User Interface Design", "provider": "CalArts / Coursera", "url": "https://www.coursera.org/search?query=Visual+Elements+of+User+Interface+Design", "duration": "4 weeks"}]}, "keepGoing": [{"label": "Digitize your sketch", "desc": "Recreate your paper sketch in Excalidraw or Figma. Add labels explaining your choices."}, {"label": "Do a 5-second test", "desc": "Show someone your redesign for 5 seconds. Ask what they noticed first. That's usability testing."}, {"label": "Redesign another screen", "desc": "Pick a different app and redesign its worst screen. You're building a UX portfolio."}]}, {"skill": "Photography", "category": "creative", "emoji": "\ud83d\udcf7", "challenge": "Walk to the nearest window. Take 3 photos of the same scene: one zoomed out, one zoomed in on a detail, one from an unusual angle.", "challengeUrl": "https://www.coursera.org/search?query=Photography", "challengeLabel": "Course: Photography", "why": "Photography trains you to see composition, light, and story. Those skills transfer to design, marketing, and communication.", "course": {"title": "Photography Basics and Beyond", "provider": "Michigan State / Coursera", "url": "https://www.coursera.org/search?query=Photography+Basics+and+Beyond", "duration": "5 months", "cost": "Free to audit", "next": [{"title": "Photography Techniques: Light, Content, and Sharing", "provider": "Michigan State / Coursera", "url": "https://www.coursera.org/search?query=Photography+Techniques%3A+Light%2C+Content%2C+and+Sharing", "duration": "4 weeks"}, {"title": "Digital Photography", "provider": "Coursera", "url": "https://www.coursera.org/search?query=Digital+Photography", "duration": "4 weeks"}, {"title": "Portrait Photography", "provider": "Coursera", "url": "https://www.coursera.org/search?query=Portrait+Photography", "duration": "3 weeks"}]}, "keepGoing": [{"label": "Compare your 3 shots", "desc": "Which one tells the most interesting story? Why? That's the start of artistic judgment."}, {"label": "Try the rule of thirds", "desc": "Google it, then take 5 photos with the subject off-center. Notice the difference."}, {"label": "Do a photo walk", "desc": "Spend 15 minutes walking around and take 20 photos. Pick your best 3 and explain why."}]}, {"skill": "Critical Thinking", "category": "people", "emoji": "\ud83e\udde0", "challenge": "Find a news headline that makes a bold claim. Spend 5 minutes finding the original source. Does the headline match what the study actually says?", "challengeUrl": "https://www.allsides.com/", "challengeLabel": "Open AllSides", "why": "The ability to question claims and trace them to sources is the most important skill nobody teaches you in school.", "course": {"title": "Mindware: Critical Thinking", "provider": "University of Michigan / Coursera", "url": "https://www.coursera.org/search?query=Mindware%3A+Critical+Thinking", "duration": "8 weeks", "cost": "Free to audit", "next": [{"title": "Think Again: How to Reason and Argue", "provider": "Duke / Coursera", "url": "https://www.coursera.org/search?query=Think+Again%3A+How+to+Reason+and+Argue", "duration": "4 weeks"}, {"title": "Introduction to Logic and Critical Thinking", "provider": "Duke / Coursera", "url": "https://www.coursera.org/search?query=Introduction+to+Logic+and+Critical+Thinking", "duration": "4 weeks"}, {"title": "Problem Solving Using Computational Thinking", "provider": "University of Michigan / Coursera", "url": "https://www.coursera.org/search?query=Problem+Solving+Using+Computational+Thinking", "duration": "4 weeks"}]}, "keepGoing": [{"label": "Check the sample size", "desc": "Find the study behind a health claim. How many people were in it? Under 100? Be skeptical."}, {"label": "Read the opposing view", "desc": "Find an opinion you agree with, then search for the strongest argument against it."}, {"label": "Spot logical fallacies", "desc": "Google 'common logical fallacies' and try to find one in today's news."}]}, {"skill": "Networking", "category": "people", "emoji": "\ud83c\udf10", "challenge": "Open LinkedIn and send one genuine message to someone whose career path interests you. Just say what specifically you admire about their work.", "challengeUrl": "https://www.linkedin.com/", "challengeLabel": "Open LinkedIn", "why": "Most opportunities come through people, not applications. One genuine message is worth 50 cold applications.", "course": {"title": "Building Your Professional Network", "provider": "University of Washington / Coursera", "url": "https://www.coursera.org/search?query=Building+Your+Professional+Network", "duration": "4 weeks", "cost": "Free to audit", "next": [{"title": "Building Your Professional Network", "provider": "University of Washington / Coursera", "url": "https://www.coursera.org/search?query=Building+Your+Professional+Network", "duration": "4 weeks"}, {"title": "Career Success Specialization", "provider": "UC Irvine / Coursera", "url": "https://www.coursera.org/search?query=Career+Success+Specialization", "duration": "5 months"}, {"title": "Communication Strategies for a Virtual Age", "provider": "University of Toronto / Coursera", "url": "https://www.coursera.org/search?query=Communication+Strategies+for+a+Virtual+Age", "duration": "4 weeks"}]}, "keepGoing": [{"label": "Send 2 more messages", "desc": "Find 2 more people in roles you find interesting. Mention something specific about their work."}, {"label": "Comment on a post", "desc": "Find a post in your field and leave a thoughtful comment. That's visibility without the pressure of posting."}, {"label": "Write your first post", "desc": "Share something you learned recently in 3-4 sentences. You'd be surprised how many people engage."}]}, {"skill": "Basic Statistics", "category": "technical", "emoji": "\ud83d\udcc9", "challenge": "Google 'average vs median income in the US.' Notice how different they are. Write one sentence explaining why they diverge.", "challengeUrl": "https://www.khanacademy.org/math/statistics-probability", "challengeLabel": "Open Khan Academy", "why": "Statistics is how you stop being fooled by numbers. Understanding averages, medians, and distributions changes how you read everything.", "course": {"title": "Statistics with Python", "provider": "University of Michigan / Coursera", "url": "https://www.coursera.org/search?query=Statistics+with+Python", "duration": "5 months", "cost": "Free to audit", "next": [{"title": "Statistics with Python Specialization", "provider": "University of Michigan / Coursera", "url": "https://www.coursera.org/search?query=Statistics+with+Python+Specialization", "duration": "5 months"}, {"title": "Bayesian Statistics: From Concept to Data Analysis", "provider": "UC Santa Cruz / Coursera", "url": "https://www.coursera.org/search?query=Bayesian+Statistics%3A+From+Concept+to+Data+Analysis", "duration": "4 weeks"}, {"title": "Probability and Statistics", "provider": "Stanford / Coursera", "url": "https://www.coursera.org/search?query=Probability+and+Statistics", "duration": "8 weeks"}]}, "keepGoing": [{"label": "Learn standard deviation", "desc": "Google 'standard deviation explained simply.' Try calculating one by hand for 5 numbers."}, {"label": "Find a misleading chart", "desc": "Search 'misleading data visualizations.' Can you spot what makes each one deceptive?"}, {"label": "Try Khan Academy", "desc": "The statistics module is the best free intro to stats that exists. Start with probability.", "url": "https://www.khanacademy.org/math/statistics-probability"}]}, {"skill": "Meditation & Focus", "category": "people", "emoji": "\ud83e\uddd8", "challenge": "Set a timer for 3 minutes. Close your eyes, breathe slowly, and count your breaths. When you lose count, start over. That's it.", "challengeUrl": "https://www.youtube.com/results?search_query=3+minute+guided+meditation", "challengeLabel": "Guided meditation", "why": "Focus is a skill, not a trait. Three minutes of practice literally rewires your brain for better attention.", "course": {"title": "De-Mystifying Mindfulness", "provider": "Leiden University / Coursera", "url": "https://www.coursera.org/search?query=De-Mystifying+Mindfulness", "duration": "5 weeks", "cost": "Free to audit", "next": [{"title": "The Science of Well-Being", "provider": "Yale / Coursera", "url": "https://www.coursera.org/search?query=The+Science+of+Well-Being", "duration": "10 weeks"}, {"title": "Mindfulness and Resilience to Stress at Work", "provider": "UC Berkeley / edX", "url": "https://www.edx.org/search?q=Mindfulness+and+Resilience+to+Stress+at+Work", "duration": "4 weeks"}, {"title": "Positive Psychology Specialization", "provider": "University of Pennsylvania / Coursera", "url": "https://www.coursera.org/search?query=Positive+Psychology+Specialization", "duration": "5 months"}]}, "keepGoing": [{"label": "Try 5 minutes tomorrow", "desc": "Add one minute each day this week. By Friday you'll be at 7 minutes."}, {"label": "Try a body scan", "desc": "Search 'body scan meditation 5 minutes' on YouTube. It's a different technique that builds awareness."}, {"label": "Track your streak", "desc": "Mark each day you meditate on a calendar. The streak becomes its own motivation."}]}];
+let activeFilter = 'all';
+let spinning = false;
+
+document.querySelectorAll('.filter-pill').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeFilter = btn.dataset.filter;
+  });
+});
+
+function getFiltered() {
+  if (activeFilter === 'all') return [...SPRINTS];
+  return SPRINTS.filter(s => s.category === activeFilter);
+}
+
+function spin() {
+  if (typeof SSProgress !== 'undefined') SSProgress.award('roulette', null);
+  if (spinning) return;
+  const pool = getFiltered();
+  if (pool.length === 0) return;
+  spinning = true;
+
+  const btn = document.getElementById('spinBtn');
+  btn.disabled = true;
+  btn.textContent = 'Spinning...';
+
+  const ticker = document.getElementById('ticker');
+  const card = document.getElementById('resultCard');
+  card.classList.remove('visible');
+  document.getElementById('bottomActions').style.display = 'none';
+
+  const totalTicks = 30;
+  let tick = 0;
+  const chosen = pool[Math.floor(Math.random() * pool.length)];
+
+  function doTick() {
+    let item;
+    if (tick < totalTicks - 1) {
+      item = pool[Math.floor(Math.random() * pool.length)];
+    } else {
+      item = chosen;
+    }
+    ticker.innerHTML = '<div class="ticker-item"><span class="t-emoji">' + item.emoji + '</span> ' + item.skill + '</div>';
+
+    tick++;
+    if (tick < totalTicks) {
+      const baseDelay = 60;
+      const progress = tick / totalTicks;
+      const delay = baseDelay + (progress * progress * progress) * 400;
+      setTimeout(doTick, delay);
+    } else {
+      setTimeout(() => showResult(chosen), 400);
+    }
+  }
+
+  doTick();
+}
+
+
+function buildCourseNextHTML(course) {
+  if (!course.next || !course.next.length) return '';
+  var stepLabels = ['Next','Then','Go deeper'];
+  var items = '';
+  for (var i = 0; i < course.next.length; i++) {
+    var nc = course.next[i];
+    items += '<div class="kg-item"><span class="kg-step">' + stepLabels[i] + '</span><a href="' + nc.url + '" target="_blank" rel="noopener">' + nc.title + '</a><span class="kg-meta">' + nc.provider + ' &middot; ' + nc.duration + '</span></div>';
+  }
+  return '<button class="btn-keep" onclick="var d=this.parentElement.nextElementSibling;d.classList.toggle(\'open\')">Keep going \u2192</button></div><div class="keep-going-dropdown">' + items + '</div>';
+}
+
+function showResult(sprint) {
+  const card = document.getElementById('resultCard');
+  const badgeClass = sprint.category === 'technical' ? 'badge-technical' : sprint.category === 'creative' ? 'badge-creative' : 'badge-people';
+
+  let kgHTML = '';
+  sprint.keepGoing.forEach(kg => {
+    if (kg.url) {
+      kgHTML += '<a class="kg-card" href="' + kg.url + '" target="_blank"><h4>' + kg.label + '</h4><p>' + kg.desc + '</p></a>';
+    } else {
+      kgHTML += '<div class="kg-card"><h4>' + kg.label + '</h4><p>' + kg.desc + '</p></div>';
+    }
+  });
+
+  card.innerHTML =
+    '<div class="result-header">' +
+      '<div class="result-emoji">' + sprint.emoji + '</div>' +
+      '<div class="result-skill">' + sprint.skill + '</div>' +
+      '<span class="category-badge ' + badgeClass + '">' + sprint.category + '</span>' +
+    '</div>' +
+    '<div class="challenge-section">' +
+      '<div class="challenge-label">Your 5-minute challenge</div>' +
+      '<p class="challenge-text">' + sprint.challenge + '</p>' +
+      '<a class="challenge-btn" href="' + sprint.challengeUrl + '" target="_blank">' + sprint.challengeLabel + ' &rarr;</a>' +
+    '</div>' +
+    '<div class="why-section">' + sprint.why + '</div>' +
+    '<div class="divider"></div>' +
+    '<div class="keep-going-label">Keep going</div>' +
+    '<p class="keep-going-desc">Done with the challenge? Here\'s what\'s next:</p>' +
+    '<div class="keep-going-grid">' + kgHTML + '</div>' +
+    (function() {
+      var cNext = buildCourseNextHTML(sprint.course);
+      var keepBtn = cNext ? cNext : '</div>';
+      return '<div class="course-card">' +
+        '<div class="course-eyebrow">Want to go deeper?</div>' +
+        '<div style="font-family:var(--serif,Georgia,serif);font-size:18px;color:var(--accent,#C4652A);margin-bottom:4px">' + sprint.course.title + '</div>' +
+        '<div class="course-meta">' + sprint.course.provider + ' &middot; ' + sprint.course.duration + ' &middot; ' + sprint.course.cost + '</div>' +
+        '<div class="course-buttons">' +
+          '<a class="btn-start" href="' + sprint.course.url + '" target="_blank" rel="noopener">Start here</a>' +
+          keepBtn +
+      '</div>';
+    })();
+
+  requestAnimationFrame(() => {
+    card.classList.add('visible');
+    document.getElementById('bottomActions').style.display = '';
+    card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    const btn = document.getElementById('spinBtn');
+    btn.disabled = false;
+    btn.textContent = 'Spin the wheel';
+    spinning = false;
+  });
+}
+</script>
+<script>
+function toggleMobileMenu(){var h=document.getElementById('navHamburger'),m=document.getElementById('mobileMenu');h.classList.toggle('open');m.classList.toggle('open');document.body.style.overflow=m.classList.contains('open')?'hidden':'';}
+</script>
+
+<script>
+// Track course clicks for progress
+document.addEventListener('click', function(e) {
+  var link = e.target.closest('a[href*="coursera.org"], a[href*="edx.org"], a[href*="skillshare.com"]');
+  if (link && typeof SSProgress !== 'undefined') {
+    var title = link.closest('.skill-course, .course-card, .keep-going-item');
+    var name = title ? title.textContent.trim().substring(0, 50) : 'unknown';
+    SSProgress.award('course', name);
+  }
+});
+</script>
+<!-- SS_PROGRESS_TRACKER -->
+<script>
+// ========== START SOMEWHERE PROGRESS TRACKER ==========
+// Self-contained gamified progress system using localStorage
+(function() {
+  var LEVELS = [
+    { name: "Curious", xp: 0, color: "#918E85" },
+    { name: "Explorer", xp: 25, color: "#534AB7" },
+    { name: "Builder", xp: 75, color: "#1D9E75" },
+    { name: "Momentum", xp: 150, color: "#C4652A" },
+    { name: "Unstoppable", xp: 300, color: "#B8336A" }
+  ];
+
+  var BADGES = {
+    first_step:     { icon: "🚀", name: "First Step",      desc: "Did something. That's the whole point.", check: function(s) { return s.totalActions >= 1; } },
+    sprint_star:    { icon: "⚡", name: "Sprint Star",      desc: "Completed 5 skill sprints.", check: function(s) { return s.sprintsCompleted >= 5; } },
+    scholar:        { icon: "📚", name: "Scholar",          desc: "Clicked through to 10 courses.", check: function(s) { return s.coursesClicked >= 10; } },
+    cartographer:   { icon: "🗺️", name: "Cartographer",    desc: "Explored the Skill Map.", check: function(s) { return s.visitedPages.indexOf("skill-map") >= 0; } },
+    deep_diver:     { icon: "🔍", name: "Deep Diver",       desc: "Checked out 3 different careers.", check: function(s) { return s.careersViewed >= 3; } },
+    full_send:      { icon: "🎯", name: "Full Send",        desc: "Visited Explore, Build, and Apply.", check: function(s) { var p = s.visitedPages; return p.indexOf("explore") >= 0 && p.indexOf("build") >= 0 && p.indexOf("apply") >= 0; } },
+    roulette:       { icon: "🎲", name: "Roulette Roller",  desc: "Spun the roulette 3 times.", check: function(s) { return s.rouletteSpins >= 3; } },
+    completionist:  { icon: "👑", name: "Completionist",    desc: "Finished all 18 sprints.", check: function(s) { return s.sprintsCompleted >= 18; } },
+    skill_hunter:   { icon: "🎪", name: "Skill Hunter",     desc: "Explored 10 different skills.", check: function(s) { return s.skillsExplored >= 10; } },
+    analyzer:       { icon: "🔬", name: "Analyzer",         desc: "Used the Job Analyzer.", check: function(s) { return s.jobsAnalyzed >= 1; } }
+  };
+
+  // ---- State management ----
+  function getState() {
+    try {
+      var raw = localStorage.getItem("ss_progress");
+      if (raw) return JSON.parse(raw);
+    } catch(e) {}
+    return {
+      xp: 0,
+      totalActions: 0,
+      sprintsCompleted: 0,
+      coursesClicked: 0,
+      careersViewed: 0,
+      skillsExplored: 0,
+      rouletteSpins: 0,
+      jobsAnalyzed: 0,
+      visitedPages: [],
+      earnedBadges: [],
+      completedSprintIds: [],
+      viewedCareerNames: [],
+      clickedCourseNames: [],
+      exploredSkillNames: []
+    };
+  }
+
+  function saveState(s) {
+    try { localStorage.setItem("ss_progress", JSON.stringify(s)); } catch(e) {}
+  }
+
+  function getLevel(xp) {
+    var level = LEVELS[0];
+    for (var i = 0; i < LEVELS.length; i++) {
+      if (xp >= LEVELS[i].xp) level = LEVELS[i];
+    }
+    return level;
+  }
+
+  function getNextLevel(xp) {
+    for (var i = 0; i < LEVELS.length; i++) {
+      if (xp < LEVELS[i].xp) return LEVELS[i];
+    }
+    return null;
+  }
+
+  function checkBadges(state) {
+    var newBadges = [];
+    var keys = Object.keys(BADGES);
+    for (var i = 0; i < keys.length; i++) {
+      var key = keys[i];
+      if (state.earnedBadges.indexOf(key) < 0 && BADGES[key].check(state)) {
+        state.earnedBadges.push(key);
+        newBadges.push(key);
+      }
+    }
+    return newBadges;
+  }
+
+  // ---- Public API ----
+  window.SSProgress = {
+    award: function(type, detail) {
+      var s = getState();
+      var xpGain = 0;
+
+      if (type === "sprint") {
+        if (detail && s.completedSprintIds.indexOf(detail) >= 0) return; // already done
+        if (detail) s.completedSprintIds.push(detail);
+        s.sprintsCompleted++;
+        xpGain = 15;
+      } else if (type === "course") {
+        if (detail && s.clickedCourseNames.indexOf(detail) < 0) {
+          s.clickedCourseNames.push(detail);
+        }
+        s.coursesClicked++;
+        xpGain = 5;
+      } else if (type === "career") {
+        if (detail && s.viewedCareerNames.indexOf(detail) < 0) {
+          s.viewedCareerNames.push(detail);
+          s.careersViewed++;
+          xpGain = 5;
+        }
+      } else if (type === "skill") {
+        if (detail && s.exploredSkillNames.indexOf(detail) < 0) {
+          s.exploredSkillNames.push(detail);
+          s.skillsExplored++;
+          xpGain = 3;
+        }
+      } else if (type === "roulette") {
+        s.rouletteSpins++;
+        xpGain = 5;
+      } else if (type === "job_analyze") {
+        s.jobsAnalyzed++;
+        xpGain = 10;
+      } else if (type === "page") {
+        if (detail && s.visitedPages.indexOf(detail) < 0) {
+          s.visitedPages.push(detail);
+          xpGain = 1;
+        }
+      }
+
+      if (xpGain > 0) {
+        s.xp += xpGain;
+        s.totalActions++;
+        var oldLevel = getLevel(s.xp - xpGain);
+        var newLevel = getLevel(s.xp);
+        var newBadges = checkBadges(s);
+        saveState(s);
+        updateWidget(s);
+
+        if (newLevel.name !== oldLevel.name) {
+          showToast("Level up! You're now " + newLevel.name + " 🎉", newLevel.color);
+        } else if (newBadges.length > 0) {
+          var b = BADGES[newBadges[0]];
+          showToast(b.icon + " " + b.name + " unlocked!", "#C4652A");
+        } else if (xpGain >= 10) {
+          showToast("+" + xpGain + " XP", "#1D9E75");
+        }
+      }
+    },
+
+    getState: getState,
+    getLevel: function() { return getLevel(getState().xp); },
+
+    reset: function() {
+      localStorage.removeItem("ss_progress");
+      updateWidget(getState());
+    }
+  };
+
+  // ---- Toast notification ----
+  function showToast(msg, color) {
+    var toast = document.createElement("div");
+    toast.className = "ss-toast";
+    toast.style.cssText = "position:fixed;bottom:80px;right:20px;z-index:10001;background:" + (color || "#C4652A") + ";color:white;padding:10px 18px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;opacity:0;transform:translateY(10px);transition:all 0.3s;box-shadow:0 4px 12px rgba(0,0,0,0.15);pointer-events:none;";
+    toast.textContent = msg;
+    document.body.appendChild(toast);
+    requestAnimationFrame(function() {
+      toast.style.opacity = "1";
+      toast.style.transform = "translateY(0)";
+    });
+    setTimeout(function() {
+      toast.style.opacity = "0";
+      toast.style.transform = "translateY(10px)";
+      setTimeout(function() { toast.remove(); }, 300);
+    }, 2500);
+  }
+
+  // ---- Widget ----
+  function createWidget() {
+    var css = document.createElement("style");
+    css.textContent = [
+      ".ss-widget{position:fixed;bottom:20px;right:20px;z-index:10000;font-family:'DM Sans',sans-serif;}",
+      ".ss-pill{display:flex;align-items:center;gap:8px;background:#FFFFFF;border:1px solid rgba(0,0,0,0.1);border-radius:40px;padding:6px 14px 6px 8px;cursor:pointer;box-shadow:0 2px 12px rgba(0,0,0,0.08);transition:all 0.2s;}",
+      ".ss-pill:hover{box-shadow:0 4px 20px rgba(0,0,0,0.12);transform:translateY(-1px);}",
+      ".ss-pill-xp{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:white;}",
+      ".ss-pill-info{display:flex;flex-direction:column;line-height:1.2;}",
+      ".ss-pill-level{font-size:11px;font-weight:600;color:#1A1A18;}",
+      ".ss-pill-bar{width:60px;height:4px;background:#F0EDE6;border-radius:2px;overflow:hidden;margin-top:2px;}",
+      ".ss-pill-fill{height:100%;border-radius:2px;transition:width 0.5s ease;}",
+      ".ss-panel{position:absolute;bottom:50px;right:0;width:300px;background:#FFFFFF;border:1px solid rgba(0,0,0,0.1);border-radius:16px;box-shadow:0 8px 30px rgba(0,0,0,0.12);padding:20px;display:none;max-height:70vh;overflow-y:auto;}",
+      ".ss-panel.open{display:block;animation:ss-fadeIn 0.2s ease;}",
+      "@keyframes ss-fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}",
+      ".ss-panel-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}",
+      ".ss-panel-title{font-family:'DM Serif Display',Georgia,serif;font-size:20px;}",
+      ".ss-panel-xp{font-size:13px;color:#6B6860;font-weight:500;}",
+      ".ss-progress-bar{width:100%;height:8px;background:#F0EDE6;border-radius:4px;overflow:hidden;margin-bottom:4px;}",
+      ".ss-progress-fill{height:100%;border-radius:4px;transition:width 0.5s ease;}",
+      ".ss-progress-label{display:flex;justify-content:space-between;font-size:11px;color:#918E85;margin-bottom:20px;}",
+      ".ss-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px;}",
+      ".ss-stat{background:#FAF9F6;border-radius:8px;padding:10px;text-align:center;}",
+      ".ss-stat-num{font-size:20px;font-weight:700;color:#1A1A18;}",
+      ".ss-stat-label{font-size:11px;color:#6B6860;margin-top:2px;}",
+      ".ss-badges-title{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:#918E85;margin-bottom:10px;}",
+      ".ss-badge{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(0,0,0,0.04);}",
+      ".ss-badge:last-child{border-bottom:none;}",
+      ".ss-badge-icon{font-size:20px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;background:#FAF9F6;border-radius:8px;flex-shrink:0;}",
+      ".ss-badge-locked .ss-badge-icon{filter:grayscale(1);opacity:0.3;}",
+      ".ss-badge-info{flex:1;min-width:0;}",
+      ".ss-badge-name{font-size:13px;font-weight:600;color:#1A1A18;}",
+      ".ss-badge-locked .ss-badge-name{color:#918E85;}",
+      ".ss-badge-desc{font-size:11px;color:#918E85;line-height:1.3;}",
+      "@media(max-width:480px){.ss-panel{width:280px;right:-5px;}.ss-widget{bottom:12px;right:12px;}}"
+    ].join("
+");
+    document.head.appendChild(css);
+
+    var widget = document.createElement("div");
+    widget.className = "ss-widget";
+    widget.id = "ss-widget";
+    widget.innerHTML = '<div class="ss-pill" id="ss-pill">' +
+      '<div class="ss-pill-xp" id="ss-pill-icon"></div>' +
+      '<div class="ss-pill-info">' +
+        '<div class="ss-pill-level" id="ss-pill-level"></div>' +
+        '<div class="ss-pill-bar"><div class="ss-pill-fill" id="ss-pill-fill"></div></div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="ss-panel" id="ss-panel"></div>';
+    document.body.appendChild(widget);
+
+    document.getElementById("ss-pill").addEventListener("click", function(e) {
+      e.stopPropagation();
+      var panel = document.getElementById("ss-panel");
+      panel.classList.toggle("open");
+      if (panel.classList.contains("open")) renderPanel(getState());
+    });
+
+    document.addEventListener("click", function(e) {
+      var panel = document.getElementById("ss-panel");
+      if (panel && panel.classList.contains("open") && !e.target.closest(".ss-widget")) {
+        panel.classList.remove("open");
+      }
+    });
+  }
+
+  function updateWidget(state) {
+    var level = getLevel(state.xp);
+    var next = getNextLevel(state.xp);
+    var pct = 100;
+    if (next) {
+      pct = Math.round(((state.xp - level.xp) / (next.xp - level.xp)) * 100);
+    }
+
+    var icon = document.getElementById("ss-pill-icon");
+    var levelEl = document.getElementById("ss-pill-level");
+    var fill = document.getElementById("ss-pill-fill");
+
+    if (icon) {
+      icon.style.background = level.color;
+      icon.textContent = state.xp;
+    }
+    if (levelEl) levelEl.textContent = level.name;
+    if (fill) {
+      fill.style.width = pct + "%";
+      fill.style.background = level.color;
+    }
+  }
+
+  function renderPanel(state) {
+    var level = getLevel(state.xp);
+    var next = getNextLevel(state.xp);
+    var pct = 100;
+    var nextLabel = "Max level!";
+    if (next) {
+      pct = Math.round(((state.xp - level.xp) / (next.xp - level.xp)) * 100);
+      nextLabel = next.xp + " XP to " + next.name;
+    }
+
+    var badgesHTML = "";
+    var badgeKeys = Object.keys(BADGES);
+    for (var i = 0; i < badgeKeys.length; i++) {
+      var key = badgeKeys[i];
+      var b = BADGES[key];
+      var earned = state.earnedBadges.indexOf(key) >= 0;
+      badgesHTML += '<div class="ss-badge ' + (earned ? "" : "ss-badge-locked") + '">' +
+        '<div class="ss-badge-icon">' + b.icon + '</div>' +
+        '<div class="ss-badge-info">' +
+          '<div class="ss-badge-name">' + b.name + '</div>' +
+          '<div class="ss-badge-desc">' + (earned ? b.desc : "???") + '</div>' +
+        '</div>' +
+      '</div>';
+    }
+
+    document.getElementById("ss-panel").innerHTML =
+      '<div class="ss-panel-header">' +
+        '<div class="ss-panel-title">Your Progress</div>' +
+        '<div class="ss-panel-xp">' + state.xp + ' XP</div>' +
+      '</div>' +
+      '<div class="ss-progress-bar"><div class="ss-progress-fill" style="width:' + pct + '%;background:' + level.color + '"></div></div>' +
+      '<div class="ss-progress-label"><span>' + level.name + '</span><span>' + nextLabel + '</span></div>' +
+      '<div class="ss-stats">' +
+        '<div class="ss-stat"><div class="ss-stat-num">' + state.sprintsCompleted + '</div><div class="ss-stat-label">Sprints</div></div>' +
+        '<div class="ss-stat"><div class="ss-stat-num">' + state.coursesClicked + '</div><div class="ss-stat-label">Courses</div></div>' +
+        '<div class="ss-stat"><div class="ss-stat-num">' + state.careersViewed + '</div><div class="ss-stat-label">Careers</div></div>' +
+        '<div class="ss-stat"><div class="ss-stat-num">' + state.earnedBadges.length + '/' + badgeKeys.length + '</div><div class="ss-stat-label">Badges</div></div>' +
+      '</div>' +
+      '<div class="ss-badges-title">Badges</div>' +
+      badgesHTML;
+  }
+
+  // ---- Auto-detect page and track visit ----
+  function detectPage() {
+    var path = window.location.pathname.split("/").pop().replace(".html", "");
+    var pageMap = {
+      "start-somewhere": "home",
+      "explore": "explore",
+      "build": "build",
+      "apply": "apply",
+      "skill-explorer-production": "skill-explorer",
+      "job-analyzer": "job-analyzer",
+      "skill-roulette": "skill-roulette",
+      "skill-sprints": "skill-sprints",
+      "skill-map": "skill-map",
+      "career": "career"
+    };
+    return pageMap[path] || path;
+  }
+
+  // ---- Init ----
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
+
+  function init() {
+    createWidget();
+    var state = getState();
+
+    // Track page visit
+    var page = detectPage();
+    if (page) {
+      SSProgress.award("page", page);
+    }
+
+    // Auto-track career page views
+    if (page === "career") {
+      var params = new URLSearchParams(window.location.search);
+      var job = params.get("job");
+      if (job) SSProgress.award("career", job);
+    }
+
+    updateWidget(getState());
+  }
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skill Map — Start Somewhere</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+nav { position: sticky; top: 0; z-index: 100; background: rgba(250,249,246,0.95); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(0,0,0,0.08); }
+.nav-inner { display: flex; align-items: center; justify-content: space-between; padding: 14px 2rem; max-width: 1200px; margin: 0 auto; }
+.nav-logo { font-family: 'DM Serif Display', Georgia, serif; font-size: 20px; text-decoration: none; }
+.nav-logo .s { color: #1A1A18; }
+.nav-logo .sw { color: #C4652A; }
+.nav-links { display: flex; gap: 1.75rem; align-items: center; }
+.nav-links a { font-size: 14px; color: #6B6860; text-decoration: none; font-weight: 500; transition: color 0.2s; }
+.nav-links a:hover { color: #1A1A18; }
+.nav-links a.active { color: #C4652A; font-weight: 600; }
+:root {
+  --bg: #FAF9F6;
+  --bg-warm: #F5F0E8;
+  --bg-card: #FFFFFF;
+  --text: #1A1A18;
+  --text-muted: #6B6860;
+  --text-soft: #918E85;
+  --accent: #C4652A;
+  --accent-light: #FAECE7;
+  --accent-hover: #A8521F;
+  --teal: #1D9E75;
+  --teal-light: #E1F5EE;
+  --purple: #534AB7;
+  --purple-light: #EEEDFE;
+  --blue: #2D7DD2;
+  --border: rgba(0,0,0,0.08);
+  --serif: 'DM Serif Display', Georgia, serif;
+  --sans: 'DM Sans', -apple-system, sans-serif;
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { font-family: var(--sans); background: var(--bg); color: var(--text); line-height: 1.7; }
+
+/* NAV */
+
+/* HERO */
+.hero {
+  padding: 120px 2rem 48px; text-align: center;
+  max-width: 800px; margin: 0 auto;
+}
+.hero-eyebrow {
+  font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.15em;
+  color: var(--accent); margin-bottom: 1.5rem;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.hero-eyebrow::before, .hero-eyebrow::after {
+  content: ''; width: 24px; height: 1px; background: var(--accent); opacity: 0.5;
+}
+.hero h1 {
+  font-family: var(--serif); font-size: clamp(36px, 5vw, 56px);
+  line-height: 1.15; margin-bottom: 1.2rem; letter-spacing: -0.02em;
+}
+.hero h1 em { font-style: italic; color: var(--accent); }
+.hero-sub {
+  font-size: 17px; color: var(--text-muted); max-width: 560px; line-height: 1.7;
+  margin: 0 auto;
+}
+
+/* MAIN CONTENT */
+.main-content {
+  max-width: 1200px; margin: 0 auto; padding: 0 2rem 4rem;
+}
+
+/* FILTERS */
+.filter-bar {
+  display: flex; gap: 10px; justify-content: center; margin: 2rem 0 1.5rem;
+  flex-wrap: wrap;
+}
+.filter-pill {
+  padding: 8px 18px; border-radius: 999px; border: 1.5px solid var(--border);
+  background: var(--bg-card); font-family: var(--sans); font-size: 13px;
+  font-weight: 500; cursor: pointer; transition: all 0.2s;
+  display: flex; align-items: center; gap: 6px;
+}
+.filter-pill:hover { border-color: var(--text-soft); }
+.filter-pill.active { border-color: currentColor; }
+.filter-pill[data-cat="technical"] { color: var(--teal); }
+.filter-pill[data-cat="technical"].active { background: var(--teal-light); border-color: var(--teal); }
+.filter-pill[data-cat="creative"] { color: var(--purple); }
+.filter-pill[data-cat="creative"].active { background: var(--purple-light); border-color: var(--purple); }
+.filter-pill[data-cat="people"] { color: var(--accent); }
+.filter-pill[data-cat="people"].active { background: var(--accent-light); border-color: var(--accent); }
+.filter-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+}
+
+/* CANVAS CONTAINER */
+.canvas-wrap {
+  position: relative; width: 100%;
+  background: var(--bg-card); border-radius: var(--radius);
+  border: 1px solid var(--border); overflow: hidden;
+}
+#graphCanvas {
+  display: block; width: 100%; height: 500px; cursor: default;
+}
+
+/* LEGEND */
+.legend {
+  display: flex; gap: 20px; justify-content: center; padding: 12px 0;
+  font-size: 12px; color: var(--text-muted); font-weight: 500;
+}
+.legend-item { display: flex; align-items: center; gap: 6px; }
+.legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+/* HINT */
+.graph-hint {
+  text-align: center; font-size: 13px; color: var(--text-soft);
+  margin-top: 8px; font-style: italic;
+}
+
+/* INFO PANEL */
+.info-panel {
+  margin-top: 1.5rem;
+  background: var(--bg-card); border-radius: var(--radius);
+  border: 1px solid var(--border); padding: 2rem;
+  display: none;
+}
+.info-panel.visible { display: block; }
+.info-header {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 1.5rem; flex-wrap: wrap;
+}
+.info-title {
+  font-family: var(--serif); font-size: 24px; line-height: 1.2;
+}
+.info-badge {
+  font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em;
+  padding: 4px 10px; border-radius: 999px;
+}
+.info-badge.technical { background: var(--teal-light); color: var(--teal); }
+.info-badge.creative { background: var(--purple-light); color: var(--purple); }
+.info-badge.people { background: var(--accent-light); color: var(--accent); }
+
+.info-section { margin-bottom: 1.5rem; }
+.info-section-title {
+  font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--text-soft); margin-bottom: 8px;
+}
+.connected-pills {
+  display: flex; flex-wrap: wrap; gap: 6px;
+}
+.connected-pill {
+  padding: 5px 12px; border-radius: 999px; border: 1px solid var(--border);
+  background: var(--bg); font-size: 12px; font-weight: 500; cursor: pointer;
+  transition: all 0.15s; color: var(--text-muted);
+}
+.connected-pill:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+
+.career-list {
+  display: flex; flex-wrap: wrap; gap: 4px 12px;
+  list-style: none;
+}
+.career-list li {
+  font-size: 13px; color: var(--text-muted); line-height: 1.8;
+}
+.career-list li a { color: var(--text-muted); text-decoration: none; transition: color 0.2s; }
+.career-list li a:hover { color: var(--accent); }
+.career-list li::before {
+  content: '\2022'; margin-right: 6px; color: var(--text-soft);
+}
+
+.course-card {
+  background: var(--bg); border-radius: var(--radius-sm);
+  padding: 1rem 1.25rem; border: 1px solid var(--border);
+}
+.course-title {
+  font-weight: 600; color: var(--accent); font-size: 15px; margin-bottom: 4px;
+}
+.course-meta {
+  font-size: 13px; color: var(--text-muted);
+}
+.course-btn {
+  display: inline-block; margin-top: 12px;
+  padding: 10px 24px; border-radius: 999px;
+  background: var(--accent); color: white; font-size: 13px; font-weight: 600;
+  text-decoration: none; font-family: var(--sans); transition: background 0.2s;
+}
+.course-btn:hover { background: var(--accent-hover); }
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .nav-inner { padding: 12px 1rem; }
+  .nav-links { display: none; }
+  .nav-hamburger { display: flex; }
+  
+  .hero { padding: 80px 1.25rem 24px; }
+  .hero h1 { font-size: 28px; }
+  .hero-sub { font-size: 14px; }
+  .hero-eyebrow { font-size: 11px; margin-bottom: 1rem; }
+  .main-content { padding: 0 0.75rem 3rem; }
+  #graphCanvas { height: 400px; touch-action: none; }
+  .canvas-wrap { border-radius: var(--radius-sm); }
+  .filter-bar { gap: 6px; margin: 1rem 0 1rem; }
+  .filter-pill { padding: 6px 12px; font-size: 12px; }
+  .legend { gap: 12px; font-size: 11px; padding: 8px 0; }
+  .graph-hint { font-size: 12px; }
+  
+  .info-panel { padding: 1.25rem; margin-top: 1rem; }
+  .info-title { font-size: 20px; }
+  .info-section-title { font-size: 11px; }
+  .connected-pills { gap: 4px; }
+  .connected-pill { padding: 4px 10px; font-size: 11px; }
+  .career-list { gap: 2px 10px; }
+  .career-list li { font-size: 12px; line-height: 1.7; }
+  .community-list { grid-template-columns: 1fr; }
+  .course-card { padding: 0.75rem 1rem; }
+  .course-title { font-size: 14px; }
+  .course-meta { font-size: 12px; }
+  .course-buttons { flex-wrap: wrap; }
+  .btn-start, .btn-keep { font-size: 12px; padding: 5px 12px; }
+}
+
+@media (max-width: 480px) {
+  .hero { padding: 70px 1rem 20px; }
+  .hero h1 { font-size: 24px; }
+  #graphCanvas { height: 360px; }
+  .info-panel { padding: 1rem; }
+  .info-title { font-size: 18px; }
+  .filter-bar { margin: 0.75rem 0; }
+}
+
+/* Two-button course UI */
+.course-buttons { display: flex; gap: 8px; margin-top: 8px; }
+.btn-start { display: inline-flex; align-items: center; gap: 4px; padding: 6px 14px; background: #C4652A; color: white; border-radius: 99px; font-size: 13px; font-weight: 600; text-decoration: none; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+.btn-start:hover { background: #A8511F; }
+.btn-keep { display: inline-flex; align-items: center; gap: 4px; padding: 6px 14px; background: transparent; color: #6B6860; border: 1px solid #D3D1C7; border-radius: 99px; font-size: 13px; font-weight: 500; text-decoration: none; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+.btn-keep:hover { border-color: #888780; color: #444441; }
+.keep-going-dropdown { display: none; margin-top: 8px; padding: 10px 12px; background: rgba(245,240,232,0.5); border-radius: 8px; }
+.keep-going-dropdown.open { display: block; }
+.keep-going-dropdown .kg-item { display: flex; align-items: center; gap: 8px; padding: 5px 0; flex-wrap: wrap; }
+.keep-going-dropdown .kg-step { font-size: 11px; color: #6B6860; background: rgba(0,0,0,0.05); padding: 2px 8px; border-radius: 99px; white-space: nowrap; }
+.keep-going-dropdown .kg-item a { font-size: 13px; color: #1a6fb5; text-decoration: none; }
+.keep-going-dropdown .kg-item a:hover { text-decoration: underline; }
+.keep-going-dropdown .kg-meta { font-size: 12px; color: #9C9A93; }
+
+
+/* MOBILE HAMBURGER NAV */
+.nav-hamburger {
+  display: none; align-items: center; justify-content: center;
+  width: 36px; height: 36px; cursor: pointer; border: none;
+  background: transparent; padding: 0; flex-direction: column; gap: 5px;
+}
+.nav-hamburger span {
+  display: block; width: 20px; height: 2px; background: var(--text);
+  transition: all 0.3s; border-radius: 1px;
+}
+.nav-hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.nav-hamburger.open span:nth-child(2) { opacity: 0; }
+.nav-hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+.mobile-menu {
+  display: none; position: fixed; top: 53px; left: 0; right: 0; bottom: 0;
+  background: rgba(250,249,246,0.98); backdrop-filter: blur(20px);
+  z-index: 99; padding: 2rem 1.5rem; overflow-y: auto;
+}
+.mobile-menu.open { display: flex; flex-direction: column; gap: 0; }
+.mobile-menu a {
+  display: block; padding: 14px 0; font-size: 16px; color: var(--text-muted);
+  text-decoration: none; font-weight: 500; border-bottom: 1px solid var(--border);
+  transition: color 0.2s;
+}
+.mobile-menu a:hover, .mobile-menu a.active { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="start-somewhere.html" class="nav-logo"><span class="s">start</span><span class="sw">somewhere.</span></a>
+    <button class="nav-hamburger" id="navHamburger" onclick="toggleMobileMenu()">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="nav-links">
+      <a href="start-somewhere.html">Home</a>
+      <a href="explore.html">Explore</a>
+      <a href="build.html">Build</a>
+      <a href="apply.html">Apply</a>
+      <a href="skill-explorer-production.html">Skill Explorer</a>
+      <a href="job-analyzer.html">Job Analyzer</a>
+      <a href="skill-roulette.html">Skill Roulette</a>
+      <a href="skill-sprints.html">Skill Sprints</a>
+      <a href="skill-map.html" class="active">Skill Map</a>
+    </div>
+  </div>
+</nav>
+
+<div class="mobile-menu" id="mobileMenu">
+  <a href="start-somewhere.html">Home</a>
+  <a href="explore.html">Explore</a>
+  <a href="build.html">Build</a>
+  <a href="apply.html">Apply</a>
+  <a href="skill-explorer-production.html">Skill Explorer</a>
+  <a href="job-analyzer.html">Job Analyzer</a>
+  <a href="skill-roulette.html">Skill Roulette</a>
+  <a href="skill-sprints.html">Skill Sprints</a>
+  <a href="skill-map.html" class="active">Skill Map</a>
+</div>
+
+<div class="hero">
+  <div class="hero-eyebrow">THERE ARE NO WRONG SKILLS.</div>
+  <h1>Every skill connects to <em>something else.</em></h1>
+  <p class="hero-sub">Click any skill to see what it connects to, which careers use it, and where to start learning. The most interesting paths come from unexpected combinations.</p>
+</div>
+
+<div class="main-content">
+  <div class="filter-bar">
+    <button class="filter-pill active" data-cat="technical" onclick="toggleFilter('technical')">
+      <span class="filter-dot" style="background: var(--teal);"></span> Technical
+    </button>
+    <button class="filter-pill active" data-cat="creative" onclick="toggleFilter('creative')">
+      <span class="filter-dot" style="background: var(--purple);"></span> Creative
+    </button>
+    <button class="filter-pill active" data-cat="people" onclick="toggleFilter('people')">
+      <span class="filter-dot" style="background: var(--accent);"></span> People
+    </button>
+  </div>
+
+  <div class="canvas-wrap">
+    <canvas id="graphCanvas"></canvas>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item"><span class="legend-dot" style="background: var(--teal);"></span> Technical</div>
+    <div class="legend-item"><span class="legend-dot" style="background: var(--purple);"></span> Creative</div>
+    <div class="legend-item"><span class="legend-dot" style="background: var(--accent);"></span> People</div>
+  </div>
+  <div class="graph-hint" id="graphHint">Tap any skill to see what it connects to.</div>
+
+  <div class="info-panel" id="infoPanel"></div>
+</div>
+
+<script>
+// ─── DATA ───
+const GRAPH_DATA = {"nodes": [{"id": "Active Learning", "category": "people", "careers": ["Biochemists and Biophysicists", "Biological Science Teachers, Postsecondary", "Biological Technicians", "Chemical Technicians", "Chemistry Teachers, Postsecondary", "Chemists"], "course": {"title": "Learning How to Learn", "provider": "McMaster University / Coursera", "url": "https://www.coursera.org/search?query=Learning+How+to+Learn", "duration": "4 weeks", "cost": "Free to audit", "next": [{"title": "Mindshift: Break Through Obstacles to Learning", "provider": "McMaster University / Coursera", "url": "https://www.coursera.org/search?query=Mindshift%3A+Break+Through+Obstacles+to+Learning", "duration": "4 weeks"}, {"title": "How to Study and Improve Memory", "provider": "Coursera", "url": "https://www.coursera.org/search?query=How+to+Study+and+Improve+Memory", "duration": "3 weeks"}, {"title": "The Science of Well-Being", "provider": "Yale / Coursera", "url": "https://www.coursera.org/search?query=The+Science+of+Well-Being", "duration": "10 weeks"}]}, "connections": 9}, {"id": "Active Listening", "category": "people", "careers": ["Accountants and Auditors", "Administrative Law Judges, Adjudicators, and Hearing Officers", "Anthropologists and Archeologists", "Anthropology and Archeology Teachers, Postsecondary", "Appraisers and Assessors of Real Estate", "Budget Analysts"], "course": {"title": "Improving Communication Skills", "provider": "University of Pennsylvania / Coursera", "url": "https://www.coursera.org/search?query=Improving+Communication+Skills", "duration": "4 weeks", "cost": "Free to audit", "next": [{"title": "Successful Negotiation: Essential Strategies and Skills", "provider": "University of Michigan / Coursera", "url": "https://www.coursera.org/search?query=Successful+Negotiation%3A+Essential+Strategies+and+Skills", "duration": "7 weeks"}, {"title": "Conflict Resolution Skills", "provider": "University of California / Coursera", "url": "https://www.coursera.org/search?query=Conflict+Resolution+Skills", "duration": "4 weeks"}, {"title": "Teamwork Skills: Communicating Effectively in Groups", "provider": "University of Colorado / Coursera", "url": "https://www.coursera.org/search?query=Teamwork+Skills%3A+Communicating+Effectively+in+Groups", "duration": "4 weeks"}]}, "connections": 27}, {"id": "Administration and Management", "category": "technical", "careers": ["Accountants and Auditors", "Administrative Services Managers", "Advertising and Promotions Managers", "Agricultural Sciences Teachers, Postsecondary", "Agricultural Technicians", "Animal Scientists"], "course": {"title": "Foundations of Management", "provider": "IESE / Coursera", "url": "https://www.coursera.org/search?query=Foundations+of+Management", "duration": "5 months", "cost": "Free to audit", "next": [{"title": "Organizational Leadership Specialization", "provider": "Northwestern / Coursera", "url": "https://www.coursera.org/search?query=Organizational+Leadership+Specialization", "duration": "4 months"}, {"title": "Strategic Management and Innovation", "provider": "Copenhagen Business School / Coursera", "url": "https://www.coursera.org/search?query=Strategic+Management+and+Innovation", "duration": "6 weeks"}, {"title": "Management Skills for International Business", "provider": "University of London / Coursera", "url": "https://www.coursera.org/search?query=Management+Skills+for+International+Business", "duration": "5 weeks"}]}, "connections": 47}, {"id": "Administrative", "category": "technical", "careers": ["Administrative Law Judges, Adjudicators, and Hearing Officers", "Chefs and Head Cooks", "Compliance Officers", "Correctional Officers and Jailers", "Detectives and Criminal Investigators", "Editors"], "course": {"title": "Google Project Management Certificate", "provider": "Google / Coursera", "url": "https://www.coursera.org/search?query=Google+Project+Management+Certificate", "duration": "6 months", "cost": "Free to audit", "next": [{"title": "Agile Project Management", "provider": "Google / Coursera", "url": "https://www.coursera.org/search?query=Agile+Project+Management", "duration": "5 weeks"}, {"title": "Foundations of Business Strategy", "provider": "University of Virginia / Coursera", "url": "https://www.coursera.org/search?query=Foundations+of+Business+Strategy", "duration": "4 weeks"}, {"title": "Project Execution: Running the Project", "provider": "Google / Coursera", "url": "https://www.coursera.org/search?query=Project+Execution%3A+Running+the+Project", "duration": "4 weeks"}]}, "connections": 23}, {"id": "Biology", "category": "technical", "careers": ["Acute Care Nurses", "Advanced Practice Psychiatric Nurses", "Agricultural Sciences Teachers, Postsecondary", "Agricultural Technicians", "Anesthesiologists", "Animal Scientists"], "course": {"title": "Introduction to Biology — The Secret of Life", "provider": "MIT / edX", "url": "https://www.edx.org/search?q=Introduction+to+Biology++The+Secret+of+Life", "duration": "16 weeks", "cost": "Free to audit", "next": [{"title": "Molecular Biology: DNA Replication and Repair", "provider": "MIT / edX", "url": "https://www.edx.org/search?q=Molecular+Biology%3A+DNA+Replication+and+Repair", "duration": "8 weeks"}, {"title": "Ecology: Ecosystem Dynamics and Conservation", "provider": "American Museum of Natural History / Coursera", "url": "https://www.coursera.org/search?query=Ecology%3A+Ecosystem+Dynamics+and+Conservation", "duration": "5 weeks"}, {"title": "Genetics and Genomics", "provider": "University of California / Coursera", "url": "https://www.coursera.org/search?query=Genetics+and+Genomics", "duration": "5 months"}]}, "connections": 29}, {"id": "Building and Construction", "category": "technical", "careers": ["Appraisers and Assessors of Real Estate", "Architects, Except Landscape and Naval", "Architectural and Civil Drafters", "Architectural and Engineering Managers", "Art Directors", "Civil Engineering Technologists and Technicians"], "course": {"title": "Construction Management", "provider": "Columbia / Coursera", "url": "https://www.coursera.org/search?query=Construction+Management", "duration": "4 weeks", "cost": "Free to audit", "next": [{"title": "Construction Scheduling", "provider": "Columbia / Coursera", "url": "https://www.coursera.org/search?query=Construction+Scheduling", "duration": "4 weeks"}, {"title": "Construction Cost Estimating and Cost Control", "provider": "Columbia / Coursera", "url": "https://www.coursera.org/search?query=Construction+Cost+Estimating+and+Cost+Control", "duration": "4 weeks"}, {"title": "Building Information Modeling BIM", "provider": "Coursera", "url": "https://www.coursera.org/search?query=Building+Information+Modeling+BIM", "duration": "6 weeks"}]}, "connections": 16}, {"id": "Chemistry", "category": "technical", "careers": ["Agricultural Sciences Teachers, Postsecondary", "Agricultural Technicians", "Animal Scientists", "Architectural and Engineering Managers", "Biochemists and Biophysicists", "Biological Science Teachers, Postsecondary"], "course": {"title": "Introduction to Chemistry", "provider": "Duke / Coursera", "url": "https://www.coursera.org/search?query=Introduction+to+Chemistry", "duration": "8 weeks", "cost": "Free to audit", "next": [{"title": "Organic Chemistry", "provider": "University of Illinois / Coursera", "url": "https://www.coursera.org/search?query=Organic+Chemistry", "duration": "8 weeks"}, {"title": "Chemistry: Molecular and Electronic Structure", "provider": "University of Kentucky / Coursera", "url": "https://www.coursera.org/search?query=Chemistry%3A+Molecular+and+Electronic+Structure", "duration": "6 weeks"}, {"title": "Biochemistry", "provider": "Duke / Coursera", "url": "https://www.coursera.org/search?query=Biochemistry", "duration": "8 weeks"}]}, "connections": 23}, {"id": "Communications and Media", "category": "creative", "careers": ["Actors", "Advertising and Promotions Managers", "Anthropologists and Archeologists", "Art Directors", "Art, Drama, and Music Teachers, Postsecondary", "Camera Operators, Television, Video, and Film"], "course": {"title": "Content Strategy for Professionals", "provider": "Northwestern / Coursera", "url": "https://www.coursera.org/search?query=Content+Strategy+for+Professionals", "duration": "5 months", "cost": "Free to audit", "next": [{"title": "Digital Media and Marketing Strategies", "provider": "University of Illinois / Coursera", "url": "https://www.coursera.org/search?query=Digital+Media+and+Marketing+Strategies", "duration": "4 weeks"}, {"title": "Transmedia Storytelling", "provider": "University of New South Wales / Coursera", "url": "https://www.coursera.org/search?query=Transmedia+Storytelling", "duration": "6 weeks"}, {"title": "Journalism, the Future, and You", "provider": "Michigan State / Coursera", "url": "https://www.coursera.org/search?query=Journalism%2C+the+Future%2C+and+You", "duration": "4 weeks"}]}, "connections": 27}, {"id": "Complex Problem Solving", "category": "people", "careers": ["Architectural and Engineering Managers", "Biostatisticians", "Business Intelligence Analysts", "Chemical Engineers", "Computer Systems Analysts", "Computer and Information Research Scientists"], "course": {"title": "Creative Problem Solving", "provider": "University of Minnesota / Coursera", "url": "https://www.coursera.org/search?query=Creative+Problem+Solving", "duration": "5 weeks", "cost": "Free to audit", "next": [{"title": "Design Thinking for Innovation", "provider": "University of Virginia / Coursera", "url": "https://www.coursera.org/search?query=Design+Thinking+for+Innovation", "duration": "5 weeks"}, {"title": "Problem Solving Using Computational Thinking", "provider": "University of Michigan / Coursera", "url": "https://www.coursera.org/search?query=Problem+Solving+Using+Computational+Thinking", "duration": "4 weeks"}, {"title": "Structured Decision Making", "provider": "University of Melbourne / Coursera", "url": "https://www.coursera.org/search?query=Structured+Decision+Making", "duration": "4 weeks"}]}, "connections": 17}, {"id": "Computers and Electronics", "category": "technical", "careers": ["Actors", "Advertising and Promotions Managers", "Aerospace Engineers", "Appraisers and Assessors of Real Estate", "Architects, Except Landscape and Naval", "Architectural and Civil Drafters"], "course": {"title": "Google IT Support Professional Certificate", "provider": "Google / Coursera", "url": "https://www.coursera.org/search?query=Google+IT+Support+Professional+Certificate", "duration": "6 months", "cost": "Free to audit", "next": [{"title": "Google Cybersecurity Professional Certificate", "provider": "Google / Coursera", "url": "https://www.coursera.org/search?query=Google+Cybersecurity+Professional+Certificate", "duration": "6 months"}, {"title": "Computer Science 101", "provider": "Stanford / edX", "url": "https://www.edx.org/search?q=Computer+Science+101", "duration": "6 weeks"}, {"title": "Google IT Automation with Python", "provider": "Google / Coursera", "url": "https://www.coursera.org/search?query=Google+IT+Automation+with+Python", "duration": "6 months"}]}, "connections": 42}, {"id": "Coordination", "category": "people", "careers": ["Chief Executives", "Facilities Managers", "Financial Managers", "First-Line Supervisors of Helpers, Laborers, and Material Movers, Hand", "General and Operations Managers", "Human Resources Managers"], "course": {"title": "Google Project Management Certificate", "provider": "Google / Coursera", "url": "https://www.coursera.org/search?query=Google+Project+Management+Certificate", "duration": "6 months", "cost": "Free to audit", "next": [{"title": "Agile Project Management", "provider": "Google / Coursera", "url": "https://www.coursera.org/search?query=Agile+Project+Management", "duration": "5 weeks"}, {"title": "Leading Teams", "provider": "University of Michigan / Coursera", "url": "https://www.coursera.org/search?query=Leading+Teams", "duration": "4 weeks"}, {"title": "Organizational Behavior: How to Manage People", "provider": "IESE / Coursera", "url": "https://www.coursera.org/search?query=Organizational+Behavior%3A+How+to+Manage+People", "duration": "4 weeks"}]}, "connections": 13}, {"id": "Critical Thinking", "category": "people", "careers": ["Accountants and Auditors", "Administrative Law Judges, Adjudicators, and Hearing Officers", "Biostatisticians", "Budget Analysts", "Business Intelligence Analysts", "Computer Network Support Specialists"], "course": {"title": "Mindware: Critical Thinking for the Information Age", "provider": "University of Michigan / Coursera", "url": "https://www.coursera.org/search?query=Mindware%3A+Critical+Thinking+for+the+Information+Age", "duration": "8 weeks", "cost": "Free to audit", "next": [{"title": "Think Again: How to Reason and Argue", "provider": "Duke / Coursera", "url": "https://www.coursera.org/search?query=Think+Again%3A+How+to+Reason+and+Argue", "duration": "4 weeks"}, {"title": "Introduction to Logic and Critical Thinking", "provider": "Duke / Coursera", "url": "https://www.coursera.org/search?query=Introduction+to+Logic+and+Critical+Thinking", "duration": "4 weeks"}, {"title": "Problem Solving Using Computational Thinking", "provider": "University of Michigan / Coursera", "url": "https://www.coursera.org/search?query=Problem+Solving+Using+Computational+Thinking", "duration": "4 weeks"}]}, "connections": 21}, {"id": "Customer and Personal Service", "category": "technical", "careers": ["Accountants and Auditors", "Acute Care Nurses", "Administrative Services Managers", "Advanced Practice Psychiatric Nurses", "Anesthesiologists", "Appraisers and Assessors of Real Estate"], "course": {"title": "Customer Service Fundamentals", "provider": "CVS Health / Coursera", "url": "https://www.coursera.org/search?query=Customer+Service+Fundamentals", "duration": "4 weeks", "cost": "Free to audit", "next": [{"title": "Customer Experience Management", "provider": "Coursera", "url": "https://www.coursera.org/search?query=Customer+Experience+Management", "duration": "4 weeks"}, {"title": "Communication Strategies for a Virtual Age", "provider": "University of Toronto / Coursera", "url": "https://www.coursera.org/search?query=Communication+Strategies+for+a+Virtual+Age", "duration": "4 weeks"}, {"title": "CRM Fundamentals and Practice", "provider": "Coursera", "url": "https://www.coursera.org/search?query=CRM+Fundamentals+and+Practice", "duration": "4 weeks"}]}, "connections": 39}, {"id": "Design", "category": "creative", "careers": ["Actors", "Advertising and Promotions Managers", "Aerospace Engineers", "Appraisers and Assessors of Real Estate", "Architects, Except Landscape and Naval", "Architectural and Civil Drafters"], "course": {"title": "Graphic Design Specialization", "provider": "CalArts / Coursera", "url": "https://www.coursera.org/search?query=Graphic+Design+Specialization", "duration": "5 months", "cost": "Free to audit", "next": [{"title": "UI / UX Design Specialization", "provider": "CalArts / Coursera", "url": "https://www.coursera.org/search?query=UI+%2F+UX+Design+Specialization", "duration": "4 months"}, {"title": "Visual Elements of User Interface Design", "provider": "CalArts / Coursera", "url": "https://www.coursera.org/search?query=Visual+Elements+of+User+Interface+Design", "duration": "4 weeks"}, {"title": "Google UX Design Professional Certificate", "provider": "Google / Coursera", "url": "https://www.coursera.org/search?query=Google+UX+Design+Professional+Certificate", "duration": "6 months"}]}, "connections": 32}, {"id": "Economics and Accounting", "category": "technical", "careers": ["Accountants and Auditors", "Appraisers and Assessors of Real Estate", "Architects, Except Landscape and Naval", "Biostatisticians", "Budget Analysts", "Chief Executives"], "course": {"title": "Financial Accounting Fundamentals", "provider": "University of Virginia / Coursera", "url": "https://www.coursera.org/search?query=Financial+Accounting+Fundamentals", "duration": "5 weeks", "cost": "Free to audit", "next": [{"title": "Introduction to Corporate Finance", "provider": "University of Pennsylvania / Coursera", "url": "https://www.coursera.org/search?query=Introduction+to+Corporate+Finance", "duration": "4 weeks"}, {"title": "Managerial Accounting Fundamentals", "provider": "University of Virginia / Coursera", "url": "https://www.coursera.org/search?query=Managerial+Accounting+Fundamentals", "duration": "5 weeks"}, {"title": "Financial Markets", "provider": "Yale / Coursera", "url": "https://www.coursera.org/search?query=Financial+Markets", "duration": "7 weeks"}]}, "connections": 31}, {"id": "Education and Training", "category": "technical", "careers": ["Acute Care Nurses", "Advanced Practice Psychiatric Nurses", "Agricultural Sciences Teachers, Postsecondary", "Agricultural Technicians", "Animal Scientists", "Anthropologists and Archeologists"], "course": {"title": "Foundations of Teaching for Learning", "provider": "Commonwealth Education Trust / Coursera", "url": "https://www.coursera.org/search?query=Foundations+of+Teaching+for+Learning", "duration": "7 months", "cost": "Free to audit", "next": [{"title": "Instructional Design and Technology", "provider": "University of Maryland / Coursera", "url": "https://www.coursera.org/search?query=Instructional+Design+and+Technology", "duration": "4 months"}, {"title": "Learning to Teach Online", "provider": "UNSW / Coursera", "url": "https://www.coursera.org/search?query=Learning+to+Teach+Online", "duration": "5 weeks"}, {"title": "Assessment and Teaching of 21st Century Skills", "provider": "University of Melbourne / Coursera", "url": "https://www.coursera.org/search?query=Assessment+and+Teaching+of+21st+Century+Skills", "duration": "6 weeks"}]}, "connections": 36}, {"id": "Engineering and Technology", "category": "technical", "careers": ["Aerospace Engineers", "Architects, Except Landscape and Naval", "Architectural and Civil Drafters", "Architectural and Engineering Managers", "Art Directors", "Art, Drama, and Music Teachers, Postsecondary"], "course": {"title": "Introduction to Engineering Mechanics", "provider": "Georgia Tech / Coursera", "url": "https://www.coursera.org/search?query=Introduction+to+Engineering+Mechanics", "duration": "8 weeks", "cost": "Free to audit", "next": [{"title": "Materials Science: 10 Things Every Engineer Should Know", "provider": "UC Davis / Coursera", "url": "https://www.coursera.org/search?query=Materials+Science%3A+10+Things+Every+Engineer+Should+Know", "duration": "5 weeks"}, {"title": "Introduction to Systems Engineering", "provider": "UNSW / Coursera", "url": "https://www.coursera.org/search?query=Introduction+to+Systems+Engineering", "duration": "4 weeks"}, {"title": "Engineering Project Management", "provider": "Rice University / Coursera", "url": "https://www.coursera.org/search?query=Engineering+Project+Management", "duration": "4 weeks"}]}, "connections": 27}, {"id": "English Language", "category": "creative", "careers": ["Accountants and Auditors", "Actors", "Administrative Law Judges, Adjudicators, and Hearing Officers", "Administrative Services Managers", "Advertising and Promotions Managers", "Anesthesiologists"], "course": {"title": "Academic English: Writing Specialization", "provider": "UC Irvine / Coursera", "url": "https://www.coursera.org/search?query=Academic+English%3A+Writing+Specialization", "duration": "5 months", "cost": "Free to audit", "next": [{"title": "Writing Professional Emails and Memos", "provider": "UC Irvine / Coursera", "url": "https://www.coursera.org/search?query=Writing+Professional+Emails+and+Memos", "duration": "4 weeks"}, {"title": "Advanced Writing", "provider": "UC Irvine / Coursera", "url": "https://www.coursera.org/search?query=Advanced+Writing", "duration": "5 weeks"}, {"title": "Business English for Non-Native Speakers", "provider": "Hong Kong University / Coursera", "url": "https://www.coursera.org/search?query=Business+English+for+Non-Native+Speakers", "duration": "5 weeks"}]}, "connections": 45}, {"id": "Fine Arts", "category": "creative", "careers": ["Actors", "Advertising and Promotions Managers", "Art Directors", "Art, Drama, and Music Teachers, Postsecondary", "Camera Operators, Television, Video, and Film", "Commercial and Industrial Designers"], "course": {"title": "Modern Art & Ideas", "provider": "MoMA / Coursera", "url": "https://www.coursera.org/search?query=Modern+Art+and+Ideas", "duration": "5 weeks", "cost": "Free to audit", "next": [{"title": "Art and Activity: Interactive Strategies for Engaging with Art", "provider": "MoMA / Coursera", "url": "https://www.coursera.org/search?query=Art+and+Activity%3A+Interactive+Strategies+for+Engaging+with+Art", "duration": "4 weeks"}, {"title": "Introduction to Art: Concepts and Techniques", "provider": "Pennsylvania State / Coursera", "url": "https://www.coursera.org/search?query=Introduction+to+Art%3A+Concepts+and+Techniques", "duration": "4 weeks"}, {"title": "Photography Basics and Beyond", "provider": "Michigan State / Coursera", "url": "https://www.coursera.org/search?query=Photography+Basics+and+Beyond", "duration": "5 months"}]}, "connections": 16}, {"id": "Food Production", "category": "technical", "careers": ["Agricultural Sciences Teachers, Postsecondary", "Agricultural Technicians", "Animal Scientists", "Chefs and Head Cooks", "Conservation Scientists", "Dietitians and Nutritionists"], "course": {"title": "Food Science", "provider": "Wageningen / edX", "url": "https://www.edx.org/search?q=Food+Science", "duration": "6 weeks", "cost": "Free to audit", "next": [{"title": "Food Safety and Toxicology", "provider": "Wageningen / edX", "url": "https://www.edx.org/search?q=Food+Safety+and+Toxicology", "duration": "6 weeks"}, {"title": "Nutrition and Health: Food Risks", "provider": "Wageningen / edX", "url": "https://www.edx.org/search?q=Nutrition+and+Health%3A+Food+Risks", "duration": "4 weeks"}, {"title": "Sustainable Food Production Through Livestock Health Management", "provider": "University of Illinois / Coursera", "url": "https://www.coursera.org/search?query=Sustainable+Food+Production+Through+Livestock+Health+Management", "duration": "5 weeks"}]}, "connections": 16}, {"id": "Foreign Language", "category": "creative", "careers": ["Curators", "Editors", "English Language and Literature Teachers, Postsecondary", "Historians", "History Teachers, Postsecondary", "Interpreters and Translators"], "course": {"title": "First Step Korean", "provider": "Yonsei University / Coursera", "url": "https://www.coursera.org/search?query=First+Step+Korean", "duration": "5 weeks", "cost": "Free to audit", "next": [{"title": "Chinese for Beginners", "provider": "Peking University / Coursera", "url": "https://www.coursera.org/search?query=Chinese+for+Beginners", "duration": "7 weeks"}, {"title": "Spanish for Beginners", "provider": "UC Davis / Coursera", "url": "https://www.coursera.org/search?query=Spanish+for+Beginners", "duration": "5 weeks"}, {"title": "Japanese for Beginners", "provider": "Emory University / Coursera", "url": "https://www.coursera.org/search?query=Japanese+for+Beginners", "duration": "5 weeks"}]}, "connections": 13}, {"id": "Geography", "category": "technical", "careers": ["Anthropologists and Archeologists", "Anthropology and Archeology Teachers, Postsecondary", "Architects, Except Landscape and Naval", "Architectural and Civil Drafters", "Architectural and Engineering Managers", "Chief Executives"], "course": {"title": "Geographic Information Systems (GIS)", "provider": "UC Davis / Coursera", "url": "https://www.coursera.org/search?query=Geographic+Information+Systems+%28GIS%29", "duration": "5 months", "cost": "Free to audit", "next": [{"title": "Remote Sensing Image Analysis", "provider": "UC Davis / Coursera", "url": "https://www.coursera.org/search?query=Remote+Sensing+Image+Analysis", "duration": "4 weeks"}, {"title": "Spatial Data Science and Applications", "provider": "Yonsei University / Coursera", "url": "https://www.coursera.org/search?query=Spatial+Data+Science+and+Applications", "duration": "5 weeks"}, {"title": "GIS Data Formats, Design, and Quality", "provider": "UC Davis / Coursera", "url": "https://www.coursera.org/search?query=GIS+Data+Formats%2C+Design%2C+and+Quality", "duration": "4 weeks"}]}, "connections": 28}, {"id": "History and Archeology", "category": "creative", "careers": ["Anthropologists and Archeologists", "Anthropology and Archeology Teachers, Postsecondary", "Clergy", "Curators", "Historians", "History Teachers, Postsecondary"], "course": {"title": "The Ancient Greeks", "provider": "Wesleyan / Coursera", "url": "https://www.coursera.org/search?query=The+Ancient+Greeks", "duration": "8 weeks", "cost": "Free to audit", "next": [{"title": "A History of the World since 1300", "provider": "Princeton / Coursera", "url": "https://www.coursera.org/search?query=A+History+of+the+World+since+1300", "duration": "12 weeks"}, {"title": "Archaeology: From Dig to Lab and Beyond", "provider": "Emory University / Coursera", "url": "https://www.coursera.org/search?query=Archaeology%3A+From+Dig+to+Lab+and+Beyond", "duration": "6 weeks"}, {"title": "The Modern World: Global History since 1760", "provider": "University of Virginia / Coursera", "url": "https://www.coursera.org/search?query=The+Modern+World%3A+Global+History+since+1760", "duration": "10 weeks"}]}, "connections": 11}, {"id": "Instructing", "category": "people", "careers": ["Athletic Trainers", "Business Teachers, Postsecondary", "Career/Technical Education Teachers, Secondary School", "Educational, Guidance, and Career Counselors and Advisors", "Elementary School Teachers, Except Special Education", "Exercise Physiologists"], "course": {"title": "Foundations of Teaching for Learning", "provider": "Commonwealth Education Trust / Coursera", "url": "https://www.coursera.org/search?query=Foundations+of+Teaching+for+Learning", "duration": "7 months", "cost": "Free to audit", "next": [{"title": "Instructional Design and Technology", "provider": "University of Maryland / Coursera", "url": "https://www.coursera.org/search?query=Instructional+Design+and+Technology", "duration": "4 months"}, {"title": "Learning to Teach Online", "provider": "UNSW / Coursera", "url": "https://www.coursera.org/search?query=Learning+to+Teach+Online", "duration": "5 weeks"}, {"title": "Blended Learning: Personalizing Education for Students", "provider": "New Teacher Center / Coursera", "url": "https://www.coursera.org/search?query=Blended+Learning%3A+Personalizing+Education+for+Students", "duration": "4 weeks"}]}, "connections": 14}, {"id": "Judgment and Decision Making", "category": "people", "careers": ["Anesthesiologists", "Computer Systems Analysts", "Computer and Information Research Scientists", "Family Medicine Physicians", "General Internal Medicine Physicians", "Management Analysts"], "course": {"title": "Model Thinking", "provider": "University of Michigan / Coursera", "url": "https://www.coursera.org/search?query=Model+Thinking", "duration": "12 weeks", "cost": "Free to audit", "next": [{"title": "Behavioral Economics in Action", "provider": "University of Toronto / Coursera", "url": "https://www.coursera.org/search?query=Behavioral+Economics+in+Action", "duration": "4 weeks"}, {"title": "Decision Making and Scenarios", "provider": "University of Pennsylvania / Coursera", "url": "https://www.coursera.org/search?query=Decision+Making+and+Scenarios", "duration": "4 weeks"}, {"title": "Structured Decision Making", "provider": "University of Melbourne / Coursera", "url": "https://www.coursera.org/search?query=Structured+Decision+Making", "duration": "4 weeks"}]}, "connections": 15}, {"id": "Law and Government", "category": "technical", "careers": ["Administrative Law Judges, Adjudicators, and Hearing Officers", "Administrative Services Managers", "Appraisers and Assessors of Real Estate", "Chief Executives", "Compliance Officers", "Correctional Officers and Jailers"], "course": {"title": "Introduction to American Law", "provider": "University of Pennsylvania / Coursera", "url": "https://www.coursera.org/search?query=Introduction+to+American+Law", "duration": "6 weeks", "cost": "Free to audit", "next": [{"title": "Contract Law: From Trust to Promise to Contract", "provider": "Harvard / edX", "url": "https://www.edx.org/search?q=Contract+Law%3A+From+Trust+to+Promise+to+Contract", "duration": "5 weeks"}, {"title": "International Law", "provider": "University of Louvain / Coursera", "url": "https://www.coursera.org/search?query=International+Law", "duration": "8 weeks"}, {"title": "Constitutional Law", "provider": "Yale / Coursera", "url": "https://www.coursera.org/search?query=Constitutional+Law", "duration": "7 weeks"}]}, "connections": 29}, {"id": "Learning Strategies", "category": "people", "careers": ["Athletic Trainers", "Biochemists and Biophysicists", "Biological Science Teachers, Postsecondary", "Biological Technicians", "Business Teachers, Postsecondary", "Career/Technical Education Teachers, Secondary School"], "course": {"title": "Learning How to Learn", "provider": "McMaster University / Coursera", "url": "https://www.coursera.org/search?query=Learning+How+to+Learn", "duration": "4 weeks", "cost": "Free to audit", "next": [{"title": "Mindshift: Break Through Obstacles to Learning", "provider": "McMaster University / Coursera", "url": "https://www.coursera.org/search?query=Mindshift%3A+Break+Through+Obstacles+to+Learning", "duration": "4 weeks"}, {"title": "Study Skills for Academic Success", "provider": "Coursera", "url": "https://www.coursera.org/search?query=Study+Skills+for+Academic+Success", "duration": "4 weeks"}, {"title": "Personal Productivity, Time Management and Prioritization", "provider": "Coursera", "url": "https://www.coursera.org/search?query=Personal+Productivity%2C+Time+Management+and+Prioritization", "duration": "3 weeks"}]}, "connections": 20}, {"id": "Management of Personnel Resources", "category": "people", "careers": ["Administrative Services Managers", "Advertising and Promotions Managers", "Cashiers", "Chefs and Head Cooks", "Chief Executives", "Compliance Officers"], "course": {"title": "Leading People and Teams", "provider": "University of Michigan / Coursera", "url": "https://www.coursera.org/search?query=Leading+People+and+Teams", "duration": "4 months", "cost": "Free to audit", "next": [{"title": "Talent Management and Succession Planning", "provider": "University of Michigan / Coursera", "url": "https://www.coursera.org/search?query=Talent+Management+and+Succession+Planning", "duration": "4 weeks"}, {"title": "Managing Employee Performance", "provider": "University of Minnesota / Coursera", "url": "https://www.coursera.org/search?query=Managing+Employee+Performance", "duration": "4 weeks"}, {"title": "Coaching Skills for Managers", "provider": "UC Davis / Coursera", "url": "https://www.coursera.org/search?query=Coaching+Skills+for+Managers", "duration": "4 weeks"}]}, "connections": 22}, {"id": "Mathematics", "category": "technical", "careers": ["Accountants and Auditors", "Advertising and Promotions Managers", "Agricultural Sciences Teachers, Postsecondary", "Agricultural Technicians", "Animal Scientists", "Architects, Except Landscape and Naval"], "course": {"title": "Mathematics for Data Science", "provider": "Imperial College / Coursera", "url": "https://www.coursera.org/search?query=Mathematics+for+Data+Science", "duration": "6 months", "cost": "Free to audit", "next": [{"title": "Linear Algebra", "provider": "MIT / edX", "url": "https://www.edx.org/search?q=Linear+Algebra", "duration": "12 weeks"}, {"title": "Calculus: Single Variable", "provider": "University of Pennsylvania / Coursera", "url": "https://www.coursera.org/search?query=Calculus%3A+Single+Variable", "duration": "4 months"}, {"title": "Discrete Mathematics", "provider": "UC San Diego / Coursera", "url": "https://www.coursera.org/search?query=Discrete+Mathematics", "duration": "5 months"}]}, "connections": 39}, {"id": "Mechanical", "category": "technical", "careers": ["Aerospace Engineers", "Architectural and Engineering Managers", "Art Directors", "Art, Drama, and Music Teachers, Postsecondary", "Automotive Engineers", "Bioengineers and Biomedical Engineers"], "course": {"title": "Introduction to Mechanical Engineering Design", "provider": "Georgia Tech / Coursera", "url": "https://www.coursera.org/search?query=Introduction+to+Mechanical+Engineering+Design", "duration": "9 weeks", "cost": "Free to audit", "next": [{"title": "CAD and Digital Manufacturing", "provider": "Autodesk / Coursera", "url": "https://www.coursera.org/search?query=CAD+and+Digital+Manufacturing", "duration": "6 months"}, {"title": "Mechanics of Materials", "provider": "Georgia Tech / Coursera", "url": "https://www.coursera.org/search?query=Mechanics+of+Materials", "duration": "8 weeks"}, {"title": "Introduction to Thermodynamics", "provider": "University of Michigan / Coursera", "url": "https://www.coursera.org/search?query=Introduction+to+Thermodynamics", "duration": "4 weeks"}]}, "connections": 20}, {"id": "Medicine and Dentistry", "category": "technical", "careers": ["Acute Care Nurses", "Advanced Practice Psychiatric Nurses", "Anesthesiologists", "Athletic Trainers", "Community Health Workers", "Critical Care Nurses"], "course": {"title": "Anatomy Specialization", "provider": "University of Michigan / Coursera", "url": "https://www.coursera.org/search?query=Anatomy+Specialization", "duration": "4 months", "cost": "Free to audit", "next": [{"title": "Medical Neuroscience", "provider": "Duke / Coursera", "url": "https://www.coursera.org/search?query=Medical+Neuroscience", "duration": "12 weeks"}, {"title": "Vital Signs: Understanding What the Body Is Telling Us", "provider": "University of Pennsylvania / Coursera", "url": "https://www.coursera.org/search?query=Vital+Signs%3A+Understanding+What+the+Body+Is+Telling+Us", "duration": "6 weeks"}, {"title": "Introductory Human Physiology", "provider": "Duke / Coursera", "url": "https://www.coursera.org/search?query=Introductory+Human+Physiology", "duration": "10 weeks"}]}, "connections": 20}, {"id": "Monitoring", "category": "people", "careers": ["Acute Care Nurses", "Advanced Practice Psychiatric Nurses", "Career/Technical Education Teachers, Secondary School", "Critical Care Nurses", "Elementary School Teachers, Except Special Education", "Instructional Coordinators"], "course": {"title": "Operations Management", "provider": "University of Pennsylvania / Coursera", "url": "https://www.coursera.org/search?query=Operations+Management", "duration": "4 weeks", "cost": "Free to audit", "next": [{"title": "Six Sigma Yellow Belt Specialization", "provider": "University System of Georgia / Coursera", "url": "https://www.coursera.org/search?query=Six+Sigma+Yellow+Belt+Specialization", "duration": "4 months"}, {"title": "Operations Analytics", "provider": "University of Pennsylvania / Coursera", "url": "https://www.coursera.org/search?query=Operations+Analytics", "duration": "4 weeks"}, {"title": "Business Metrics for Data-Driven Companies", "provider": "Duke / Coursera", "url": "https://www.coursera.org/search?query=Business+Metrics+for+Data-Driven+Companies", "duration": "4 weeks"}]}, "connections": 19}, {"id": "Negotiation", "category": "people", "careers": ["Administrative Law Judges, Adjudicators, and Hearing Officers", "Advertising and Promotions Managers", "Chief Executives", "Compliance Officers", "Construction Managers", "Editors"], "course": {"title": "Introduction to Negotiation", "provider": "Yale / Coursera", "url": "https://www.coursera.org/search?query=Introduction+to+Negotiation", "duration": "9 weeks", "cost": "Free to audit", "next": [{"title": "Successful Negotiation: Essential Strategies and Skills", "provider": "University of Michigan / Coursera", "url": "https://www.coursera.org/search?query=Successful+Negotiation%3A+Essential+Strategies+and+Skills", "duration": "7 weeks"}, {"title": "Negotiation, Mediation, and Conflict Resolution", "provider": "ESSEC / Coursera", "url": "https://www.coursera.org/search?query=Negotiation%2C+Mediation%2C+and+Conflict+Resolution", "duration": "5 months"}, {"title": "International Business Negotiation", "provider": "University of London / Coursera", "url": "https://www.coursera.org/search?query=International+Business+Negotiation", "duration": "4 weeks"}]}, "connections": 20}, {"id": "Operations Analysis", "category": "technical", "careers": ["Architects, Except Landscape and Naval", "Architectural and Civil Drafters", "Architectural and Engineering Managers", "Art Directors", "Civil Engineering Technologists and Technicians", "Civil Engineers"], "course": {"title": "Operations Analytics", "provider": "University of Pennsylvania / Coursera", "url": "https://www.coursera.org/search?query=Operations+Analytics", "duration": "4 weeks", "cost": "Free to audit", "next": [{"title": "Business Analytics Specialization", "provider": "University of Pennsylvania / Coursera", "url": "https://www.coursera.org/search?query=Business+Analytics+Specialization", "duration": "4 months"}, {"title": "Process Improvement with Six Sigma", "provider": "University System of Georgia / Coursera", "url": "https://www.coursera.org/search?query=Process+Improvement+with+Six+Sigma", "duration": "4 weeks"}, {"title": "Supply Chain Analytics", "provider": "Rutgers / Coursera", "url": "https://www.coursera.org/search?query=Supply+Chain+Analytics", "duration": "4 weeks"}]}, "connections": 13}, {"id": "Operations Monitoring", "category": "technical", "careers": ["Electrical Engineers", "Electrical and Electronic Engineering Technologists and Technicians", "Electronics Engineers, Except Computer", "Industrial Engineers", "Network and Computer Systems Administrators"], "course": {"title": "Operations Management", "provider": "University of Pennsylvania / Coursera", "url": "https://www.coursera.org/search?query=Operations+Management", "duration": "4 weeks", "cost": "Free to audit", "next": [{"title": "Six Sigma Yellow Belt Specialization", "provider": "University System of Georgia / Coursera", "url": "https://www.coursera.org/search?query=Six+Sigma+Yellow+Belt+Specialization", "duration": "4 months"}, {"title": "Business Metrics for Data-Driven Companies", "provider": "Duke / Coursera", "url": "https://www.coursera.org/search?query=Business+Metrics+for+Data-Driven+Companies", "duration": "4 weeks"}, {"title": "Lean Production", "provider": "Coursera", "url": "https://www.coursera.org/search?query=Lean+Production", "duration": "4 weeks"}]}, "connections": 7}, {"id": "Personnel and Human Resources", "category": "technical", "careers": ["Administrative Law Judges, Adjudicators, and Hearing Officers", "Administrative Services Managers", "Chefs and Head Cooks", "Chief Executives", "Compliance Officers", "Computer Systems Analysts"], "course": {"title": "Human Resource Management: HR for People Managers", "provider": "University of Minnesota / Coursera", "url": "https://www.coursera.org/search?query=Human+Resource+Management%3A+HR+for+People+Managers", "duration": "5 months", "cost": "Free to audit", "next": [{"title": "Recruiting, Hiring, and Onboarding Employees", "provider": "University of Minnesota / Coursera", "url": "https://www.coursera.org/search?query=Recruiting%2C+Hiring%2C+and+Onboarding+Employees", "duration": "4 weeks"}, {"title": "Compensation and Benefits", "provider": "University of Minnesota / Coursera", "url": "https://www.coursera.org/search?query=Compensation+and+Benefits", "duration": "4 weeks"}, {"title": "People Analytics", "provider": "University of Pennsylvania / Coursera", "url": "https://www.coursera.org/search?query=People+Analytics", "duration": "4 weeks"}]}, "connections": 28}, {"id": "Persuasion", "category": "people", "careers": ["Chief Executives", "Child, Family, and School Social Workers", "Fundraisers", "Healthcare Social Workers", "Social and Community Service Managers"], "course": {"title": "Influence: The Psychology of Persuasion", "provider": "University of Michigan / Coursera", "url": "https://www.coursera.org/search?query=Influence%3A+The+Psychology+of+Persuasion", "duration": "5 weeks", "cost": "Free to audit", "next": [{"title": "Rhetoric: The Art of Persuasive Writing and Public Speaking", "provider": "Harvard / edX", "url": "https://www.edx.org/search?q=Rhetoric%3A+The+Art+of+Persuasive+Writing+and+Public+Speaking", "duration": "8 weeks"}, {"title": "Marketing in a Digital World", "provider": "University of Illinois / Coursera", "url": "https://www.coursera.org/search?query=Marketing+in+a+Digital+World", "duration": "4 weeks"}, {"title": "Introduction to Negotiation", "provider": "Yale / Coursera", "url": "https://www.coursera.org/search?query=Introduction+to+Negotiation", "duration": "9 weeks"}]}, "connections": 7}, {"id": "Philosophy and Theology", "category": "creative", "careers": ["Anthropologists and Archeologists", "Clergy", "Lawyers", "Philosophy and Religion Teachers, Postsecondary", "Writers and Authors"], "course": {"title": "Introduction to Philosophy", "provider": "University of Edinburgh / Coursera", "url": "https://www.coursera.org/search?query=Introduction+to+Philosophy", "duration": "5 weeks", "cost": "Free to audit", "next": [{"title": "Think Again: How to Reason and Argue", "provider": "Duke / Coursera", "url": "https://www.coursera.org/search?query=Think+Again%3A+How+to+Reason+and+Argue", "duration": "4 weeks"}, {"title": "Ancient Philosophy: Plato and His Predecessors", "provider": "University of Pennsylvania / Coursera", "url": "https://www.coursera.org/search?query=Ancient+Philosophy%3A+Plato+and+His+Predecessors", "duration": "5 weeks"}, {"title": "Philosophy of Science", "provider": "University of Pennsylvania / Coursera", "url": "https://www.coursera.org/search?query=Philosophy+of+Science", "duration": "5 weeks"}]}, "connections": 7}, {"id": "Physics", "category": "technical", "careers": ["Aerospace Engineers", "Atmospheric, Earth, Marine, and Space Sciences Teachers, Postsecondary", "Automotive Engineers", "Chemical Technicians", "Chemistry Teachers, Postsecondary", "Chemists"], "course": {"title": "How Things Work: An Introduction to Physics", "provider": "University of Virginia / Coursera", "url": "https://www.coursera.org/search?query=How+Things+Work%3A+An+Introduction+to+Physics", "duration": "8 weeks", "cost": "Free to audit", "next": [{"title": "Mechanics: Motion, Forces, Energy and Gravity", "provider": "UNSW / Coursera", "url": "https://www.coursera.org/search?query=Mechanics%3A+Motion%2C+Forces%2C+Energy+and+Gravity", "duration": "8 weeks"}, {"title": "Electricity and Magnetism", "provider": "MIT / edX", "url": "https://www.edx.org/search?q=Electricity+and+Magnetism", "duration": "14 weeks"}, {"title": "Introduction to Thermodynamics", "provider": "University of Michigan / Coursera", "url": "https://www.coursera.org/search?query=Introduction+to+Thermodynamics", "duration": "4 weeks"}]}, "connections": 14}, {"id": "Production and Processing", "category": "technical", "careers": ["Aerospace Engineers", "Agricultural Sciences Teachers, Postsecondary", "Agricultural Technicians", "Animal Scientists", "Architectural and Engineering Managers", "Art Directors"], "course": {"title": "Supply Chain Management Specialization", "provider": "Rutgers / Coursera", "url": "https://www.coursera.org/search?query=Supply+Chain+Management+Specialization", "duration": "4 months", "cost": "Free to audit", "next": [{"title": "Operations Management", "provider": "University of Pennsylvania / Coursera", "url": "https://www.coursera.org/search?query=Operations+Management", "duration": "4 weeks"}, {"title": "Lean Six Sigma", "provider": "University System of Georgia / Coursera", "url": "https://www.coursera.org/search?query=Lean+Six+Sigma", "duration": "4 months"}, {"title": "Global Procurement and Sourcing", "provider": "Rutgers / Coursera", "url": "https://www.coursera.org/search?query=Global+Procurement+and+Sourcing", "duration": "4 weeks"}]}, "connections": 29}, {"id": "Programming", "category": "technical", "careers": ["Bioengineers and Biomedical Engineers", "Biostatisticians", "Business Intelligence Analysts", "Computer Systems Analysts", "Computer Systems Engineers/Architects", "Computer and Information Research Scientists"], "course": {"title": "Python for Everybody", "provider": "University of Michigan / Coursera", "url": "https://www.coursera.org/search?query=Python+for+Everybody", "duration": "8 months", "cost": "Free to audit", "next": [{"title": "Python Data Structures", "provider": "University of Michigan / Coursera", "url": "https://www.coursera.org/search?query=Python+Data+Structures", "duration": "7 weeks"}, {"title": "Introduction to Computer Science and Programming Using Python", "provider": "MIT / edX", "url": "https://www.edx.org/search?q=Introduction+to+Computer+Science+and+Programming+Using+Python", "duration": "9 weeks"}, {"title": "100 Days of Code: The Complete Python Pro Bootcamp", "provider": "Coursera", "url": "https://www.coursera.org/search?query=100+Days+of+Code%3A+The+Complete+Python+Pro+Bootcamp", "duration": "4 months"}]}, "connections": 16}, {"id": "Psychology", "category": "technical", "careers": ["Acute Care Nurses", "Advanced Practice Psychiatric Nurses", "Anesthesiologists", "Athletic Trainers", "Chief Executives", "Child, Family, and School Social Workers"], "course": {"title": "Introduction to Psychology", "provider": "Yale / Coursera", "url": "https://www.coursera.org/search?query=Introduction+to+Psychology", "duration": "6 weeks", "cost": "Free to audit", "next": [{"title": "Social Psychology", "provider": "Wesleyan / Coursera", "url": "https://www.coursera.org/search?query=Social+Psychology", "duration": "7 weeks"}, {"title": "Positive Psychology Specialization", "provider": "University of Pennsylvania / Coursera", "url": "https://www.coursera.org/search?query=Positive+Psychology+Specialization", "duration": "5 months"}, {"title": "Introduction to Clinical Psychology", "provider": "University of Queensland / edX", "url": "https://www.edx.org/search?q=Introduction+to+Clinical+Psychology", "duration": "8 weeks"}]}, "connections": 28}, {"id": "Public Safety and Security", "category": "technical", "careers": ["Architects, Except Landscape and Naval", "Architectural and Civil Drafters", "Architectural and Engineering Managers", "Civil Engineering Technologists and Technicians", "Civil Engineers", "Compliance Officers"], "course": {"title": "Introduction to Cybersecurity for Business", "provider": "University of Colorado / Coursera", "url": "https://www.coursera.org/search?query=Introduction+to+Cybersecurity+for+Business", "duration": "4 weeks", "cost": "Free to audit", "next": [{"title": "Google Cybersecurity Professional Certificate", "provider": "Google / Coursera", "url": "https://www.coursera.org/search?query=Google+Cybersecurity+Professional+Certificate", "duration": "6 months"}, {"title": "Network Security and Database Vulnerabilities", "provider": "IBM / Coursera", "url": "https://www.coursera.org/search?query=Network+Security+and+Database+Vulnerabilities", "duration": "4 weeks"}, {"title": "Security Operations and Administration", "provider": "ISC2 / Coursera", "url": "https://www.coursera.org/search?query=Security+Operations+and+Administration", "duration": "5 weeks"}]}, "connections": 18}, {"id": "Reading Comprehension", "category": "technical", "careers": ["Accountants and Auditors", "Actors", "Administrative Law Judges, Adjudicators, and Hearing Officers", "Administrative Services Managers", "Advertising and Promotions Managers", "Anthropologists and Archeologists"], "course": {"title": "Learning How to Learn", "provider": "McMaster University / Coursera", "url": "https://www.coursera.org/search?query=Learning+How+to+Learn", "duration": "4 weeks", "cost": "Free to audit", "next": [{"title": "Mindshift: Break Through Obstacles to Learning", "provider": "McMaster University / Coursera", "url": "https://www.coursera.org/search?query=Mindshift%3A+Break+Through+Obstacles+to+Learning", "duration": "4 weeks"}, {"title": "Speed Reading Mastery", "provider": "Coursera", "url": "https://www.coursera.org/search?query=Speed+Reading+Mastery", "duration": "3 weeks"}, {"title": "Critical Reading and Writing", "provider": "edX", "url": "https://www.edx.org/search?q=Critical+Reading+and+Writing", "duration": "6 weeks"}]}, "connections": 47}, {"id": "Sales and Marketing", "category": "technical", "careers": ["Actors", "Advertising and Promotions Managers", "Appraisers and Assessors of Real Estate", "Camera Operators, Television, Video, and Film", "Cashiers", "Chefs and Head Cooks"], "course": {"title": "Google Digital Marketing & E-commerce Certificate", "provider": "Google / Coursera", "url": "https://www.coursera.org/search?query=Google+Digital+Marketing+and+E-commerce+Certificate", "duration": "6 months", "cost": "Free to audit", "next": [{"title": "Marketing Analytics", "provider": "University of Virginia / Coursera", "url": "https://www.coursera.org/search?query=Marketing+Analytics", "duration": "5 weeks"}, {"title": "Social Media Marketing Specialization", "provider": "Northwestern / Coursera", "url": "https://www.coursera.org/search?query=Social+Media+Marketing+Specialization", "duration": "5 months"}, {"title": "Brand Management: Aligning Business, Brand and Behaviour", "provider": "University of London / Coursera", "url": "https://www.coursera.org/search?query=Brand+Management%3A+Aligning+Business%2C+Brand+and+Behaviour", "duration": "4 weeks"}]}, "connections": 32}, {"id": "Science", "category": "technical", "careers": ["Aerospace Engineers", "Agricultural Sciences Teachers, Postsecondary", "Agricultural Technicians", "Anesthesiologists", "Animal Scientists", "Architectural and Engineering Managers"], "course": {"title": "Understanding the Scientific Method", "provider": "University of Alberta / Coursera", "url": "https://www.coursera.org/search?query=Understanding+the+Scientific+Method", "duration": "5 weeks", "cost": "Free to audit", "next": [{"title": "Science Literacy", "provider": "University of Alberta / Coursera", "url": "https://www.coursera.org/search?query=Science+Literacy", "duration": "5 weeks"}, {"title": "Data Analysis and Statistical Inference", "provider": "Duke / Coursera", "url": "https://www.coursera.org/search?query=Data+Analysis+and+Statistical+Inference", "duration": "10 weeks"}, {"title": "Experimental Methods in Systems Biology", "provider": "Icahn School of Medicine / Coursera", "url": "https://www.coursera.org/search?query=Experimental+Methods+in+Systems+Biology", "duration": "5 weeks"}]}, "connections": 28}, {"id": "Service Orientation", "category": "people", "careers": ["Anesthesiologists", "Child, Family, and School Social Workers", "Educational, Guidance, and Career Counselors and Advisors", "Elementary School Teachers, Except Special Education", "Healthcare Social Workers", "Instructional Coordinators"], "course": {"title": "Customer Service Fundamentals", "provider": "CVS Health / Coursera", "url": "https://www.coursera.org/search?query=Customer+Service+Fundamentals", "duration": "4 weeks", "cost": "Free to audit", "next": [{"title": "Customer Experience Management", "provider": "Coursera", "url": "https://www.coursera.org/search?query=Customer+Experience+Management", "duration": "4 weeks"}, {"title": "Hospitality Management", "provider": "Coursera", "url": "https://www.coursera.org/search?query=Hospitality+Management", "duration": "5 weeks"}, {"title": "Communication Strategies for a Virtual Age", "provider": "University of Toronto / Coursera", "url": "https://www.coursera.org/search?query=Communication+Strategies+for+a+Virtual+Age", "duration": "4 weeks"}]}, "connections": 15}, {"id": "Social Perceptiveness", "category": "people", "careers": ["Acute Care Nurses", "Advanced Practice Psychiatric Nurses", "Anesthesiologists", "Business Teachers, Postsecondary", "Chief Executives", "Child, Family, and School Social Workers"], "course": {"title": "Emotional Intelligence", "provider": "University of Michigan / Coursera", "url": "https://www.coursera.org/search?query=Emotional+Intelligence", "duration": "4 weeks", "cost": "Free to audit", "next": [{"title": "Inspiring and Motivating Individuals", "provider": "University of Michigan / Coursera", "url": "https://www.coursera.org/search?query=Inspiring+and+Motivating+Individuals", "duration": "4 weeks"}, {"title": "Intercultural Communication and Conflict Resolution", "provider": "University of California / Coursera", "url": "https://www.coursera.org/search?query=Intercultural+Communication+and+Conflict+Resolution", "duration": "4 weeks"}, {"title": "The Science of Well-Being", "provider": "Yale / Coursera", "url": "https://www.coursera.org/search?query=The+Science+of+Well-Being", "duration": "10 weeks"}]}, "connections": 22}, {"id": "Sociology and Anthropology", "category": "technical", "careers": ["Anthropologists and Archeologists", "Anthropology and Archeology Teachers, Postsecondary", "Child, Family, and School Social Workers", "Clergy", "Clinical and Counseling Psychologists", "Curators"], "course": {"title": "Cultural Anthropology", "provider": "Macquarie University / Coursera", "url": "https://www.coursera.org/search?query=Cultural+Anthropology", "duration": "4 weeks", "cost": "Free to audit", "next": [{"title": "Social Norms, Social Change", "provider": "University of Pennsylvania / Coursera", "url": "https://www.coursera.org/search?query=Social+Norms%2C+Social+Change", "duration": "5 weeks"}, {"title": "Qualitative Research Methods", "provider": "University of Amsterdam / Coursera", "url": "https://www.coursera.org/search?query=Qualitative+Research+Methods", "duration": "4 weeks"}, {"title": "Medical Anthropology", "provider": "University of Copenhagen / Coursera", "url": "https://www.coursera.org/search?query=Medical+Anthropology", "duration": "6 weeks"}]}, "connections": 21}, {"id": "Speaking", "category": "people", "careers": ["Anthropologists and Archeologists", "Anthropology and Archeology Teachers, Postsecondary", "Appraisers and Assessors of Real Estate", "Business Teachers, Postsecondary", "Career/Technical Education Teachers, Secondary School", "Cashiers"], "course": {"title": "Introduction to Public Speaking", "provider": "University of Washington / Coursera", "url": "https://www.coursera.org/search?query=Introduction+to+Public+Speaking", "duration": "10 weeks", "cost": "Free to audit", "next": [{"title": "Dynamic Public Speaking Specialization", "provider": "University of Washington / Coursera", "url": "https://www.coursera.org/search?query=Dynamic+Public+Speaking+Specialization", "duration": "5 months"}, {"title": "Presentation Skills: Speechwriting and Storytelling", "provider": "National Research Tomsk State University / Coursera", "url": "https://www.coursera.org/search?query=Presentation+Skills%3A+Speechwriting+and+Storytelling", "duration": "4 weeks"}, {"title": "Successful Negotiation: Essential Strategies and Skills", "provider": "University of Michigan / Coursera", "url": "https://www.coursera.org/search?query=Successful+Negotiation%3A+Essential+Strategies+and+Skills", "duration": "7 weeks"}]}, "connections": 34}, {"id": "Systems Analysis", "category": "technical", "careers": ["Chief Executives", "Compliance Officers", "Financial Examiners", "First-Line Supervisors of Office and Administrative Support Workers", "Urban and Regional Planners"], "course": {"title": "Systems Thinking In Public Health", "provider": "Johns Hopkins / Coursera", "url": "https://www.coursera.org/search?query=Systems+Thinking+In+Public+Health", "duration": "6 weeks", "cost": "Free to audit", "next": [{"title": "Systems Engineering Fundamentals", "provider": "UNSW / Coursera", "url": "https://www.coursera.org/search?query=Systems+Engineering+Fundamentals", "duration": "4 weeks"}, {"title": "System Dynamics and Complexity", "provider": "MIT / edX", "url": "https://www.edx.org/search?q=System+Dynamics+and+Complexity", "duration": "14 weeks"}, {"title": "Healthcare Data Quality and Governance", "provider": "Johns Hopkins / Coursera", "url": "https://www.coursera.org/search?query=Healthcare+Data+Quality+and+Governance", "duration": "4 weeks"}]}, "connections": 7}, {"id": "Telecommunications", "category": "technical", "careers": ["Actors", "Camera Operators, Television, Video, and Film", "Editors", "Film and Video Editors", "Producers and Directors", "Special Effects Artists and Animators"], "course": {"title": "Computer Networking", "provider": "Google / Coursera", "url": "https://www.coursera.org/search?query=Computer+Networking", "duration": "5 weeks", "cost": "Free to audit", "next": [{"title": "The Bits and Bytes of Computer Networking", "provider": "Google / Coursera", "url": "https://www.coursera.org/search?query=The+Bits+and+Bytes+of+Computer+Networking", "duration": "6 weeks"}, {"title": "Introduction to TCP/IP", "provider": "Yonsei University / Coursera", "url": "https://www.coursera.org/search?query=Introduction+to+TCP%2FIP", "duration": "4 weeks"}, {"title": "Network Protocols and Architecture", "provider": "Cisco / Coursera", "url": "https://www.coursera.org/search?query=Network+Protocols+and+Architecture", "duration": "4 weeks"}]}, "connections": 7}, {"id": "Therapy and Counseling", "category": "technical", "careers": ["Acute Care Nurses", "Advanced Practice Psychiatric Nurses", "Anesthesiologists", "Athletic Trainers", "Chief Executives", "Child, Family, and School Social Workers"], "course": {"title": "Psychological First Aid", "provider": "Johns Hopkins / Coursera", "url": "https://www.coursera.org/search?query=Psychological+First+Aid", "duration": "5 weeks", "cost": "Free to audit", "next": [{"title": "Cognitive Behavioral Therapy", "provider": "University of Pennsylvania / Coursera", "url": "https://www.coursera.org/search?query=Cognitive+Behavioral+Therapy", "duration": "5 weeks"}, {"title": "Mental Health First Aid", "provider": "University of Melbourne / Coursera", "url": "https://www.coursera.org/search?query=Mental+Health+First+Aid", "duration": "5 weeks"}, {"title": "Positive Psychiatry and Mental Health", "provider": "University of Sydney / Coursera", "url": "https://www.coursera.org/search?query=Positive+Psychiatry+and+Mental+Health", "duration": "5 weeks"}]}, "connections": 29}, {"id": "Time Management", "category": "people", "careers": ["Administrative Services Managers", "Chief Executives", "Compliance Officers", "Facilities Managers", "Financial Managers", "First-Line Supervisors of Helpers, Laborers, and Material Movers, Hand"], "course": {"title": "Work Smarter, Not Harder: Time Management", "provider": "UC Irvine / Coursera", "url": "https://www.coursera.org/search?query=Work+Smarter%2C+Not+Harder%3A+Time+Management", "duration": "3 weeks", "cost": "Free to audit", "next": [{"title": "Getting Things Done: Practical Productivity", "provider": "Coursera", "url": "https://www.coursera.org/search?query=Getting+Things+Done%3A+Practical+Productivity", "duration": "3 weeks"}, {"title": "Productivity and Time Management for the Overwhelmed", "provider": "Coursera", "url": "https://www.coursera.org/search?query=Productivity+and+Time+Management+for+the+Overwhelmed", "duration": "3 weeks"}, {"title": "Agile Planning for Software Products", "provider": "University of Alberta / Coursera", "url": "https://www.coursera.org/search?query=Agile+Planning+for+Software+Products", "duration": "4 weeks"}]}, "connections": 14}, {"id": "Transportation", "category": "technical", "careers": ["Aerospace Engineers", "Architects, Except Landscape and Naval", "Civil Engineering Technologists and Technicians", "Civil Engineers", "Electrical Engineers", "Financial Managers"], "course": {"title": "Supply Chain Logistics", "provider": "Rutgers / Coursera", "url": "https://www.coursera.org/search?query=Supply+Chain+Logistics", "duration": "4 weeks", "cost": "Free to audit", "next": [{"title": "Supply Chain Operations", "provider": "Rutgers / Coursera", "url": "https://www.coursera.org/search?query=Supply+Chain+Operations", "duration": "4 weeks"}, {"title": "Warehouse Management", "provider": "Georgia Tech / edX", "url": "https://www.edx.org/search?q=Warehouse+Management", "duration": "6 weeks"}, {"title": "Transportation Network Analysis", "provider": "Coursera", "url": "https://www.coursera.org/search?query=Transportation+Network+Analysis", "duration": "5 weeks"}]}, "connections": 27}, {"id": "Writing", "category": "creative", "careers": ["Administrative Law Judges, Adjudicators, and Hearing Officers", "Advertising and Promotions Managers", "Anesthesiologists", "Anthropologists and Archeologists", "Athletic Trainers", "Atmospheric, Earth, Marine, and Space Sciences Teachers, Postsecondary"], "course": {"title": "Writing in the Sciences", "provider": "Stanford / Coursera", "url": "https://www.coursera.org/search?query=Writing+in+the+Sciences", "duration": "8 weeks", "cost": "Free to audit", "next": [{"title": "Good with Words: Writing and Editing", "provider": "University of Michigan / Coursera", "url": "https://www.coursera.org/search?query=Good+with+Words%3A+Writing+and+Editing", "duration": "5 months"}, {"title": "Creative Writing Specialization", "provider": "Wesleyan / Coursera", "url": "https://www.coursera.org/search?query=Creative+Writing+Specialization", "duration": "6 months"}, {"title": "Business Writing", "provider": "University of Colorado / Coursera", "url": "https://www.coursera.org/search?query=Business+Writing", "duration": "4 weeks"}]}, "connections": 42}], "edges": [{"source": "Active Learning", "target": "Chemistry", "weight": 2}, {"source": "Active Learning", "target": "Science", "weight": 2}, {"source": "Active Learning", "target": "Mathematics", "weight": 2}, {"source": "Active Learning", "target": "Reading Comprehension", "weight": 2}, {"source": "Active Learning", "target": "Biology", "weight": 2}, {"source": "Active Listening", "target": "Reading Comprehension", "weight": 12}, {"source": "Active Listening", "target": "English Language", "weight": 11}, {"source": "Active Listening", "target": "Customer and Personal Service", "weight": 9}, {"source": "Active Listening", "target": "Speaking", "weight": 9}, {"source": "Active Listening", "target": "Critical Thinking", "weight": 8}, {"source": "Administration and Management", "target": "Mathematics", "weight": 19}, {"source": "Administration and Management", "target": "English Language", "weight": 15}, {"source": "Administration and Management", "target": "Economics and Accounting", "weight": 14}, {"source": "Administration and Management", "target": "Reading Comprehension", "weight": 14}, {"source": "Administration and Management", "target": "Customer and Personal Service", "weight": 14}, {"source": "Administrative", "target": "Law and Government", "weight": 5}, {"source": "Administrative", "target": "Writing", "weight": 4}, {"source": "Administrative", "target": "Administration and Management", "weight": 3}, {"source": "Administrative", "target": "Customer and Personal Service", "weight": 3}, {"source": "Administrative", "target": "Sales and Marketing", "weight": 3}, {"source": "Biology", "target": "Science", "weight": 9}, {"source": "Biology", "target": "Chemistry", "weight": 8}, {"source": "Biology", "target": "Medicine and Dentistry", "weight": 6}, {"source": "Biology", "target": "Therapy and Counseling", "weight": 6}, {"source": "Biology", "target": "Reading Comprehension", "weight": 5}, {"source": "Building and Construction", "target": "Design", "weight": 5}, {"source": "Building and Construction", "target": "Engineering and Technology", "weight": 4}, {"source": "Building and Construction", "target": "Operations Analysis", "weight": 4}, {"source": "Building and Construction", "target": "Mathematics", "weight": 3}, {"source": "Building and Construction", "target": "Public Safety and Security", "weight": 3}, {"source": "Chemistry", "target": "Science", "weight": 9}, {"source": "Chemistry", "target": "Mathematics", "weight": 6}, {"source": "Chemistry", "target": "Engineering and Technology", "weight": 5}, {"source": "Chemistry", "target": "Reading Comprehension", "weight": 4}, {"source": "Communications and Media", "target": "Computers and Electronics", "weight": 9}, {"source": "Communications and Media", "target": "Sales and Marketing", "weight": 7}, {"source": "Communications and Media", "target": "Fine Arts", "weight": 7}, {"source": "Communications and Media", "target": "Design", "weight": 7}, {"source": "Communications and Media", "target": "Reading Comprehension", "weight": 7}, {"source": "Complex Problem Solving", "target": "Computers and Electronics", "weight": 6}, {"source": "Complex Problem Solving", "target": "Mathematics", "weight": 6}, {"source": "Complex Problem Solving", "target": "Science", "weight": 5}, {"source": "Complex Problem Solving", "target": "Administration and Management", "weight": 4}, {"source": "Complex Problem Solving", "target": "Writing", "weight": 3}, {"source": "Computers and Electronics", "target": "Design", "weight": 16}, {"source": "Computers and Electronics", "target": "Mathematics", "weight": 13}, {"source": "Computers and Electronics", "target": "Reading Comprehension", "weight": 13}, {"source": "Computers and Electronics", "target": "Administration and Management", "weight": 12}, {"source": "Computers and Electronics", "target": "Engineering and Technology", "weight": 11}, {"source": "Coordination", "target": "Administration and Management", "weight": 3}, {"source": "Coordination", "target": "Time Management", "weight": 3}, {"source": "Coordination", "target": "Management of Personnel Resources", "weight": 2}, {"source": "Coordination", "target": "Transportation", "weight": 2}, {"source": "Coordination", "target": "Production and Processing", "weight": 2}, {"source": "Critical Thinking", "target": "Reading Comprehension", "weight": 12}, {"source": "Critical Thinking", "target": "Mathematics", "weight": 8}, {"source": "Critical Thinking", "target": "English Language", "weight": 8}, {"source": "Critical Thinking", "target": "Administration and Management", "weight": 6}, {"source": "Customer and Personal Service", "target": "English Language", "weight": 10}, {"source": "Customer and Personal Service", "target": "Economics and Accounting", "weight": 9}, {"source": "Customer and Personal Service", "target": "Mathematics", "weight": 8}, {"source": "Design", "target": "Engineering and Technology", "weight": 15}, {"source": "Design", "target": "Mechanical", "weight": 9}, {"source": "Design", "target": "Mathematics", "weight": 8}, {"source": "Design", "target": "Production and Processing", "weight": 8}, {"source": "Economics and Accounting", "target": "Mathematics", "weight": 9}, {"source": "Economics and Accounting", "target": "Reading Comprehension", "weight": 7}, {"source": "Economics and Accounting", "target": "Personnel and Human Resources", "weight": 6}, {"source": "Education and Training", "target": "Writing", "weight": 9}, {"source": "Education and Training", "target": "Reading Comprehension", "weight": 8}, {"source": "Education and Training", "target": "Speaking", "weight": 7}, {"source": "Education and Training", "target": "Mathematics", "weight": 6}, {"source": "Education and Training", "target": "Administration and Management", "weight": 6}, {"source": "Engineering and Technology", "target": "Mathematics", "weight": 10}, {"source": "Engineering and Technology", "target": "Mechanical", "weight": 9}, {"source": "Engineering and Technology", "target": "Science", "weight": 9}, {"source": "English Language", "target": "Reading Comprehension", "weight": 16}, {"source": "English Language", "target": "Speaking", "weight": 12}, {"source": "Fine Arts", "target": "Computers and Electronics", "weight": 7}, {"source": "Fine Arts", "target": "Design", "weight": 7}, {"source": "Fine Arts", "target": "Sales and Marketing", "weight": 4}, {"source": "Fine Arts", "target": "English Language", "weight": 4}, {"source": "Food Production", "target": "Administration and Management", "weight": 4}, {"source": "Food Production", "target": "Customer and Personal Service", "weight": 3}, {"source": "Food Production", "target": "Education and Training", "weight": 3}, {"source": "Food Production", "target": "Biology", "weight": 3}, {"source": "Food Production", "target": "Chemistry", "weight": 3}, {"source": "Foreign Language", "target": "Communications and Media", "weight": 3}, {"source": "Foreign Language", "target": "Writing", "weight": 3}, {"source": "Foreign Language", "target": "Reading Comprehension", "weight": 3}, {"source": "Foreign Language", "target": "Sales and Marketing", "weight": 2}, {"source": "Foreign Language", "target": "Computers and Electronics", "weight": 2}, {"source": "Geography", "target": "Reading Comprehension", "weight": 4}, {"source": "Geography", "target": "English Language", "weight": 4}, {"source": "Geography", "target": "Law and Government", "weight": 4}, {"source": "Geography", "target": "Writing", "weight": 3}, {"source": "Geography", "target": "Sociology and Anthropology", "weight": 3}, {"source": "History and Archeology", "target": "Reading Comprehension", "weight": 3}, {"source": "History and Archeology", "target": "Sociology and Anthropology", "weight": 3}, {"source": "History and Archeology", "target": "Writing", "weight": 2}, {"source": "History and Archeology", "target": "Geography", "weight": 2}, {"source": "History and Archeology", "target": "Communications and Media", "weight": 2}, {"source": "Instructing", "target": "Education and Training", "weight": 5}, {"source": "Instructing", "target": "Learning Strategies", "weight": 5}, {"source": "Instructing", "target": "Writing", "weight": 3}, {"source": "Instructing", "target": "English Language", "weight": 3}, {"source": "Instructing", "target": "Social Perceptiveness", "weight": 3}, {"source": "Judgment and Decision Making", "target": "Science", "weight": 2}, {"source": "Judgment and Decision Making", "target": "Writing", "weight": 2}, {"source": "Judgment and Decision Making", "target": "Medicine and Dentistry", "weight": 2}, {"source": "Judgment and Decision Making", "target": "Biology", "weight": 2}, {"source": "Judgment and Decision Making", "target": "Psychology", "weight": 2}, {"source": "Law and Government", "target": "English Language", "weight": 8}, {"source": "Law and Government", "target": "Reading Comprehension", "weight": 7}, {"source": "Law and Government", "target": "Writing", "weight": 6}, {"source": "Law and Government", "target": "Administration and Management", "weight": 5}, {"source": "Learning Strategies", "target": "Education and Training", "weight": 6}, {"source": "Learning Strategies", "target": "Writing", "weight": 4}, {"source": "Learning Strategies", "target": "Therapy and Counseling", "weight": 3}, {"source": "Learning Strategies", "target": "English Language", "weight": 3}, {"source": "Management of Personnel Resources", "target": "Administration and Management", "weight": 8}, {"source": "Management of Personnel Resources", "target": "Customer and Personal Service", "weight": 6}, {"source": "Management of Personnel Resources", "target": "Personnel and Human Resources", "weight": 5}, {"source": "Management of Personnel Resources", "target": "Sales and Marketing", "weight": 5}, {"source": "Management of Personnel Resources", "target": "Economics and Accounting", "weight": 3}, {"source": "Mathematics", "target": "Reading Comprehension", "weight": 16}, {"source": "Mathematics", "target": "Science", "weight": 12}, {"source": "Mechanical", "target": "Computers and Electronics", "weight": 7}, {"source": "Mechanical", "target": "Production and Processing", "weight": 7}, {"source": "Mechanical", "target": "Science", "weight": 6}, {"source": "Medicine and Dentistry", "target": "Therapy and Counseling", "weight": 7}, {"source": "Medicine and Dentistry", "target": "Psychology", "weight": 6}, {"source": "Medicine and Dentistry", "target": "Customer and Personal Service", "weight": 4}, {"source": "Medicine and Dentistry", "target": "Education and Training", "weight": 3}, {"source": "Monitoring", "target": "Speaking", "weight": 3}, {"source": "Monitoring", "target": "Education and Training", "weight": 3}, {"source": "Monitoring", "target": "Administration and Management", "weight": 2}, {"source": "Monitoring", "target": "English Language", "weight": 2}, {"source": "Monitoring", "target": "Social Perceptiveness", "weight": 2}, {"source": "Negotiation", "target": "Administration and Management", "weight": 5}, {"source": "Negotiation", "target": "Sales and Marketing", "weight": 4}, {"source": "Negotiation", "target": "English Language", "weight": 4}, {"source": "Negotiation", "target": "Reading Comprehension", "weight": 4}, {"source": "Negotiation", "target": "Communications and Media", "weight": 3}, {"source": "Operations Analysis", "target": "Design", "weight": 4}, {"source": "Operations Analysis", "target": "Engineering and Technology", "weight": 4}, {"source": "Operations Analysis", "target": "Mathematics", "weight": 3}, {"source": "Operations Analysis", "target": "Public Safety and Security", "weight": 3}, {"source": "Operations Monitoring", "target": "Engineering and Technology", "weight": 1}, {"source": "Operations Monitoring", "target": "Computers and Electronics", "weight": 1}, {"source": "Operations Monitoring", "target": "Design", "weight": 1}, {"source": "Operations Monitoring", "target": "Mathematics", "weight": 1}, {"source": "Operations Monitoring", "target": "Mechanical", "weight": 1}, {"source": "Personnel and Human Resources", "target": "Administration and Management", "weight": 8}, {"source": "Personnel and Human Resources", "target": "Customer and Personal Service", "weight": 6}, {"source": "Personnel and Human Resources", "target": "Sales and Marketing", "weight": 6}, {"source": "Persuasion", "target": "Psychology", "weight": 1}, {"source": "Persuasion", "target": "Customer and Personal Service", "weight": 1}, {"source": "Persuasion", "target": "English Language", "weight": 1}, {"source": "Persuasion", "target": "Therapy and Counseling", "weight": 1}, {"source": "Persuasion", "target": "Speaking", "weight": 1}, {"source": "Philosophy and Theology", "target": "Writing", "weight": 1}, {"source": "Philosophy and Theology", "target": "Reading Comprehension", "weight": 1}, {"source": "Philosophy and Theology", "target": "Speaking", "weight": 1}, {"source": "Philosophy and Theology", "target": "Communications and Media", "weight": 1}, {"source": "Philosophy and Theology", "target": "Sociology and Anthropology", "weight": 1}, {"source": "Physics", "target": "Engineering and Technology", "weight": 5}, {"source": "Physics", "target": "Science", "weight": 5}, {"source": "Physics", "target": "Mathematics", "weight": 4}, {"source": "Physics", "target": "Design", "weight": 3}, {"source": "Physics", "target": "Reading Comprehension", "weight": 3}, {"source": "Production and Processing", "target": "Engineering and Technology", "weight": 8}, {"source": "Production and Processing", "target": "Administration and Management", "weight": 6}, {"source": "Production and Processing", "target": "Computers and Electronics", "weight": 6}, {"source": "Programming", "target": "Computers and Electronics", "weight": 5}, {"source": "Programming", "target": "Reading Comprehension", "weight": 4}, {"source": "Programming", "target": "Critical Thinking", "weight": 4}, {"source": "Programming", "target": "Mathematics", "weight": 3}, {"source": "Programming", "target": "Active Listening", "weight": 2}, {"source": "Psychology", "target": "Therapy and Counseling", "weight": 12}, {"source": "Psychology", "target": "Customer and Personal Service", "weight": 6}, {"source": "Psychology", "target": "Social Perceptiveness", "weight": 6}, {"source": "Psychology", "target": "Biology", "weight": 5}, {"source": "Public Safety and Security", "target": "Design", "weight": 3}, {"source": "Public Safety and Security", "target": "Engineering and Technology", "weight": 3}, {"source": "Public Safety and Security", "target": "Mathematics", "weight": 3}, {"source": "Public Safety and Security", "target": "Administration and Management", "weight": 3}, {"source": "Reading Comprehension", "target": "Writing", "weight": 16}, {"source": "Sales and Marketing", "target": "Administration and Management", "weight": 13}, {"source": "Sales and Marketing", "target": "Computers and Electronics", "weight": 9}, {"source": "Sales and Marketing", "target": "English Language", "weight": 8}, {"source": "Sales and Marketing", "target": "Customer and Personal Service", "weight": 7}, {"source": "Science", "target": "Computers and Electronics", "weight": 9}, {"source": "Service Orientation", "target": "Social Perceptiveness", "weight": 4}, {"source": "Service Orientation", "target": "Therapy and Counseling", "weight": 3}, {"source": "Service Orientation", "target": "Psychology", "weight": 3}, {"source": "Service Orientation", "target": "Education and Training", "weight": 2}, {"source": "Service Orientation", "target": "Instructing", "weight": 2}, {"source": "Social Perceptiveness", "target": "Therapy and Counseling", "weight": 6}, {"source": "Social Perceptiveness", "target": "Customer and Personal Service", "weight": 5}, {"source": "Social Perceptiveness", "target": "Education and Training", "weight": 4}, {"source": "Social Perceptiveness", "target": "English Language", "weight": 4}, {"source": "Sociology and Anthropology", "target": "Reading Comprehension", "weight": 5}, {"source": "Sociology and Anthropology", "target": "Education and Training", "weight": 5}, {"source": "Sociology and Anthropology", "target": "Speaking", "weight": 5}, {"source": "Sociology and Anthropology", "target": "Writing", "weight": 4}, {"source": "Sociology and Anthropology", "target": "Active Listening", "weight": 4}, {"source": "Speaking", "target": "Reading Comprehension", "weight": 9}, {"source": "Speaking", "target": "Administration and Management", "weight": 7}, {"source": "Speaking", "target": "Writing", "weight": 7}, {"source": "Systems Analysis", "target": "Administration and Management", "weight": 1}, {"source": "Systems Analysis", "target": "Law and Government", "weight": 1}, {"source": "Systems Analysis", "target": "Economics and Accounting", "weight": 1}, {"source": "Systems Analysis", "target": "Reading Comprehension", "weight": 1}, {"source": "Systems Analysis", "target": "Personnel and Human Resources", "weight": 1}, {"source": "Telecommunications", "target": "Communications and Media", "weight": 2}, {"source": "Telecommunications", "target": "Fine Arts", "weight": 2}, {"source": "Telecommunications", "target": "Computers and Electronics", "weight": 2}, {"source": "Telecommunications", "target": "Sales and Marketing", "weight": 2}, {"source": "Telecommunications", "target": "Design", "weight": 2}, {"source": "Therapy and Counseling", "target": "Customer and Personal Service", "weight": 7}, {"source": "Time Management", "target": "Administration and Management", "weight": 4}, {"source": "Time Management", "target": "Management of Personnel Resources", "weight": 3}, {"source": "Time Management", "target": "English Language", "weight": 3}, {"source": "Time Management", "target": "Personnel and Human Resources", "weight": 2}, {"source": "Transportation", "target": "Administration and Management", "weight": 4}, {"source": "Transportation", "target": "English Language", "weight": 4}, {"source": "Transportation", "target": "Production and Processing", "weight": 3}, {"source": "Transportation", "target": "Mathematics", "weight": 3}, {"source": "Writing", "target": "English Language", "weight": 10}, {"source": "Writing", "target": "Administration and Management", "weight": 9}, {"source": "Writing", "target": "Mathematics", "weight": 8}]};
+// ─── COLORS (hardcoded for canvas) ───
+const COLORS = {
+  technical: '#1D9E75',
+  creative: '#534AB7',
+  people: '#C4652A'
+};
+const EDGE_COLOR = '#D3D1C7';
+const BG_COLOR = '#FFFFFF';
+const TEXT_COLOR = '#1A1A18';
+const TEXT_MUTED = '#6B6860';
+const TEXT_SOFT = '#918E85';
+
+// ─── STATE ───
+const nodes = GRAPH_DATA.nodes.map((n, i) => ({
+  ...n,
+  x: 0, y: 0, vx: 0, vy: 0,
+  radius: 0,
+  index: i
+}));
+const nodeMap = {};
+nodes.forEach(n => nodeMap[n.id] = n);
+
+const edges = GRAPH_DATA.edges.map(e => ({
+  source: nodeMap[e.source],
+  target: nodeMap[e.target],
+  weight: e.weight
+}));
+
+// Build adjacency
+const adjacency = {};
+nodes.forEach(n => adjacency[n.id] = new Set());
+edges.forEach(e => {
+  adjacency[e.source.id].add(e.target.id);
+  adjacency[e.target.id].add(e.source.id);
+});
+
+// Compute radius (linear scale by connections)
+const minConn = Math.min(...nodes.map(n => n.connections));
+const maxConn = Math.max(...nodes.map(n => n.connections));
+nodes.forEach(n => {
+  const t = maxConn > minConn ? (n.connections - minConn) / (maxConn - minConn) : 0.5;
+  n.radius = 8 + t * 16; // 8 to 24
+});
+
+// Max edge weight for opacity scaling
+const maxWeight = Math.max(...edges.map(e => e.weight));
+
+let activeFilters = { technical: true, creative: true, people: true };
+let hoveredNode = null;
+let selectedNode = null;
+
+// ─── FORCE LAYOUT ───
+function runForceLayout(width, height) {
+  const cx = width / 2, cy = height / 2;
+  const padding = 40;
+
+  // Category cluster centers - triangle layout
+  const mob = width < 500;
+  const catCenters = {
+    technical: { x: cx - width * (mob ? 0.18 : 0.22), y: cy - height * (mob ? 0.15 : 0.18) },
+    creative:  { x: cx + width * (mob ? 0.18 : 0.22), y: cy - height * (mob ? 0.15 : 0.18) },
+    people:    { x: cx, y: cy + height * (mob ? 0.18 : 0.22) }
+  };
+
+  // Initialize positions near category centers with spread
+  nodes.forEach(n => {
+    const cc = catCenters[n.category] || { x: cx, y: cy };
+    n.x = cc.x + (Math.random() - 0.5) * width * 0.25;
+    n.y = cc.y + (Math.random() - 0.5) * height * 0.25;
+    n.vx = 0; n.vy = 0;
+  });
+
+  const isMobileLayout = width < 768;
+  const repulsion = isMobileLayout ? 1500 : 2500;
+  const springK = isMobileLayout ? 0.008 : 0.006;
+  const springLenSame = isMobileLayout ? 55 : 85;
+  const springLenCross = isMobileLayout ? 95 : 145;
+  const damping = 0.82;
+  const centerPull = isMobileLayout ? 0.012 : 0.008;
+  const catPull = isMobileLayout ? 0.006 : 0.004;
+  const iterations = 350;
+
+  for (let iter = 0; iter < iterations; iter++) {
+    const alpha = 1 - iter / iterations;
+
+    // Repulsion between all nodes
+    for (let i = 0; i < nodes.length; i++) {
+      for (let j = i + 1; j < nodes.length; j++) {
+        let dx = nodes[j].x - nodes[i].x;
+        let dy = nodes[j].y - nodes[i].y;
+        let dist = Math.sqrt(dx * dx + dy * dy) || 1;
+        let force = repulsion * alpha / (dist * dist);
+        let fx = (dx / dist) * force;
+        let fy = (dy / dist) * force;
+        nodes[i].vx -= fx;
+        nodes[i].vy -= fy;
+        nodes[j].vx += fx;
+        nodes[j].vy += fy;
+      }
+    }
+
+    // Spring attraction along edges
+    edges.forEach(e => {
+      let dx = e.target.x - e.source.x;
+      let dy = e.target.y - e.source.y;
+      let dist = Math.sqrt(dx * dx + dy * dy) || 1;
+      let sameCategory = e.source.category === e.target.category;
+      let springLen = sameCategory ? springLenSame : springLenCross;
+      let displacement = dist - springLen;
+      let force = springK * displacement * alpha;
+      let fx = (dx / dist) * force;
+      let fy = (dy / dist) * force;
+      e.source.vx += fx;
+      e.source.vy += fy;
+      e.target.vx -= fx;
+      e.target.vy -= fy;
+    });
+
+    // Category cohesion - pull toward category center
+    nodes.forEach(n => {
+      const cc = catCenters[n.category];
+      if (cc) {
+        n.vx += (cc.x - n.x) * catPull * alpha;
+        n.vy += (cc.y - n.y) * catPull * alpha;
+      }
+    });
+
+    // Gentle global center pull
+    nodes.forEach(n => {
+      n.vx += (cx - n.x) * centerPull * alpha;
+      n.vy += (cy - n.y) * centerPull * alpha;
+    });
+
+    // Apply velocities with damping
+    nodes.forEach(n => {
+      n.vx *= damping;
+      n.vy *= damping;
+      n.x += n.vx;
+      n.y += n.vy;
+      // Boundary enforcement
+      n.x = Math.max(padding + n.radius, Math.min(width - padding - n.radius, n.x));
+      n.y = Math.max(padding + n.radius, Math.min(height - padding - n.radius, n.y));
+    });
+  }
+}
+
+// ─── CANVAS RENDERING ───
+const canvas = document.getElementById('graphCanvas');
+const ctx = canvas.getContext('2d');
+let dpr = window.devicePixelRatio || 1;
+let canvasW, canvasH;
+
+function resizeCanvas() {
+  const rect = canvas.parentElement.getBoundingClientRect();
+  canvasW = rect.width;
+  canvasH = window.innerWidth < 768 ? 350 : 500;
+  canvas.style.height = canvasH + 'px';
+  canvas.width = canvasW * dpr;
+  canvas.height = canvasH * dpr;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+
+function isVisible(node) {
+  return activeFilters[node.category];
+}
+
+function draw() {
+  ctx.clearRect(0, 0, canvasW, canvasH);
+
+  const highlight = hoveredNode || selectedNode;
+  const connectedSet = highlight ? adjacency[highlight.id] : null;
+
+  // Draw edges
+  edges.forEach(e => {
+    if (!isVisible(e.source) || !isVisible(e.target)) return;
+    let opacity = 0.1 + (e.weight / maxWeight) * 0.3;
+    if (highlight) {
+      const isConnected = (e.source.id === highlight.id || e.target.id === highlight.id);
+      opacity = isConnected ? 0.5 + (e.weight / maxWeight) * 0.4 : 0.03;
+    }
+    ctx.beginPath();
+    ctx.moveTo(e.source.x, e.source.y);
+    ctx.lineTo(e.target.x, e.target.y);
+    let lw = 0.5 + (e.weight / maxWeight) * 1.5;
+    if (highlight && (e.source.id === highlight.id || e.target.id === highlight.id)) {
+      lw = 1 + (e.weight / maxWeight) * 2;
+    }
+    ctx.lineWidth = lw;
+    ctx.strokeStyle = highlight && (e.source.id === highlight.id || e.target.id === highlight.id)
+      ? COLORS[highlight.category] + '80'
+      : EDGE_COLOR;
+    ctx.globalAlpha = opacity;
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+  });
+
+  // Draw nodes
+  nodes.forEach(n => {
+    if (!isVisible(n)) return;
+    let alpha = 1;
+    if (highlight && n.id !== highlight.id && !connectedSet.has(n.id)) {
+      alpha = 0.1;
+    }
+
+    // Glow for selected/hovered
+    if (highlight && n.id === highlight.id) {
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, n.radius + 6, 0, Math.PI * 2);
+      ctx.fillStyle = COLORS[n.category] + '20';
+      ctx.fill();
+    }
+
+    ctx.beginPath();
+    ctx.arc(n.x, n.y, n.radius, 0, Math.PI * 2);
+    ctx.fillStyle = COLORS[n.category];
+    ctx.globalAlpha = alpha;
+    ctx.fill();
+
+    // White border
+    ctx.strokeStyle = '#FFFFFF';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+  });
+
+  // Draw labels
+  const labelFontSize = window.innerWidth < 768 ? 10 : 11;
+  ctx.font = '500 ' + labelFontSize + 'px DM Sans, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'top';
+  nodes.forEach(n => {
+    if (!isVisible(n)) return;
+    let alpha = 1;
+    if (highlight && n.id !== highlight.id && !connectedSet.has(n.id)) {
+      alpha = 0.1;
+    }
+    // Show label if: large node, highlighted, or connected to highlight
+    const mobileView = window.innerWidth < 768;
+    const labelThreshold = mobileView ? 11 : 14;
+    const minLabelThreshold = mobileView ? 10 : 12;
+    const showLabel = n.radius >= labelThreshold || (highlight && (n.id === highlight.id || connectedSet.has(n.id)));
+    if (!showLabel && !highlight) {
+      if (n.radius < minLabelThreshold) return;
+    }
+    if (!showLabel && highlight) return;
+
+    const maxLabelLen = window.innerWidth < 768 ? 16 : 22;
+    const label = n.id.length > maxLabelLen ? n.id.substring(0, maxLabelLen - 2) + '…' : n.id;
+    ctx.globalAlpha = alpha;
+    // Background pill for readability
+    const metrics = ctx.measureText(label);
+    const lx = n.x;
+    const ly = n.y + n.radius + 4;
+    ctx.fillStyle = 'rgba(250,249,246,0.85)';
+    const pw = metrics.width + 8;
+    const ph = 14;
+    ctx.beginPath();
+    ctx.roundRect(lx - pw/2, ly - 1, pw, ph, 3);
+    ctx.fill();
+    ctx.fillStyle = highlight && n.id === highlight.id ? COLORS[n.category] : TEXT_MUTED;
+    ctx.fillText(label, lx, ly);
+    ctx.globalAlpha = 1;
+  });
+}
+
+// ─── MOUSE INTERACTION ───
+function getMousePos(e) {
+  const rect = canvas.getBoundingClientRect();
+  return {
+    x: (e.clientX - rect.left),
+    y: (e.clientY - rect.top)
+  };
+}
+
+function findNodeAt(mx, my) {
+  let closest = null, closestDist = Infinity;
+  const hitPadding = window.innerWidth < 768 ? 12 : 5;
+  nodes.forEach(n => {
+    if (!isVisible(n)) return;
+    const dx = n.x - mx, dy = n.y - my;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    if (dist < n.radius + hitPadding && dist < closestDist) {
+      closest = n;
+      closestDist = dist;
+    }
+  });
+  return closest;
+}
+
+canvas.addEventListener('mousemove', e => {
+  const pos = getMousePos(e);
+  const node = findNodeAt(pos.x, pos.y);
+  hoveredNode = node;
+  canvas.style.cursor = node ? 'pointer' : 'default';
+  draw();
+});
+
+canvas.addEventListener('mouseleave', () => {
+  hoveredNode = null;
+  draw();
+});
+
+canvas.addEventListener('click', e => {
+  const pos = getMousePos(e);
+  const node = findNodeAt(pos.x, pos.y);
+  if (node) {
+    selectNode(node);
+  } else {
+    selectedNode = null;
+    document.getElementById('infoPanel').classList.remove('visible');
+    document.getElementById('graphHint').textContent = window.innerWidth < 768 ? 'Tap any skill to see what it connects to.' : 'Hover over a skill to see its connections. Click to explore.';
+  }
+  draw();
+});
+
+// Touch support
+canvas.addEventListener('touchstart', e => {
+  e.preventDefault();
+  const touch = e.touches[0];
+  const rect = canvas.getBoundingClientRect();
+  const mx = touch.clientX - rect.left;
+  const my = touch.clientY - rect.top;
+  const node = findNodeAt(mx, my);
+  if (node) {
+    selectNode(node);
+  }
+  draw();
+}, { passive: false });
+
+// ─── SELECT NODE ───
+function selectNode(node) {
+    if (typeof SSProgress !== 'undefined' && node) SSProgress.award('skill', node.id);
+  selectedNode = node;
+  hoveredNode = null;
+  document.getElementById('graphHint').textContent = '';
+  showInfoPanel(node);
+  draw();
+}
+
+function selectNodeById(id) {
+  const node = nodeMap[id];
+  if (node && isVisible(node)) {
+    selectNode(node);
+    // Scroll canvas into view
+    canvas.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+}
+
+// ─── INFO PANEL ───
+function showInfoPanel(node) {
+  const panel = document.getElementById('infoPanel');
+  const connected = [...adjacency[node.id]].filter(id => isVisible(nodeMap[id]));
+
+  let html = `
+    <div class="info-header">
+      <div class="info-title">${node.id}</div>
+      <span class="info-badge ${node.category}">${node.category}</span>
+    </div>
+    <div class="info-section">
+      <div class="info-section-title">Connected to (${connected.length} skills)</div>
+      <div class="connected-pills">
+        ${connected.map(id => `<button class="connected-pill" onclick="selectNodeById('${id.replace(/'/g, "\\'")}')">${id}</button>`).join('')}
+      </div>
+    </div>
+    <div class="info-section">
+      <div class="info-section-title">Careers that use this</div>
+      <ul class="career-list">
+        ${node.careers.map(c => `<li><a href="career.html?job=${encodeURIComponent(c)}">${c}</a></li>`).join('')}
+      </ul>
+    </div>
+  `;
+
+  if (node.course) {
+    let nextDropdown = '';
+    if (node.course.next && node.course.next.length) {
+      const stepLabels = ['Next','Then','Go deeper'];
+      const kgItems = node.course.next.map((nc, i) =>
+        `<div class="kg-item"><span class="kg-step">${stepLabels[i]}</span><a href="${nc.url}" target="_blank" rel="noopener">${nc.title}</a><span class="kg-meta">${nc.provider} &middot; ${nc.duration}</span></div>`
+      ).join('');
+      nextDropdown = `<button class="btn-keep" onclick="this.parentElement.nextElementSibling.classList.toggle('open')">Keep going &rarr;</button></div><div class="keep-going-dropdown">${kgItems}</div>`;
+    } else {
+      nextDropdown = '</div>';
+    }
+    html += `
+      <div class="info-section">
+        <div class="info-section-title">Start learning</div>
+        <div class="course-card">
+          <div class="course-title">${node.course.title}</div>
+          <div class="course-meta">${node.course.provider} &middot; ${node.course.duration} &middot; ${node.course.cost}</div>
+          <div class="course-buttons">
+            <a class="btn-start" href="${node.course.url}" target="_blank" rel="noopener">Start here</a>
+            ${nextDropdown}
+        </div>
+      </div>
+    `;
+  }
+
+  panel.innerHTML = html;
+  panel.classList.add('visible');
+  // Scroll panel into view on mobile
+  if (window.innerWidth < 768) {
+    setTimeout(() => panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
+  }
+}
+
+// ─── FILTERS ───
+function toggleFilter(category) {
+  activeFilters[category] = !activeFilters[category];
+  const btn = document.querySelector(`.filter-pill[data-cat="${category}"]`);
+  btn.classList.toggle('active');
+  // If selected node is now hidden, deselect
+  if (selectedNode && !isVisible(selectedNode)) {
+    selectedNode = null;
+    document.getElementById('infoPanel').classList.remove('visible');
+  }
+  draw();
+}
+
+
+// ─── MOBILE MENU ───
+function toggleMobileMenu() {
+  const hamburger = document.getElementById('navHamburger');
+  const menu = document.getElementById('mobileMenu');
+  hamburger.classList.toggle('open');
+  menu.classList.toggle('open');
+  document.body.style.overflow = menu.classList.contains('open') ? 'hidden' : '';
+}
+
+// ─── INIT ───
+function init() {
+  resizeCanvas();
+  runForceLayout(canvasW, canvasH);
+  draw();
+}
+
+let resizeTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    resizeCanvas();
+    runForceLayout(canvasW, canvasH);
+    draw();
+  }, 200);
+});
+
+// Wait for fonts
+if (document.fonts && document.fonts.ready) {
+  document.fonts.ready.then(init);
+} else {
+  window.addEventListener('load', init);
+}
+</script>
+
+<script>
+// Track course clicks for progress
+document.addEventListener('click', function(e) {
+  var link = e.target.closest('a[href*="coursera.org"], a[href*="edx.org"], a[href*="skillshare.com"]');
+  if (link && typeof SSProgress !== 'undefined') {
+    var title = link.closest('.skill-course, .course-card, .keep-going-item');
+    var name = title ? title.textContent.trim().substring(0, 50) : 'unknown';
+    SSProgress.award('course', name);
+  }
+});
+</script>
+<!-- SS_PROGRESS_TRACKER -->
+<script>
+// ========== START SOMEWHERE PROGRESS TRACKER ==========
+// Self-contained gamified progress system using localStorage
+(function() {
+  var LEVELS = [
+    { name: "Curious", xp: 0, color: "#918E85" },
+    { name: "Explorer", xp: 25, color: "#534AB7" },
+    { name: "Builder", xp: 75, color: "#1D9E75" },
+    { name: "Momentum", xp: 150, color: "#C4652A" },
+    { name: "Unstoppable", xp: 300, color: "#B8336A" }
+  ];
+
+  var BADGES = {
+    first_step:     { icon: "🚀", name: "First Step",      desc: "Did something. That's the whole point.", check: function(s) { return s.totalActions >= 1; } },
+    sprint_star:    { icon: "⚡", name: "Sprint Star",      desc: "Completed 5 skill sprints.", check: function(s) { return s.sprintsCompleted >= 5; } },
+    scholar:        { icon: "📚", name: "Scholar",          desc: "Clicked through to 10 courses.", check: function(s) { return s.coursesClicked >= 10; } },
+    cartographer:   { icon: "🗺️", name: "Cartographer",    desc: "Explored the Skill Map.", check: function(s) { return s.visitedPages.indexOf("skill-map") >= 0; } },
+    deep_diver:     { icon: "🔍", name: "Deep Diver",       desc: "Checked out 3 different careers.", check: function(s) { return s.careersViewed >= 3; } },
+    full_send:      { icon: "🎯", name: "Full Send",        desc: "Visited Explore, Build, and Apply.", check: function(s) { var p = s.visitedPages; return p.indexOf("explore") >= 0 && p.indexOf("build") >= 0 && p.indexOf("apply") >= 0; } },
+    roulette:       { icon: "🎲", name: "Roulette Roller",  desc: "Spun the roulette 3 times.", check: function(s) { return s.rouletteSpins >= 3; } },
+    completionist:  { icon: "👑", name: "Completionist",    desc: "Finished all 18 sprints.", check: function(s) { return s.sprintsCompleted >= 18; } },
+    skill_hunter:   { icon: "🎪", name: "Skill Hunter",     desc: "Explored 10 different skills.", check: function(s) { return s.skillsExplored >= 10; } },
+    analyzer:       { icon: "🔬", name: "Analyzer",         desc: "Used the Job Analyzer.", check: function(s) { return s.jobsAnalyzed >= 1; } }
+  };
+
+  // ---- State management ----
+  function getState() {
+    try {
+      var raw = localStorage.getItem("ss_progress");
+      if (raw) return JSON.parse(raw);
+    } catch(e) {}
+    return {
+      xp: 0,
+      totalActions: 0,
+      sprintsCompleted: 0,
+      coursesClicked: 0,
+      careersViewed: 0,
+      skillsExplored: 0,
+      rouletteSpins: 0,
+      jobsAnalyzed: 0,
+      visitedPages: [],
+      earnedBadges: [],
+      completedSprintIds: [],
+      viewedCareerNames: [],
+      clickedCourseNames: [],
+      exploredSkillNames: []
+    };
+  }
+
+  function saveState(s) {
+    try { localStorage.setItem("ss_progress", JSON.stringify(s)); } catch(e) {}
+  }
+
+  function getLevel(xp) {
+    var level = LEVELS[0];
+    for (var i = 0; i < LEVELS.length; i++) {
+      if (xp >= LEVELS[i].xp) level = LEVELS[i];
+    }
+    return level;
+  }
+
+  function getNextLevel(xp) {
+    for (var i = 0; i < LEVELS.length; i++) {
+      if (xp < LEVELS[i].xp) return LEVELS[i];
+    }
+    return null;
+  }
+
+  function checkBadges(state) {
+    var newBadges = [];
+    var keys = Object.keys(BADGES);
+    for (var i = 0; i < keys.length; i++) {
+      var key = keys[i];
+      if (state.earnedBadges.indexOf(key) < 0 && BADGES[key].check(state)) {
+        state.earnedBadges.push(key);
+        newBadges.push(key);
+      }
+    }
+    return newBadges;
+  }
+
+  // ---- Public API ----
+  window.SSProgress = {
+    award: function(type, detail) {
+      var s = getState();
+      var xpGain = 0;
+
+      if (type === "sprint") {
+        if (detail && s.completedSprintIds.indexOf(detail) >= 0) return; // already done
+        if (detail) s.completedSprintIds.push(detail);
+        s.sprintsCompleted++;
+        xpGain = 15;
+      } else if (type === "course") {
+        if (detail && s.clickedCourseNames.indexOf(detail) < 0) {
+          s.clickedCourseNames.push(detail);
+        }
+        s.coursesClicked++;
+        xpGain = 5;
+      } else if (type === "career") {
+        if (detail && s.viewedCareerNames.indexOf(detail) < 0) {
+          s.viewedCareerNames.push(detail);
+          s.careersViewed++;
+          xpGain = 5;
+        }
+      } else if (type === "skill") {
+        if (detail && s.exploredSkillNames.indexOf(detail) < 0) {
+          s.exploredSkillNames.push(detail);
+          s.skillsExplored++;
+          xpGain = 3;
+        }
+      } else if (type === "roulette") {
+        s.rouletteSpins++;
+        xpGain = 5;
+      } else if (type === "job_analyze") {
+        s.jobsAnalyzed++;
+        xpGain = 10;
+      } else if (type === "page") {
+        if (detail && s.visitedPages.indexOf(detail) < 0) {
+          s.visitedPages.push(detail);
+          xpGain = 1;
+        }
+      }
+
+      if (xpGain > 0) {
+        s.xp += xpGain;
+        s.totalActions++;
+        var oldLevel = getLevel(s.xp - xpGain);
+        var newLevel = getLevel(s.xp);
+        var newBadges = checkBadges(s);
+        saveState(s);
+        updateWidget(s);
+
+        if (newLevel.name !== oldLevel.name) {
+          showToast("Level up! You're now " + newLevel.name + " 🎉", newLevel.color);
+        } else if (newBadges.length > 0) {
+          var b = BADGES[newBadges[0]];
+          showToast(b.icon + " " + b.name + " unlocked!", "#C4652A");
+        } else if (xpGain >= 10) {
+          showToast("+" + xpGain + " XP", "#1D9E75");
+        }
+      }
+    },
+
+    getState: getState,
+    getLevel: function() { return getLevel(getState().xp); },
+
+    reset: function() {
+      localStorage.removeItem("ss_progress");
+      updateWidget(getState());
+    }
+  };
+
+  // ---- Toast notification ----
+  function showToast(msg, color) {
+    var toast = document.createElement("div");
+    toast.className = "ss-toast";
+    toast.style.cssText = "position:fixed;bottom:80px;right:20px;z-index:10001;background:" + (color || "#C4652A") + ";color:white;padding:10px 18px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;opacity:0;transform:translateY(10px);transition:all 0.3s;box-shadow:0 4px 12px rgba(0,0,0,0.15);pointer-events:none;";
+    toast.textContent = msg;
+    document.body.appendChild(toast);
+    requestAnimationFrame(function() {
+      toast.style.opacity = "1";
+      toast.style.transform = "translateY(0)";
+    });
+    setTimeout(function() {
+      toast.style.opacity = "0";
+      toast.style.transform = "translateY(10px)";
+      setTimeout(function() { toast.remove(); }, 300);
+    }, 2500);
+  }
+
+  // ---- Widget ----
+  function createWidget() {
+    var css = document.createElement("style");
+    css.textContent = [
+      ".ss-widget{position:fixed;bottom:20px;right:20px;z-index:10000;font-family:'DM Sans',sans-serif;}",
+      ".ss-pill{display:flex;align-items:center;gap:8px;background:#FFFFFF;border:1px solid rgba(0,0,0,0.1);border-radius:40px;padding:6px 14px 6px 8px;cursor:pointer;box-shadow:0 2px 12px rgba(0,0,0,0.08);transition:all 0.2s;}",
+      ".ss-pill:hover{box-shadow:0 4px 20px rgba(0,0,0,0.12);transform:translateY(-1px);}",
+      ".ss-pill-xp{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:white;}",
+      ".ss-pill-info{display:flex;flex-direction:column;line-height:1.2;}",
+      ".ss-pill-level{font-size:11px;font-weight:600;color:#1A1A18;}",
+      ".ss-pill-bar{width:60px;height:4px;background:#F0EDE6;border-radius:2px;overflow:hidden;margin-top:2px;}",
+      ".ss-pill-fill{height:100%;border-radius:2px;transition:width 0.5s ease;}",
+      ".ss-panel{position:absolute;bottom:50px;right:0;width:300px;background:#FFFFFF;border:1px solid rgba(0,0,0,0.1);border-radius:16px;box-shadow:0 8px 30px rgba(0,0,0,0.12);padding:20px;display:none;max-height:70vh;overflow-y:auto;}",
+      ".ss-panel.open{display:block;animation:ss-fadeIn 0.2s ease;}",
+      "@keyframes ss-fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}",
+      ".ss-panel-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}",
+      ".ss-panel-title{font-family:'DM Serif Display',Georgia,serif;font-size:20px;}",
+      ".ss-panel-xp{font-size:13px;color:#6B6860;font-weight:500;}",
+      ".ss-progress-bar{width:100%;height:8px;background:#F0EDE6;border-radius:4px;overflow:hidden;margin-bottom:4px;}",
+      ".ss-progress-fill{height:100%;border-radius:4px;transition:width 0.5s ease;}",
+      ".ss-progress-label{display:flex;justify-content:space-between;font-size:11px;color:#918E85;margin-bottom:20px;}",
+      ".ss-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px;}",
+      ".ss-stat{background:#FAF9F6;border-radius:8px;padding:10px;text-align:center;}",
+      ".ss-stat-num{font-size:20px;font-weight:700;color:#1A1A18;}",
+      ".ss-stat-label{font-size:11px;color:#6B6860;margin-top:2px;}",
+      ".ss-badges-title{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:#918E85;margin-bottom:10px;}",
+      ".ss-badge{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(0,0,0,0.04);}",
+      ".ss-badge:last-child{border-bottom:none;}",
+      ".ss-badge-icon{font-size:20px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;background:#FAF9F6;border-radius:8px;flex-shrink:0;}",
+      ".ss-badge-locked .ss-badge-icon{filter:grayscale(1);opacity:0.3;}",
+      ".ss-badge-info{flex:1;min-width:0;}",
+      ".ss-badge-name{font-size:13px;font-weight:600;color:#1A1A18;}",
+      ".ss-badge-locked .ss-badge-name{color:#918E85;}",
+      ".ss-badge-desc{font-size:11px;color:#918E85;line-height:1.3;}",
+      "@media(max-width:480px){.ss-panel{width:280px;right:-5px;}.ss-widget{bottom:12px;right:12px;}}"
+    ].join("
+");
+    document.head.appendChild(css);
+
+    var widget = document.createElement("div");
+    widget.className = "ss-widget";
+    widget.id = "ss-widget";
+    widget.innerHTML = '<div class="ss-pill" id="ss-pill">' +
+      '<div class="ss-pill-xp" id="ss-pill-icon"></div>' +
+      '<div class="ss-pill-info">' +
+        '<div class="ss-pill-level" id="ss-pill-level"></div>' +
+        '<div class="ss-pill-bar"><div class="ss-pill-fill" id="ss-pill-fill"></div></div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="ss-panel" id="ss-panel"></div>';
+    document.body.appendChild(widget);
+
+    document.getElementById("ss-pill").addEventListener("click", function(e) {
+      e.stopPropagation();
+      var panel = document.getElementById("ss-panel");
+      panel.classList.toggle("open");
+      if (panel.classList.contains("open")) renderPanel(getState());
+    });
+
+    document.addEventListener("click", function(e) {
+      var panel = document.getElementById("ss-panel");
+      if (panel && panel.classList.contains("open") && !e.target.closest(".ss-widget")) {
+        panel.classList.remove("open");
+      }
+    });
+  }
+
+  function updateWidget(state) {
+    var level = getLevel(state.xp);
+    var next = getNextLevel(state.xp);
+    var pct = 100;
+    if (next) {
+      pct = Math.round(((state.xp - level.xp) / (next.xp - level.xp)) * 100);
+    }
+
+    var icon = document.getElementById("ss-pill-icon");
+    var levelEl = document.getElementById("ss-pill-level");
+    var fill = document.getElementById("ss-pill-fill");
+
+    if (icon) {
+      icon.style.background = level.color;
+      icon.textContent = state.xp;
+    }
+    if (levelEl) levelEl.textContent = level.name;
+    if (fill) {
+      fill.style.width = pct + "%";
+      fill.style.background = level.color;
+    }
+  }
+
+  function renderPanel(state) {
+    var level = getLevel(state.xp);
+    var next = getNextLevel(state.xp);
+    var pct = 100;
+    var nextLabel = "Max level!";
+    if (next) {
+      pct = Math.round(((state.xp - level.xp) / (next.xp - level.xp)) * 100);
+      nextLabel = next.xp + " XP to " + next.name;
+    }
+
+    var badgesHTML = "";
+    var badgeKeys = Object.keys(BADGES);
+    for (var i = 0; i < badgeKeys.length; i++) {
+      var key = badgeKeys[i];
+      var b = BADGES[key];
+      var earned = state.earnedBadges.indexOf(key) >= 0;
+      badgesHTML += '<div class="ss-badge ' + (earned ? "" : "ss-badge-locked") + '">' +
+        '<div class="ss-badge-icon">' + b.icon + '</div>' +
+        '<div class="ss-badge-info">' +
+          '<div class="ss-badge-name">' + b.name + '</div>' +
+          '<div class="ss-badge-desc">' + (earned ? b.desc : "???") + '</div>' +
+        '</div>' +
+      '</div>';
+    }
+
+    document.getElementById("ss-panel").innerHTML =
+      '<div class="ss-panel-header">' +
+        '<div class="ss-panel-title">Your Progress</div>' +
+        '<div class="ss-panel-xp">' + state.xp + ' XP</div>' +
+      '</div>' +
+      '<div class="ss-progress-bar"><div class="ss-progress-fill" style="width:' + pct + '%;background:' + level.color + '"></div></div>' +
+      '<div class="ss-progress-label"><span>' + level.name + '</span><span>' + nextLabel + '</span></div>' +
+      '<div class="ss-stats">' +
+        '<div class="ss-stat"><div class="ss-stat-num">' + state.sprintsCompleted + '</div><div class="ss-stat-label">Sprints</div></div>' +
+        '<div class="ss-stat"><div class="ss-stat-num">' + state.coursesClicked + '</div><div class="ss-stat-label">Courses</div></div>' +
+        '<div class="ss-stat"><div class="ss-stat-num">' + state.careersViewed + '</div><div class="ss-stat-label">Careers</div></div>' +
+        '<div class="ss-stat"><div class="ss-stat-num">' + state.earnedBadges.length + '/' + badgeKeys.length + '</div><div class="ss-stat-label">Badges</div></div>' +
+      '</div>' +
+      '<div class="ss-badges-title">Badges</div>' +
+      badgesHTML;
+  }
+
+  // ---- Auto-detect page and track visit ----
+  function detectPage() {
+    var path = window.location.pathname.split("/").pop().replace(".html", "");
+    var pageMap = {
+      "start-somewhere": "home",
+      "explore": "explore",
+      "build": "build",
+      "apply": "apply",
+      "skill-explorer-production": "skill-explorer",
+      "job-analyzer": "job-analyzer",
+      "skill-roulette": "skill-roulette",
+      "skill-sprints": "skill-sprints",
+      "skill-map": "skill-map",
+      "career": "career"
+    };
+    return pageMap[path] || path;
+  }
+
+  // ---- Init ----
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
+
+  function init() {
+    createWidget();
+    var state = getState();
+
+    // Track page visit
+    var page = detectPage();
+    if (page) {
+      SSProgress.award("page", page);
+    }
+
+    // Auto-track career page views
+    if (page === "career") {
+      var params = new URLSearchParams(window.location.search);
+      var job = params.get("job");
+      if (job) SSProgress.award("career", job);
+    }
+
+    updateWidget(getState());
+  }
+})();
+</script>
+
+</body>
+</html>

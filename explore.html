@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Start Somewhere — Explore</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+nav { position: sticky; top: 0; z-index: 100; background: rgba(250,249,246,0.95); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(0,0,0,0.08); }
+.nav-inner { display: flex; align-items: center; justify-content: space-between; padding: 14px 2rem; max-width: 1200px; margin: 0 auto; }
+.nav-logo { font-family: 'DM Serif Display', Georgia, serif; font-size: 20px; text-decoration: none; }
+.nav-logo .s { color: #1A1A18; }
+.nav-logo .sw { color: #C4652A; }
+.nav-links { display: flex; gap: 1.75rem; align-items: center; }
+.nav-links a { font-size: 14px; color: #6B6860; text-decoration: none; font-weight: 500; transition: color 0.2s; }
+.nav-links a:hover { color: #1A1A18; }
+.nav-links a.active { color: #C4652A; font-weight: 600; }
+:root {
+  --bg: #FAF9F6; --bg-warm: #F5F0E8; --bg-card: #FFFFFF;
+  --text: #1A1A18; --text-muted: #6B6860; --text-soft: #918E85;
+  --accent: #C4652A; --accent-hover: #A8521F; --accent-light: #FAECE7;
+  --teal: #1D9E75; --teal-light: #E1F5EE;
+  --purple: #534AB7; --purple-light: #EEEDFE;
+  --border: rgba(0,0,0,0.08);
+  --serif: 'DM Serif Display', Georgia, serif;
+  --sans: 'DM Sans', -apple-system, sans-serif;
+  --radius: 12px; --radius-sm: 8px;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: var(--sans); background: var(--bg); color: var(--text); line-height: 1.7; }
+
+/* TWO-TIER NAV */
+
+/* PAGE HERO */
+.page-hero { text-align: center; padding: 60px 2rem 48px; max-width: 680px; margin: 0 auto; }
+.page-hero .eyebrow {
+  font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em;
+  color: var(--accent); margin-bottom: 1rem;
+}
+.page-hero h1 { font-family: var(--serif); font-size: 40px; line-height: 1.15; margin-bottom: 1rem; }
+.page-hero h1 em { font-style: italic; color: var(--accent); }
+.page-hero p { font-size: 17px; color: var(--text-muted); line-height: 1.6; }
+
+/* CONTENT */
+.content { max-width: 840px; margin: 0 auto; padding: 0 2rem 80px; }
+.section-label { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); margin-bottom: 0.75rem; }
+.section-heading { font-family: var(--serif); font-size: 26px; margin-bottom: 0.75rem; }
+.section-desc { font-size: 15px; color: var(--text-muted); margin-bottom: 1.5rem; max-width: 600px; }
+
+.resource-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 3rem; }
+.resource-card {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 1.25rem; text-decoration: none; color: inherit; display: block; transition: all 0.25s;
+}
+.resource-card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.05); }
+.resource-card .tag {
+  display: inline-block; font-size: 11px; font-weight: 600; padding: 3px 10px;
+  border-radius: 20px; margin-bottom: 8px;
+}
+.tag-free { background: var(--teal-light); color: var(--teal); }
+.tag-tool { background: var(--purple-light); color: var(--purple); }
+.tag-assessment { background: var(--accent-light); color: var(--accent); }
+.resource-card h3 { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+.resource-card .provider { font-size: 12px; color: var(--text-soft); margin-bottom: 8px; }
+.resource-card p { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
+.resource-card .arrow { font-size: 13px; color: var(--accent); font-weight: 600; margin-top: 10px; display: inline-block; transition: transform 0.2s; }
+.resource-card:hover .arrow { transform: translateX(4px); }
+
+.internal-cta {
+  background: var(--bg-warm); border-radius: var(--radius); padding: 2rem;
+  text-align: center; margin-bottom: 3rem;
+}
+.internal-cta h3 { font-family: var(--serif); font-size: 22px; margin-bottom: 0.5rem; }
+.internal-cta p { font-size: 14px; color: var(--text-muted); margin-bottom: 1rem; }
+.internal-cta a {
+  display: inline-block; background: var(--accent); color: white; padding: 10px 24px;
+  border-radius: 999px; text-decoration: none; font-size: 14px; font-weight: 600; transition: background 0.2s;
+}
+.internal-cta a:hover { background: var(--accent-hover); }
+
+.tip-box {
+  background: var(--teal-light); border-radius: var(--radius); padding: 1.25rem 1.5rem;
+  margin-bottom: 3rem;
+}
+.tip-box h4 { font-size: 14px; font-weight: 600; color: var(--teal); margin-bottom: 6px; }
+.tip-box p { font-size: 13px; color: #085041; line-height: 1.6; }
+
+@media (max-width: 640px) {
+  .nav-inner { padding: 12px 1rem; }
+  .nav-links { gap: 1rem; flex-wrap: wrap; }
+  .resource-grid { grid-template-columns: 1fr; }
+  
+  
+  .page-hero { padding: 40px 1.5rem 32px; }
+  .page-hero h1 { font-size: 30px; }
+  .content { padding: 0 1.5rem 60px; }
+}
+
+/* MOBILE HAMBURGER NAV */
+.nav-hamburger {
+  display: none; align-items: center; justify-content: center;
+  width: 36px; height: 36px; cursor: pointer; border: none;
+  background: transparent; padding: 0; flex-direction: column; gap: 5px;
+}
+.nav-hamburger span {
+  display: block; width: 20px; height: 2px; background: #1A1A18;
+  transition: all 0.3s; border-radius: 1px;
+}
+.nav-hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.nav-hamburger.open span:nth-child(2) { opacity: 0; }
+.nav-hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+.mobile-menu {
+  display: none; position: fixed; top: 53px; left: 0; right: 0; bottom: 0;
+  background: rgba(250,249,246,0.98); backdrop-filter: blur(20px);
+  z-index: 99; padding: 2rem 1.5rem; overflow-y: auto;
+}
+.mobile-menu.open { display: flex; flex-direction: column; gap: 0; }
+.mobile-menu a {
+  display: block; padding: 14px 0; font-size: 16px; color: #6B6860;
+  text-decoration: none; font-weight: 500; border-bottom: 1px solid rgba(0,0,0,0.08);
+  transition: color 0.2s;
+}
+.mobile-menu a:hover, .mobile-menu a.active { color: #C4652A; }
+@media (max-width: 768px) { .nav-hamburger { display: flex; } .nav-links { display: none !important; } }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="start-somewhere.html" class="nav-logo"><span class="s">start</span><span class="sw">somewhere.</span></a>
+    <button class="nav-hamburger" id="navHamburger" onclick="toggleMobileMenu()"><span></span><span></span><span></span></button>
+    <div class="nav-links">
+      <a href="start-somewhere.html">Home</a>
+      <a href="explore.html" class="active">Explore</a>
+      <a href="build.html">Build</a>
+      <a href="apply.html">Apply</a>
+      <a href="skill-explorer-production.html">Skill Explorer</a>
+      <a href="job-analyzer.html">Job Analyzer</a>
+      <a href="skill-roulette.html">Skill Roulette</a>
+      <a href="skill-sprints.html">Skill Sprints</a>
+      <a href="skill-map.html">Skill Map</a>
+    </div>
+  </div>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="start-somewhere.html">Home</a>
+  <a href="explore.html" class="active">Explore</a>
+  <a href="build.html">Build</a>
+  <a href="apply.html">Apply</a>
+  <a href="skill-explorer-production.html">Skill Explorer</a>
+  <a href="job-analyzer.html">Job Analyzer</a>
+  <a href="skill-roulette.html">Skill Roulette</a>
+  <a href="skill-sprints.html">Skill Sprints</a>
+  <a href="skill-map.html">Skill Map</a>
+</div>
+
+<div class="page-hero">
+  <div class="eyebrow">No idea? No problem.</div>
+  <h1>Figure out what <em>interests you.</em></h1>
+  <p>You don't need a five-year plan. You need to try things. These tools help you figure out what you're drawn to, through questions, quizzes, and real data about what's out there.</p>
+</div>
+
+<div class="content">
+
+  <div class="section-label">Start here</div>
+  <h2 class="section-heading">Self-assessment tools</h2>
+  <p class="section-desc">Answer some questions, get real insights. These tools find patterns in your interests, personality, and strengths that you might not notice on your own.</p>
+
+  <div class="resource-grid">
+    <a class="resource-card" href="https://www.mynextmove.org/explore/ip" target="_blank" rel="noopener">
+      <span class="tag tag-free">Free</span>
+      <h3>O*NET Interest Profiler</h3>
+      <div class="provider">U.S. Department of Labor</div>
+      <p>60 questions that map your interests to real career clusters. Backed by the largest occupational database in the world. This is the gold standard.</p>
+      <span class="arrow">Take the assessment &#8594;</span>
+    </a>
+    <a class="resource-card" href="https://www.truity.com/test/holland-code-career-test" target="_blank" rel="noopener">
+      <span class="tag tag-free">Free</span>
+      <h3>Holland Code Career Test</h3>
+      <div class="provider">Truity</div>
+      <p>Based on the RIASEC model. Maps you to one of six personality types (Realistic, Investigative, Artistic, Social, Enterprising, Conventional) and shows matching careers.</p>
+      <span class="arrow">Take the test &#8594;</span>
+    </a>
+    <a class="resource-card" href="https://www.16personalities.com/" target="_blank" rel="noopener">
+      <span class="tag tag-assessment">Assessment</span>
+      <h3>16Personalities (MBTI-style)</h3>
+      <div class="provider">NERIS Analytics</div>
+      <p>Not a career tool directly, but really useful for understanding how you process information, make decisions, and work with others.</p>
+      <span class="arrow">Discover your type &#8594;</span>
+    </a>
+    <a class="resource-card" href="https://www.careeronestop.org/ExploreCareers/Assessments/interests.aspx" target="_blank" rel="noopener">
+      <span class="tag tag-free">Free</span>
+      <h3>CareerOneStop Interest Assessment</h3>
+      <div class="provider">U.S. Department of Labor</div>
+      <p>Quick 30-question version of the Interest Profiler. Get matched to career clusters in under 10 minutes. Great if you want fast results.</p>
+      <span class="arrow">Quick assessment &#8594;</span>
+    </a>
+  </div>
+
+  <div class="tip-box">
+    <h4>Pro tip: take more than one</h4>
+    <p>No single assessment captures the full picture. Take two or three and look for overlapping themes. If "Investigative" shows up on the Holland Code and you keep landing on analytical roles in O*NET, that's a signal worth paying attention to.</p>
+  </div>
+
+  <div class="section-label">Go deeper</div>
+  <h2 class="section-heading">Career exploration</h2>
+  <p class="section-desc">Once you have a general direction (or even just a vague sense), use these to see what actual jobs look like. Day to day, salary, growth, and what skills you'd need.</p>
+
+  <div class="resource-grid">
+    <a class="resource-card" href="https://www.onetonline.org/" target="_blank" rel="noopener">
+      <span class="tag tag-free">Free</span>
+      <h3>O*NET Online</h3>
+      <div class="provider">U.S. Department of Labor</div>
+      <p>Search any job title and get the full breakdown: tasks, skills, salary, education, job outlook. The biggest career database out there.</p>
+      <span class="arrow">Explore careers &#8594;</span>
+    </a>
+    <a class="resource-card" href="https://www.bls.gov/ooh/" target="_blank" rel="noopener">
+      <span class="tag tag-free">Free</span>
+      <h3>Occupational Outlook Handbook</h3>
+      <div class="provider">Bureau of Labor Statistics</div>
+      <p>What's actually growing? What pays well? Real salary data and 10-year job outlook projections for hundreds of occupations.</p>
+      <span class="arrow">Browse occupations &#8594;</span>
+    </a>
+    <a class="resource-card" href="https://www.careervillage.org/" target="_blank" rel="noopener">
+      <span class="tag tag-free">Free</span>
+      <h3>CareerVillage</h3>
+      <div class="provider">CareerVillage.org</div>
+      <p>Ask real professionals about their careers. What's their day actually like? How did they get started? Answers from people who've been there.</p>
+      <span class="arrow">Ask a question &#8594;</span>
+    </a>
+    <a class="resource-card" href="https://www.glassdoor.com/Explore" target="_blank" rel="noopener">
+      <span class="tag tag-tool">Tool</span>
+      <h3>Glassdoor Career Explorer</h3>
+      <div class="provider">Glassdoor</div>
+      <p>See what people actually say about working in different roles and companies. Reviews, salary reports, and interview experiences from real employees.</p>
+      <span class="arrow">Research companies &#8594;</span>
+    </a>
+  </div>
+
+  <div class="internal-cta">
+    <h3>Already have a direction?</h3>
+    <p>Use the Skill Explorer to see which skills cover the most ground for your major or target sector.</p>
+    <a href="skill-explorer-production.html">Open Skill Explorer &#8594;</a>
+  </div>
+
+  <div class="section-label">Just curious</div>
+  <h2 class="section-heading">Try something random</h2>
+  <p class="section-desc">Can't decide? Don't. Hit the button on the home page and we'll pick a random skill for you. Zero stakes, maximum curiosity.</p>
+
+  <div class="internal-cta" style="background: var(--purple-light);">
+    <h3>I'm feeling lucky</h3>
+    <p>We'll hand you a random skill with a direct link to start learning. No commitment required.</p>
+    <a href="start-somewhere.html#lucky" style="background: var(--purple);">Pick something random &#8594;</a>
+  </div>
+
+</div>
+
+
+<script>
+function toggleMobileMenu(){var h=document.getElementById('navHamburger'),m=document.getElementById('mobileMenu');h.classList.toggle('open');m.classList.toggle('open');document.body.style.overflow=m.classList.contains('open')?'hidden':'';}
+</script>
+<!-- SS_PROGRESS_TRACKER -->
+<script>
+// ========== START SOMEWHERE PROGRESS TRACKER ==========
+// Self-contained gamified progress system using localStorage
+(function() {
+  var LEVELS = [
+    { name: "Curious", xp: 0, color: "#918E85" },
+    { name: "Explorer", xp: 25, color: "#534AB7" },
+    { name: "Builder", xp: 75, color: "#1D9E75" },
+    { name: "Momentum", xp: 150, color: "#C4652A" },
+    { name: "Unstoppable", xp: 300, color: "#B8336A" }
+  ];
+
+  var BADGES = {
+    first_step:     { icon: "🚀", name: "First Step",      desc: "Did something. That's the whole point.", check: function(s) { return s.totalActions >= 1; } },
+    sprint_star:    { icon: "⚡", name: "Sprint Star",      desc: "Completed 5 skill sprints.", check: function(s) { return s.sprintsCompleted >= 5; } },
+    scholar:        { icon: "📚", name: "Scholar",          desc: "Clicked through to 10 courses.", check: function(s) { return s.coursesClicked >= 10; } },
+    cartographer:   { icon: "🗺️", name: "Cartographer",    desc: "Explored the Skill Map.", check: function(s) { return s.visitedPages.indexOf("skill-map") >= 0; } },
+    deep_diver:     { icon: "🔍", name: "Deep Diver",       desc: "Checked out 3 different careers.", check: function(s) { return s.careersViewed >= 3; } },
+    full_send:      { icon: "🎯", name: "Full Send",        desc: "Visited Explore, Build, and Apply.", check: function(s) { var p = s.visitedPages; return p.indexOf("explore") >= 0 && p.indexOf("build") >= 0 && p.indexOf("apply") >= 0; } },
+    roulette:       { icon: "🎲", name: "Roulette Roller",  desc: "Spun the roulette 3 times.", check: function(s) { return s.rouletteSpins >= 3; } },
+    completionist:  { icon: "👑", name: "Completionist",    desc: "Finished all 18 sprints.", check: function(s) { return s.sprintsCompleted >= 18; } },
+    skill_hunter:   { icon: "🎪", name: "Skill Hunter",     desc: "Explored 10 different skills.", check: function(s) { return s.skillsExplored >= 10; } },
+    analyzer:       { icon: "🔬", name: "Analyzer",         desc: "Used the Job Analyzer.", check: function(s) { return s.jobsAnalyzed >= 1; } }
+  };
+
+  // ---- State management ----
+  function getState() {
+    try {
+      var raw = localStorage.getItem("ss_progress");
+      if (raw) return JSON.parse(raw);
+    } catch(e) {}
+    return {
+      xp: 0,
+      totalActions: 0,
+      sprintsCompleted: 0,
+      coursesClicked: 0,
+      careersViewed: 0,
+      skillsExplored: 0,
+      rouletteSpins: 0,
+      jobsAnalyzed: 0,
+      visitedPages: [],
+      earnedBadges: [],
+      completedSprintIds: [],
+      viewedCareerNames: [],
+      clickedCourseNames: [],
+      exploredSkillNames: []
+    };
+  }
+
+  function saveState(s) {
+    try { localStorage.setItem("ss_progress", JSON.stringify(s)); } catch(e) {}
+  }
+
+  function getLevel(xp) {
+    var level = LEVELS[0];
+    for (var i = 0; i < LEVELS.length; i++) {
+      if (xp >= LEVELS[i].xp) level = LEVELS[i];
+    }
+    return level;
+  }
+
+  function getNextLevel(xp) {
+    for (var i = 0; i < LEVELS.length; i++) {
+      if (xp < LEVELS[i].xp) return LEVELS[i];
+    }
+    return null;
+  }
+
+  function checkBadges(state) {
+    var newBadges = [];
+    var keys = Object.keys(BADGES);
+    for (var i = 0; i < keys.length; i++) {
+      var key = keys[i];
+      if (state.earnedBadges.indexOf(key) < 0 && BADGES[key].check(state)) {
+        state.earnedBadges.push(key);
+        newBadges.push(key);
+      }
+    }
+    return newBadges;
+  }
+
+  // ---- Public API ----
+  window.SSProgress = {
+    award: function(type, detail) {
+      var s = getState();
+      var xpGain = 0;
+
+      if (type === "sprint") {
+        if (detail && s.completedSprintIds.indexOf(detail) >= 0) return; // already done
+        if (detail) s.completedSprintIds.push(detail);
+        s.sprintsCompleted++;
+        xpGain = 15;
+      } else if (type === "course") {
+        if (detail && s.clickedCourseNames.indexOf(detail) < 0) {
+          s.clickedCourseNames.push(detail);
+        }
+        s.coursesClicked++;
+        xpGain = 5;
+      } else if (type === "career") {
+        if (detail && s.viewedCareerNames.indexOf(detail) < 0) {
+          s.viewedCareerNames.push(detail);
+          s.careersViewed++;
+          xpGain = 5;
+        }
+      } else if (type === "skill") {
+        if (detail && s.exploredSkillNames.indexOf(detail) < 0) {
+          s.exploredSkillNames.push(detail);
+          s.skillsExplored++;
+          xpGain = 3;
+        }
+      } else if (type === "roulette") {
+        s.rouletteSpins++;
+        xpGain = 5;
+      } else if (type === "job_analyze") {
+        s.jobsAnalyzed++;
+        xpGain = 10;
+      } else if (type === "page") {
+        if (detail && s.visitedPages.indexOf(detail) < 0) {
+          s.visitedPages.push(detail);
+          xpGain = 1;
+        }
+      }
+
+      if (xpGain > 0) {
+        s.xp += xpGain;
+        s.totalActions++;
+        var oldLevel = getLevel(s.xp - xpGain);
+        var newLevel = getLevel(s.xp);
+        var newBadges = checkBadges(s);
+        saveState(s);
+        updateWidget(s);
+
+        if (newLevel.name !== oldLevel.name) {
+          showToast("Level up! You're now " + newLevel.name + " 🎉", newLevel.color);
+        } else if (newBadges.length > 0) {
+          var b = BADGES[newBadges[0]];
+          showToast(b.icon + " " + b.name + " unlocked!", "#C4652A");
+        } else if (xpGain >= 10) {
+          showToast("+" + xpGain + " XP", "#1D9E75");
+        }
+      }
+    },
+
+    getState: getState,
+    getLevel: function() { return getLevel(getState().xp); },
+
+    reset: function() {
+      localStorage.removeItem("ss_progress");
+      updateWidget(getState());
+    }
+  };
+
+  // ---- Toast notification ----
+  function showToast(msg, color) {
+    var toast = document.createElement("div");
+    toast.className = "ss-toast";
+    toast.style.cssText = "position:fixed;bottom:80px;right:20px;z-index:10001;background:" + (color || "#C4652A") + ";color:white;padding:10px 18px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;opacity:0;transform:translateY(10px);transition:all 0.3s;box-shadow:0 4px 12px rgba(0,0,0,0.15);pointer-events:none;";
+    toast.textContent = msg;
+    document.body.appendChild(toast);
+    requestAnimationFrame(function() {
+      toast.style.opacity = "1";
+      toast.style.transform = "translateY(0)";
+    });
+    setTimeout(function() {
+      toast.style.opacity = "0";
+      toast.style.transform = "translateY(10px)";
+      setTimeout(function() { toast.remove(); }, 300);
+    }, 2500);
+  }
+
+  // ---- Widget ----
+  function createWidget() {
+    var css = document.createElement("style");
+    css.textContent = [
+      ".ss-widget{position:fixed;bottom:20px;right:20px;z-index:10000;font-family:'DM Sans',sans-serif;}",
+      ".ss-pill{display:flex;align-items:center;gap:8px;background:#FFFFFF;border:1px solid rgba(0,0,0,0.1);border-radius:40px;padding:6px 14px 6px 8px;cursor:pointer;box-shadow:0 2px 12px rgba(0,0,0,0.08);transition:all 0.2s;}",
+      ".ss-pill:hover{box-shadow:0 4px 20px rgba(0,0,0,0.12);transform:translateY(-1px);}",
+      ".ss-pill-xp{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:white;}",
+      ".ss-pill-info{display:flex;flex-direction:column;line-height:1.2;}",
+      ".ss-pill-level{font-size:11px;font-weight:600;color:#1A1A18;}",
+      ".ss-pill-bar{width:60px;height:4px;background:#F0EDE6;border-radius:2px;overflow:hidden;margin-top:2px;}",
+      ".ss-pill-fill{height:100%;border-radius:2px;transition:width 0.5s ease;}",
+      ".ss-panel{position:absolute;bottom:50px;right:0;width:300px;background:#FFFFFF;border:1px solid rgba(0,0,0,0.1);border-radius:16px;box-shadow:0 8px 30px rgba(0,0,0,0.12);padding:20px;display:none;max-height:70vh;overflow-y:auto;}",
+      ".ss-panel.open{display:block;animation:ss-fadeIn 0.2s ease;}",
+      "@keyframes ss-fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}",
+      ".ss-panel-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}",
+      ".ss-panel-title{font-family:'DM Serif Display',Georgia,serif;font-size:20px;}",
+      ".ss-panel-xp{font-size:13px;color:#6B6860;font-weight:500;}",
+      ".ss-progress-bar{width:100%;height:8px;background:#F0EDE6;border-radius:4px;overflow:hidden;margin-bottom:4px;}",
+      ".ss-progress-fill{height:100%;border-radius:4px;transition:width 0.5s ease;}",
+      ".ss-progress-label{display:flex;justify-content:space-between;font-size:11px;color:#918E85;margin-bottom:20px;}",
+      ".ss-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px;}",
+      ".ss-stat{background:#FAF9F6;border-radius:8px;padding:10px;text-align:center;}",
+      ".ss-stat-num{font-size:20px;font-weight:700;color:#1A1A18;}",
+      ".ss-stat-label{font-size:11px;color:#6B6860;margin-top:2px;}",
+      ".ss-badges-title{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:#918E85;margin-bottom:10px;}",
+      ".ss-badge{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(0,0,0,0.04);}",
+      ".ss-badge:last-child{border-bottom:none;}",
+      ".ss-badge-icon{font-size:20px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;background:#FAF9F6;border-radius:8px;flex-shrink:0;}",
+      ".ss-badge-locked .ss-badge-icon{filter:grayscale(1);opacity:0.3;}",
+      ".ss-badge-info{flex:1;min-width:0;}",
+      ".ss-badge-name{font-size:13px;font-weight:600;color:#1A1A18;}",
+      ".ss-badge-locked .ss-badge-name{color:#918E85;}",
+      ".ss-badge-desc{font-size:11px;color:#918E85;line-height:1.3;}",
+      "@media(max-width:480px){.ss-panel{width:280px;right:-5px;}.ss-widget{bottom:12px;right:12px;}}"
+    ].join("
+");
+    document.head.appendChild(css);
+
+    var widget = document.createElement("div");
+    widget.className = "ss-widget";
+    widget.id = "ss-widget";
+    widget.innerHTML = '<div class="ss-pill" id="ss-pill">' +
+      '<div class="ss-pill-xp" id="ss-pill-icon"></div>' +
+      '<div class="ss-pill-info">' +
+        '<div class="ss-pill-level" id="ss-pill-level"></div>' +
+        '<div class="ss-pill-bar"><div class="ss-pill-fill" id="ss-pill-fill"></div></div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="ss-panel" id="ss-panel"></div>';
+    document.body.appendChild(widget);
+
+    document.getElementById("ss-pill").addEventListener("click", function(e) {
+      e.stopPropagation();
+      var panel = document.getElementById("ss-panel");
+      panel.classList.toggle("open");
+      if (panel.classList.contains("open")) renderPanel(getState());
+    });
+
+    document.addEventListener("click", function(e) {
+      var panel = document.getElementById("ss-panel");
+      if (panel && panel.classList.contains("open") && !e.target.closest(".ss-widget")) {
+        panel.classList.remove("open");
+      }
+    });
+  }
+
+  function updateWidget(state) {
+    var level = getLevel(state.xp);
+    var next = getNextLevel(state.xp);
+    var pct = 100;
+    if (next) {
+      pct = Math.round(((state.xp - level.xp) / (next.xp - level.xp)) * 100);
+    }
+
+    var icon = document.getElementById("ss-pill-icon");
+    var levelEl = document.getElementById("ss-pill-level");
+    var fill = document.getElementById("ss-pill-fill");
+
+    if (icon) {
+      icon.style.background = level.color;
+      icon.textContent = state.xp;
+    }
+    if (levelEl) levelEl.textContent = level.name;
+    if (fill) {
+      fill.style.width = pct + "%";
+      fill.style.background = level.color;
+    }
+  }
+
+  function renderPanel(state) {
+    var level = getLevel(state.xp);
+    var next = getNextLevel(state.xp);
+    var pct = 100;
+    var nextLabel = "Max level!";
+    if (next) {
+      pct = Math.round(((state.xp - level.xp) / (next.xp - level.xp)) * 100);
+      nextLabel = next.xp + " XP to " + next.name;
+    }
+
+    var badgesHTML = "";
+    var badgeKeys = Object.keys(BADGES);
+    for (var i = 0; i < badgeKeys.length; i++) {
+      var key = badgeKeys[i];
+      var b = BADGES[key];
+      var earned = state.earnedBadges.indexOf(key) >= 0;
+      badgesHTML += '<div class="ss-badge ' + (earned ? "" : "ss-badge-locked") + '">' +
+        '<div class="ss-badge-icon">' + b.icon + '</div>' +
+        '<div class="ss-badge-info">' +
+          '<div class="ss-badge-name">' + b.name + '</div>' +
+          '<div class="ss-badge-desc">' + (earned ? b.desc : "???") + '</div>' +
+        '</div>' +
+      '</div>';
+    }
+
+    document.getElementById("ss-panel").innerHTML =
+      '<div class="ss-panel-header">' +
+        '<div class="ss-panel-title">Your Progress</div>' +
+        '<div class="ss-panel-xp">' + state.xp + ' XP</div>' +
+      '</div>' +
+      '<div class="ss-progress-bar"><div class="ss-progress-fill" style="width:' + pct + '%;background:' + level.color + '"></div></div>' +
+      '<div class="ss-progress-label"><span>' + level.name + '</span><span>' + nextLabel + '</span></div>' +
+      '<div class="ss-stats">' +
+        '<div class="ss-stat"><div class="ss-stat-num">' + state.sprintsCompleted + '</div><div class="ss-stat-label">Sprints</div></div>' +
+        '<div class="ss-stat"><div class="ss-stat-num">' + state.coursesClicked + '</div><div class="ss-stat-label">Courses</div></div>' +
+        '<div class="ss-stat"><div class="ss-stat-num">' + state.careersViewed + '</div><div class="ss-stat-label">Careers</div></div>' +
+        '<div class="ss-stat"><div class="ss-stat-num">' + state.earnedBadges.length + '/' + badgeKeys.length + '</div><div class="ss-stat-label">Badges</div></div>' +
+      '</div>' +
+      '<div class="ss-badges-title">Badges</div>' +
+      badgesHTML;
+  }
+
+  // ---- Auto-detect page and track visit ----
+  function detectPage() {
+    var path = window.location.pathname.split("/").pop().replace(".html", "");
+    var pageMap = {
+      "start-somewhere": "home",
+      "explore": "explore",
+      "build": "build",
+      "apply": "apply",
+      "skill-explorer-production": "skill-explorer",
+      "job-analyzer": "job-analyzer",
+      "skill-roulette": "skill-roulette",
+      "skill-sprints": "skill-sprints",
+      "skill-map": "skill-map",
+      "career": "career"
+    };
+    return pageMap[path] || path;
+  }
+
+  // ---- Init ----
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
+
+  function init() {
+    createWidget();
+    var state = getState();
+
+    // Track page visit
+    var page = detectPage();
+    if (page) {
+      SSProgress.award("page", page);
+    }
+
+    // Auto-track career page views
+    if (page === "career") {
+      var params = new URLSearchParams(window.location.search);
+      var job = params.get("job");
+      if (job) SSProgress.award("career", job);
+    }
+
+    updateWidget(getState());
+  }
+})();
+</script>
+
+</body>
+</html>

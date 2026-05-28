@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Start Somewhere — Job Analyzer</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+nav { position: sticky; top: 0; z-index: 100; background: rgba(250,249,246,0.95); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(0,0,0,0.08); }
+.nav-inner { display: flex; align-items: center; justify-content: space-between; padding: 14px 2rem; max-width: 1200px; margin: 0 auto; }
+.nav-logo { font-family: 'DM Serif Display', Georgia, serif; font-size: 20px; text-decoration: none; }
+.nav-logo .s { color: #1A1A18; }
+.nav-logo .sw { color: #C4652A; }
+.nav-links { display: flex; gap: 1.75rem; align-items: center; }
+.nav-links a { font-size: 14px; color: #6B6860; text-decoration: none; font-weight: 500; transition: color 0.2s; }
+.nav-links a:hover { color: #1A1A18; }
+.nav-links a.active { color: #C4652A; font-weight: 600; }
+:root {
+  --bg: #FAF9F6; --bg-warm: #F5F0E8;
+  --accent: #C4652A; --accent-hover: #A8521F;
+  --teal: #1D9E75; --purple: #534AB7; --blue: #2D7DD2;
+  --text: #1A1A18; --text-muted: #6B6860; --text-soft: #918E85;
+  --border: #E8E4DC; --card-bg: #FFFFFF;
+  --radius: 12px;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); }
+
+/* Nav */
+
+/* Hero */
+.hero {
+  text-align: center; padding: 60px 24px 40px; max-width: 700px; margin: 0 auto;
+}
+.hero h1 { font-family: 'DM Serif Display', serif; font-size: 42px; line-height: 1.2; margin-bottom: 16px; }
+.hero h1 em { font-style: normal; color: var(--accent); }
+.hero p { font-size: 17px; color: var(--text-muted); line-height: 1.6; }
+
+/* Input section */
+.input-section {
+  max-width: 720px; margin: 0 auto; padding: 0 24px 40px;
+}
+.api-key-row {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 20px;
+}
+.api-key-row label {
+  font-size: 13px; font-weight: 600; color: var(--text-muted); white-space: nowrap;
+}
+.api-key-row input {
+  flex: 1; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px;
+  font-family: 'DM Sans', sans-serif; font-size: 14px; background: var(--card-bg);
+  transition: border-color 0.2s;
+}
+.api-key-row input:focus { outline: none; border-color: var(--accent); }
+.api-key-help {
+  font-size: 11px; color: var(--text-soft); margin-bottom: 20px; line-height: 1.5;
+}
+.api-key-help a { color: var(--accent); }
+
+textarea {
+  width: 100%; min-height: 220px; padding: 16px; border: 1px solid var(--border);
+  border-radius: var(--radius); font-family: 'DM Sans', sans-serif; font-size: 14px;
+  line-height: 1.6; background: var(--card-bg); resize: vertical; transition: border-color 0.2s;
+}
+textarea:focus { outline: none; border-color: var(--accent); }
+textarea::placeholder { color: var(--text-soft); }
+
+.analyze-btn {
+  display: block; width: 100%; margin-top: 16px; padding: 14px;
+  background: var(--accent); color: white; border: none; border-radius: 8px;
+  font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 600;
+  cursor: pointer; transition: background 0.2s;
+}
+.analyze-btn:hover { background: var(--accent-hover); }
+.analyze-btn:disabled { background: var(--text-soft); cursor: not-allowed; }
+.analyze-btn .spinner {
+  display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: white; border-radius: 50%; animation: spin 0.6s linear infinite;
+  vertical-align: middle; margin-right: 8px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.error-msg {
+  margin-top: 12px; padding: 12px 16px; background: #FEF2F2; border: 1px solid #FECACA;
+  border-radius: 8px; color: #991B1B; font-size: 13px; display: none;
+}
+
+/* Results */
+.results {
+  max-width: 900px; margin: 0 auto; padding: 0 24px 60px;
+  opacity: 0; transform: translateY(20px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+.results.visible { opacity: 1; transform: translateY(0); }
+
+.result-header {
+  text-align: center; margin-bottom: 36px;
+}
+.result-header h2 {
+  font-family: 'DM Serif Display', serif; font-size: 28px; margin-bottom: 8px;
+}
+.company-badge {
+  display: inline-block; padding: 4px 14px; background: var(--bg-warm);
+  border-radius: 20px; font-size: 13px; font-weight: 600; color: var(--accent);
+}
+
+/* Skills grid */
+.section-title {
+  font-family: 'DM Serif Display', serif; font-size: 22px; margin-bottom: 20px;
+  padding-bottom: 10px; border-bottom: 2px solid var(--border);
+}
+.skills-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px; margin-bottom: 40px;
+}
+.skill-card {
+  background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 20px; transition: border-color 0.2s, box-shadow 0.2s;
+}
+.skill-card:hover {
+  border-color: var(--accent); box-shadow: 0 2px 12px rgba(196,101,42,0.08);
+}
+.skill-card-header {
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;
+}
+.skill-card-name { font-size: 15px; font-weight: 700; color: var(--text); }
+.skill-card-match {
+  font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 10px;
+}
+.match-required { background: rgba(196,101,42,0.1); color: var(--accent); }
+.match-preferred { background: rgba(29,158,117,0.1); color: var(--teal); }
+.skill-card-context { font-size: 13px; color: var(--text-muted); margin-bottom: 12px; line-height: 1.5; }
+.skill-card-course {
+  display: block; text-decoration: none; padding: 10px 12px; background: var(--bg-warm);
+  border-radius: 8px; transition: background 0.2s;
+}
+.skill-card-course:hover { background: #EDE8DD; }
+.course-label { font-size: 11px; font-weight: 600; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+.course-name { font-size: 13px; font-weight: 600; color: var(--accent); margin-bottom: 2px; }
+.course-detail { font-size: 12px; color: var(--text-muted); }
+
+/* Forage section */
+.forage-card {
+  background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 24px; margin-bottom: 40px; display: flex; align-items: center; gap: 20px;
+}
+.forage-icon {
+  width: 56px; height: 56px; background: var(--purple); border-radius: 12px;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.forage-icon svg { width: 28px; height: 28px; fill: white; }
+.forage-info { flex: 1; }
+.forage-info h3 { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+.forage-info p { font-size: 13px; color: var(--text-muted); margin-bottom: 8px; }
+.forage-link {
+  display: inline-block; padding: 6px 16px; background: var(--purple); color: white;
+  border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 600;
+  transition: opacity 0.2s;
+}
+.forage-link:hover { opacity: 0.85; }
+
+/* No forage */
+.no-forage {
+  background: var(--bg-warm); border-radius: var(--radius); padding: 20px;
+  margin-bottom: 40px; text-align: center; color: var(--text-muted); font-size: 14px;
+}
+.no-forage a { color: var(--accent); }
+
+/* Summary */
+.summary-card {
+  background: var(--bg-warm); border-radius: var(--radius); padding: 24px;
+  margin-bottom: 40px;
+}
+.summary-card h3 { font-family: 'DM Serif Display', serif; font-size: 18px; margin-bottom: 12px; }
+.summary-card p { font-size: 14px; color: var(--text-muted); line-height: 1.6; }
+
+@media (max-width: 640px) {
+  .nav-inner { padding: 12px 1rem; }
+  .nav-links { gap: 1rem; flex-wrap: wrap; }
+  
+  .hero { padding: 40px 20px 24px; }
+  .hero h1 { font-size: 30px; }
+  .input-section, .results { padding-left: 16px; padding-right: 16px; }
+  .skills-grid { grid-template-columns: 1fr; }
+  .forage-card { flex-direction: column; text-align: center; }
+  .api-key-row { flex-direction: column; align-items: stretch; }
+}
+
+/* Two-button course UI */
+.course-buttons { display: flex; gap: 8px; margin-top: 8px; }
+.btn-start { display: inline-flex; align-items: center; gap: 4px; padding: 6px 14px; background: #C4652A; color: white; border-radius: 99px; font-size: 13px; font-weight: 600; text-decoration: none; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+.btn-start:hover { background: #A8511F; }
+.btn-keep { display: inline-flex; align-items: center; gap: 4px; padding: 6px 14px; background: transparent; color: #6B6860; border: 1px solid #D3D1C7; border-radius: 99px; font-size: 13px; font-weight: 500; text-decoration: none; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+.btn-keep:hover { border-color: #888780; color: #444441; }
+.keep-going-dropdown { display: none; margin-top: 8px; padding: 10px 12px; background: rgba(245,240,232,0.5); border-radius: 8px; }
+.keep-going-dropdown.open { display: block; }
+.keep-going-dropdown .kg-item { display: flex; align-items: center; gap: 8px; padding: 5px 0; flex-wrap: wrap; }
+.keep-going-dropdown .kg-step { font-size: 11px; color: #6B6860; background: rgba(0,0,0,0.05); padding: 2px 8px; border-radius: 99px; white-space: nowrap; }
+.keep-going-dropdown .kg-item a { font-size: 13px; color: #1a6fb5; text-decoration: none; }
+.keep-going-dropdown .kg-item a:hover { text-decoration: underline; }
+.keep-going-dropdown .kg-meta { font-size: 12px; color: #9C9A93; }
+
+
+/* MOBILE HAMBURGER NAV */
+.nav-hamburger {
+  display: none; align-items: center; justify-content: center;
+  width: 36px; height: 36px; cursor: pointer; border: none;
+  background: transparent; padding: 0; flex-direction: column; gap: 5px;
+}
+.nav-hamburger span {
+  display: block; width: 20px; height: 2px; background: #1A1A18;
+  transition: all 0.3s; border-radius: 1px;
+}
+.nav-hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.nav-hamburger.open span:nth-child(2) { opacity: 0; }
+.nav-hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+.mobile-menu {
+  display: none; position: fixed; top: 53px; left: 0; right: 0; bottom: 0;
+  background: rgba(250,249,246,0.98); backdrop-filter: blur(20px);
+  z-index: 99; padding: 2rem 1.5rem; overflow-y: auto;
+}
+.mobile-menu.open { display: flex; flex-direction: column; gap: 0; }
+.mobile-menu a {
+  display: block; padding: 14px 0; font-size: 16px; color: #6B6860;
+  text-decoration: none; font-weight: 500; border-bottom: 1px solid rgba(0,0,0,0.08);
+  transition: color 0.2s;
+}
+.mobile-menu a:hover, .mobile-menu a.active { color: #C4652A; }
+@media (max-width: 768px) { .nav-hamburger { display: flex; } .nav-links { display: none !important; } }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="start-somewhere.html" class="nav-logo"><span class="s">start</span><span class="sw">somewhere.</span></a>
+    <button class="nav-hamburger" id="navHamburger" onclick="toggleMobileMenu()"><span></span><span></span><span></span></button>
+    <div class="nav-links">
+      <a href="start-somewhere.html">Home</a>
+      <a href="explore.html">Explore</a>
+      <a href="build.html">Build</a>
+      <a href="apply.html">Apply</a>
+      <a href="skill-explorer-production.html">Skill Explorer</a>
+      <a href="job-analyzer.html" class="active">Job Analyzer</a>
+      <a href="skill-roulette.html">Skill Roulette</a>
+      <a href="skill-sprints.html">Skill Sprints</a>
+      <a href="skill-map.html">Skill Map</a>
+    </div>
+  </div>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="start-somewhere.html">Home</a>
+  <a href="explore.html">Explore</a>
+  <a href="build.html">Build</a>
+  <a href="apply.html">Apply</a>
+  <a href="skill-explorer-production.html">Skill Explorer</a>
+  <a href="job-analyzer.html" class="active">Job Analyzer</a>
+  <a href="skill-roulette.html">Skill Roulette</a>
+  <a href="skill-sprints.html">Skill Sprints</a>
+  <a href="skill-map.html">Skill Map</a>
+</div>
+
+<div class="hero">
+  <h1>Paste a job posting.<br>Get a <em>game plan.</em></h1>
+  <p>We'll read the job description, pull out the skills they're looking for, and match you with free courses to build each one. Plus a Forage simulation if the company offers one.</p>
+</div>
+
+<div class="input-section">
+  <div class="api-key-row">
+    <label for="api-key">Anthropic API Key</label>
+    <input type="password" id="api-key" placeholder="sk-ant-..." autocomplete="off">
+  </div>
+  <div class="api-key-help">
+    Your key stays in your browser and is never stored. Need one? <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">Get a key here</a>
+  </div>
+
+  <textarea id="job-desc" placeholder="Paste the full job description here. Title, requirements, qualifications, everything. The more detail, the better the analysis."></textarea>
+
+  <button class="analyze-btn" id="analyze-btn" onclick="analyze()">Analyze this job</button>
+  <div class="error-msg" id="error-msg"></div>
+</div>
+
+<div class="results" id="results">
+  <div class="result-header">
+    <h2 id="result-title">Your game plan</h2>
+    <div id="company-badge-wrap"></div>
+  </div>
+
+  <div id="forage-section"></div>
+
+  <h3 class="section-title" id="skills-section-title">Skills to build</h3>
+  <div class="skills-grid" id="skills-grid"></div>
+
+  <div class="summary-card" id="summary-card">
+    <h3>What this means</h3>
+    <p id="summary-text"></p>
+  </div>
+</div>
+
+<script>
+const COURSES = {"Computers and Electronics": {"title": "Google IT Support Professional Certificate", "provider": "Google / Coursera", "url": "https://www.coursera.org/search?query=Google+IT+Support+Professional+Certificate", "duration": "6 months", "cost": "Free to audit", "next": [{"title": "Google Cybersecurity Professional Certificate", "provider": "Google / Coursera", "url": "https://www.coursera.org/search?query=Google+Cybersecurity+Professional+Certificate", "duration": "6 months"}, {"title": "Computer Science 101", "provider": "Stanford / edX", "url": "https://www.edx.org/search?q=Computer+Science+101", "duration": "6 weeks"}, {"title": "Google IT Automation with Python", "provider": "Google / Coursera", "url": "https://www.coursera.org/search?query=Google+IT+Automation+with+Python", "duration": "6 months"}]}, "Programming": {"title": "Python for Everybody", "provider": "University of Michigan / Coursera", "url": "https://www.coursera.org/search?query=Python+for+Everybody", "duration": "8 months", "cost": "Free to audit", "next": [{"title": "Python Data Structures", "provider": "University of Michigan / Coursera", "url": "https://www.coursera.org/search?query=Python+Data+Structures", "duration": "7 weeks"}, {"title": "Introduction to Computer Science and Programming Using Python", "provider": "MIT / edX", "url": "https://www.edx.org/search?q=Introduction+to+Computer+Science+and+Programming+Using+Python", "duration": "9 weeks"}, {"title": "100 Days of Code: The Complete Python Pro Bootcamp", "provider": "Coursera", "url": "https://www.coursera.org/search?query=100+Days+of+Code%3A+The+Complete+Python+Pro+Bootcamp", "duration": "4 months"}]}, "Mathematics": {"title": "Mathematics for Data Science", "provider": "Imperial College / Coursera", "url": "https://www.coursera.org/search?query=Mathematics+for+Data+Science", "duration": "6 months", "cost": "Free to audit", "next": [{"title": "Linear Algebra", "provider": "MIT / edX", "url": "https://www.edx.org/search?q=Linear+Algebra", "duration": "12 weeks"}, {"title": "Calculus: Single Variable", "provider": "University of Pennsylvania / Coursera", "url": "https://www.coursera.org/search?query=Calculus%3A+Single+Variable", "duration": "4 months"}, {"title": "Discrete Mathematics", "provider": "UC San Diego / Coursera", "url": "https://www.coursera.org/search?query=Discrete+Mathematics", "duration": "5 months"}]}, "Economics and Accounting": {"title": "Financial Accounting Fundamentals", "provider": "University of Virginia / Coursera", "url": "https://www.coursera.org/search?query=Financial+Accounting+Fundamentals", "duration": "5 weeks", "cost": "Free to audit", "next": [{"title": "Introduction to Corporate Finance", "provider": "University of Pennsylvania / Coursera", "url": "https://www.coursera.org/search?query=Introduction+to+Corporate+Finance", "duration": "4 weeks"}, {"title": "Managerial Accounting Fundamentals", "provider": "University of Virginia / Coursera", "url": "https://www.coursera.org/search?query=Managerial+Accounting+Fundamentals", "duration": "5 weeks"}, {"title": "Financial Markets", "provider": "Yale / Coursera", "url": "https://www.coursera.org/search?query=Financial+Markets", "duration": "7 weeks"}]}, "Administration and Management": {"title": "Foundations of Management", "provider": "IESE / Coursera", "url": "https://www.coursera.org/search?query=Foundations+of+Management", "duration": "5 months", "cost": "Free to audit", "next": [{"title": "Organizational Leadership Specialization", "provider": "Northwestern / Coursera", "url": "https://www.coursera.org/search?query=Organizational+Leadership+Specialization", "duration": "4 months"}, {"title": "Strategic Management and Innovation", "provider": "Copenhagen Business School / Coursera", "url": "https://www.coursera.org/search?query=Strategic+Management+and+Innovation", "duration": "6 weeks"}, {"title": "Management Skills for International Business", "provider": "University of London / Coursera", "url": "https://www.coursera.org/search?query=Management+Skills+for+International+Business", "duration": "5 weeks"}]}, "Sales and Marketing": {"title": "Google Digital Marketing & E-commerce Certificate", "provider": "Google / Coursera", "url": "https://www.coursera.org/search?query=Google+Digital+Marketing+and+E-commerce+Certificate", "duration": "6 months", "cost": "Free to audit", "next": [{"title": "Marketing Analytics", "provider": "University of Virginia / Coursera", "url": "https://www.coursera.org/search?query=Marketing+Analytics", "duration": "5 weeks"}, {"title": "Social Media Marketing Specialization", "provider": "Northwestern / Coursera", "url": "https://www.coursera.org/search?query=Social+Media+Marketing+Specialization", "duration": "5 months"}, {"title": "Brand Management: Aligning Business, Brand and Behaviour", "provider": "University of London / Coursera", "url": "https://www.coursera.org/search?query=Brand+Management%3A+Aligning+Business%2C+Brand+and+Behaviour", "duration": "4 weeks"}]}, "Customer and Personal Service": {"title": "Customer Service Fundamentals", "provider": "CVS Health / Coursera", "url": "https://www.coursera.org/search?query=Customer+Service+Fundamentals", "duration": "4 weeks", "cost": "Free to audit", "next": [{"title": "Customer Experience Management", "provider": "Coursera", "url": "https://www.coursera.org/search?query=Customer+Experience+Management", "duration": "4 weeks"}, {"title": "Communication Strategies for a Virtual Age", "provider": "University of Toronto / Coursera", "url": "https://www.coursera.org/search?query=Communication+Strategies+for+a+Virtual+Age", "duration": "4 weeks"}, {"title": "CRM Fundamentals and Practice", "provider": "Coursera", "url": "https://www.coursera.org/search?query=CRM+Fundamentals+and+Practice", "duration": "4 weeks"}]}, "Personnel and Human Resources": {"title": "Human Resource Management: HR for People Managers", "provider": "University of Minnesota / Coursera", "url": "https://www.coursera.org/search?query=Human+Resource+Management%3A+HR+for+People+Managers", "duration": "5 months", "cost": "Free to audit", "next": [{"title": "Recruiting, Hiring, and Onboarding Employees", "provider": "University of Minnesota / Coursera", "url": "https://www.coursera.org/search?query=Recruiting%2C+Hiring%2C+and+Onboarding+Employees", "duration": "4 weeks"}, {"title": "Compensation and Benefits", "provider": "University of Minnesota / Coursera", "url": "https://www.coursera.org/search?query=Compensation+and+Benefits", "duration": "4 weeks"}, {"title": "People Analytics", "provider": "University of Pennsylvania / Coursera", "url": "https://www.coursera.org/search?query=People+Analytics", "duration": "4 weeks"}]}, "Education and Training": {"title": "Foundations of Teaching for Learning", "provider": "Commonwealth Education Trust / Coursera", "url": "https://www.coursera.org/search?query=Foundations+of+Teaching+for+Learning", "duration": "7 months", "cost": "Free to audit", "next": [{"title": "Instructional Design and Technology", "provider": "University of Maryland / Coursera", "url": "https://www.coursera.org/search?query=Instructional+Design+and+Technology", "duration": "4 months"}, {"title": "Learning to Teach Online", "provider": "UNSW / Coursera", "url": "https://www.coursera.org/search?query=Learning+to+Teach+Online", "duration": "5 weeks"}, {"title": "Assessment and Teaching of 21st Century Skills", "provider": "University of Melbourne / Coursera", "url": "https://www.coursera.org/search?query=Assessment+and+Teaching+of+21st+Century+Skills", "duration": "6 weeks"}]}, "Psychology": {"title": "Introduction to Psychology", "provider": "Yale / Coursera", "url": "https://www.coursera.org/search?query=Introduction+to+Psychology", "duration": "6 weeks", "cost": "Free to audit", "next": [{"title": "Social Psychology", "provider": "Wesleyan / Coursera", "url": "https://www.coursera.org/search?query=Social+Psychology", "duration": "7 weeks"}, {"title": "Positive Psychology Specialization", "provider": "University of Pennsylvania / Coursera", "url": "https://www.coursera.org/search?query=Positive+Psychology+Specialization", "duration": "5 months"}, {"title": "Introduction to Clinical Psychology", "provider": "University of Queensland / edX", "url": "https://www.edx.org/search?q=Introduction+to+Clinical+Psychology", "duration": "8 weeks"}]}, "Sociology and Anthropology": {"title": "Cultural Anthropology", "provider": "Macquarie University / Coursera", "url": "https://www.coursera.org/search?query=Cultural+Anthropology", "duration": "4 weeks", "cost": "Free to audit", "next": [{"title": "Social Norms, Social Change", "provider": "University of Pennsylvania / Coursera", "url": "https://www.coursera.org/search?query=Social+Norms%2C+Social+Change", "duration": "5 weeks"}, {"title": "Qualitative Research Methods", "provider": "University of Amsterdam / Coursera", "url": "https://www.coursera.org/search?query=Qualitative+Research+Methods", "duration": "4 weeks"}, {"title": "Medical Anthropology", "provider": "University of Copenhagen / Coursera", "url": "https://www.coursera.org/search?query=Medical+Anthropology", "duration": "6 weeks"}]}, "Law and Government": {"title": "Introduction to American Law", "provider": "University of Pennsylvania / Coursera", "url": "https://www.coursera.org/search?query=Introduction+to+American+Law", "duration": "6 weeks", "cost": "Free to audit", "next": [{"title": "Contract Law: From Trust to Promise to Contract", "provider": "Harvard / edX", "url": "https://www.edx.org/search?q=Contract+Law%3A+From+Trust+to+Promise+to+Contract", "duration": "5 weeks"}, {"title": "International Law", "provider": "University of Louvain / Coursera", "url": "https://www.coursera.org/search?query=International+Law", "duration": "8 weeks"}, {"title": "Constitutional Law", "provider": "Yale / Coursera", "url": "https://www.coursera.org/search?query=Constitutional+Law", "duration": "7 weeks"}]}, "Public Safety and Security": {"title": "Introduction to Cybersecurity for Business", "provider": "University of Colorado / Coursera", "url": "https://www.coursera.org/search?query=Introduction+to+Cybersecurity+for+Business", "duration": "4 weeks", "cost": "Free to audit", "next": [{"title": "Google Cybersecurity Professional Certificate", "provider": "Google / Coursera", "url": "https://www.coursera.org/search?query=Google+Cybersecurity+Professional+Certificate", "duration": "6 months"}, {"title": "Network Security and Database Vulnerabilities", "provider": "IBM / Coursera", "url": "https://www.coursera.org/search?query=Network+Security+and+Database+Vulnerabilities", "duration": "4 weeks"}, {"title": "Security Operations and Administration", "provider": "ISC2 / Coursera", "url": "https://www.coursera.org/search?query=Security+Operations+and+Administration", "duration": "5 weeks"}]}, "Communications and Media": {"title": "Content Strategy for Professionals", "provider": "Northwestern / Coursera", "url": "https://www.coursera.org/search?query=Content+Strategy+for+Professionals", "duration": "5 months", "cost": "Free to audit", "next": [{"title": "Digital Media and Marketing Strategies", "provider": "University of Illinois / Coursera", "url": "https://www.coursera.org/search?query=Digital+Media+and+Marketing+Strategies", "duration": "4 weeks"}, {"title": "Transmedia Storytelling", "provider": "University of New South Wales / Coursera", "url": "https://www.coursera.org/search?query=Transmedia+Storytelling", "duration": "6 weeks"}, {"title": "Journalism, the Future, and You", "provider": "Michigan State / Coursera", "url": "https://www.coursera.org/search?query=Journalism%2C+the+Future%2C+and+You", "duration": "4 weeks"}]}, "Chemistry": {"title": "Introduction to Chemistry", "provider": "Duke / Coursera", "url": "https://www.coursera.org/search?query=Introduction+to+Chemistry", "duration": "8 weeks", "cost": "Free to audit", "next": [{"title": "Organic Chemistry", "provider": "University of Illinois / Coursera", "url": "https://www.coursera.org/search?query=Organic+Chemistry", "duration": "8 weeks"}, {"title": "Chemistry: Molecular and Electronic Structure", "provider": "University of Kentucky / Coursera", "url": "https://www.coursera.org/search?query=Chemistry%3A+Molecular+and+Electronic+Structure", "duration": "6 weeks"}, {"title": "Biochemistry", "provider": "Duke / Coursera", "url": "https://www.coursera.org/search?query=Biochemistry", "duration": "8 weeks"}]}, "Biology": {"title": "Introduction to Biology — The Secret of Life", "provider": "MIT / edX", "url": "https://www.edx.org/search?q=Introduction+to+Biology++The+Secret+of+Life", "duration": "16 weeks", "cost": "Free to audit", "next": [{"title": "Molecular Biology: DNA Replication and Repair", "provider": "MIT / edX", "url": "https://www.edx.org/search?q=Molecular+Biology%3A+DNA+Replication+and+Repair", "duration": "8 weeks"}, {"title": "Ecology: Ecosystem Dynamics and Conservation", "provider": "American Museum of Natural History / Coursera", "url": "https://www.coursera.org/search?query=Ecology%3A+Ecosystem+Dynamics+and+Conservation", "duration": "5 weeks"}, {"title": "Genetics and Genomics", "provider": "University of California / Coursera", "url": "https://www.coursera.org/search?query=Genetics+and+Genomics", "duration": "5 months"}]}, "Physics": {"title": "How Things Work: An Introduction to Physics", "provider": "University of Virginia / Coursera", "url": "https://www.coursera.org/search?query=How+Things+Work%3A+An+Introduction+to+Physics", "duration": "8 weeks", "cost": "Free to audit", "next": [{"title": "Mechanics: Motion, Forces, Energy and Gravity", "provider": "UNSW / Coursera", "url": "https://www.coursera.org/search?query=Mechanics%3A+Motion%2C+Forces%2C+Energy+and+Gravity", "duration": "8 weeks"}, {"title": "Electricity and Magnetism", "provider": "MIT / edX", "url": "https://www.edx.org/search?q=Electricity+and+Magnetism", "duration": "14 weeks"}, {"title": "Introduction to Thermodynamics", "provider": "University of Michigan / Coursera", "url": "https://www.coursera.org/search?query=Introduction+to+Thermodynamics", "duration": "4 weeks"}]}, "Medicine and Dentistry": {"title": "Anatomy Specialization", "provider": "University of Michigan / Coursera", "url": "https://www.coursera.org/search?query=Anatomy+Specialization", "duration": "4 months", "cost": "Free to audit", "next": [{"title": "Medical Neuroscience", "provider": "Duke / Coursera", "url": "https://www.coursera.org/search?query=Medical+Neuroscience", "duration": "12 weeks"}, {"title": "Vital Signs: Understanding What the Body Is Telling Us", "provider": "University of Pennsylvania / Coursera", "url": "https://www.coursera.org/search?query=Vital+Signs%3A+Understanding+What+the+Body+Is+Telling+Us", "duration": "6 weeks"}, {"title": "Introductory Human Physiology", "provider": "Duke / Coursera", "url": "https://www.coursera.org/search?query=Introductory+Human+Physiology", "duration": "10 weeks"}]}, "Therapy and Counseling": {"title": "Psychological First Aid", "provider": "Johns Hopkins / Coursera", "url": "https://www.coursera.org/search?query=Psychological+First+Aid", "duration": "5 weeks", "cost": "Free to audit", "next": [{"title": "Cognitive Behavioral Therapy", "provider": "University of Pennsylvania / Coursera", "url": "https://www.coursera.org/search?query=Cognitive+Behavioral+Therapy", "duration": "5 weeks"}, {"title": "Mental Health First Aid", "provider": "University of Melbourne / Coursera", "url": "https://www.coursera.org/search?query=Mental+Health+First+Aid", "duration": "5 weeks"}, {"title": "Positive Psychiatry and Mental Health", "provider": "University of Sydney / Coursera", "url": "https://www.coursera.org/search?query=Positive+Psychiatry+and+Mental+Health", "duration": "5 weeks"}]}, "Geography": {"title": "Geographic Information Systems (GIS)", "provider": "UC Davis / Coursera", "url": "https://www.coursera.org/search?query=Geographic+Information+Systems+%28GIS%29", "duration": "5 months", "cost": "Free to audit", "next": [{"title": "Remote Sensing Image Analysis", "provider": "UC Davis / Coursera", "url": "https://www.coursera.org/search?query=Remote+Sensing+Image+Analysis", "duration": "4 weeks"}, {"title": "Spatial Data Science and Applications", "provider": "Yonsei University / Coursera", "url": "https://www.coursera.org/search?query=Spatial+Data+Science+and+Applications", "duration": "5 weeks"}, {"title": "GIS Data Formats, Design, and Quality", "provider": "UC Davis / Coursera", "url": "https://www.coursera.org/search?query=GIS+Data+Formats%2C+Design%2C+and+Quality", "duration": "4 weeks"}]}, "Design": {"title": "Graphic Design Specialization", "provider": "CalArts / Coursera", "url": "https://www.coursera.org/search?query=Graphic+Design+Specialization", "duration": "5 months", "cost": "Free to audit", "next": [{"title": "UI / UX Design Specialization", "provider": "CalArts / Coursera", "url": "https://www.coursera.org/search?query=UI+%2F+UX+Design+Specialization", "duration": "4 months"}, {"title": "Visual Elements of User Interface Design", "provider": "CalArts / Coursera", "url": "https://www.coursera.org/search?query=Visual+Elements+of+User+Interface+Design", "duration": "4 weeks"}, {"title": "Google UX Design Professional Certificate", "provider": "Google / Coursera", "url": "https://www.coursera.org/search?query=Google+UX+Design+Professional+Certificate", "duration": "6 months"}]}, "Fine Arts": {"title": "Modern Art & Ideas", "provider": "MoMA / Coursera", "url": "https://www.coursera.org/search?query=Modern+Art+and+Ideas", "duration": "5 weeks", "cost": "Free to audit", "next": [{"title": "Art and Activity: Interactive Strategies for Engaging with Art", "provider": "MoMA / Coursera", "url": "https://www.coursera.org/search?query=Art+and+Activity%3A+Interactive+Strategies+for+Engaging+with+Art", "duration": "4 weeks"}, {"title": "Introduction to Art: Concepts and Techniques", "provider": "Pennsylvania State / Coursera", "url": "https://www.coursera.org/search?query=Introduction+to+Art%3A+Concepts+and+Techniques", "duration": "4 weeks"}, {"title": "Photography Basics and Beyond", "provider": "Michigan State / Coursera", "url": "https://www.coursera.org/search?query=Photography+Basics+and+Beyond", "duration": "5 months"}]}, "Building and Construction": {"title": "Construction Management", "provider": "Columbia / Coursera", "url": "https://www.coursera.org/search?query=Construction+Management", "duration": "4 weeks", "cost": "Free to audit", "next": [{"title": "Construction Scheduling", "provider": "Columbia / Coursera", "url": "https://www.coursera.org/search?query=Construction+Scheduling", "duration": "4 weeks"}, {"title": "Construction Cost Estimating and Cost Control", "provider": "Columbia / Coursera", "url": "https://www.coursera.org/search?query=Construction+Cost+Estimating+and+Cost+Control", "duration": "4 weeks"}, {"title": "Building Information Modeling BIM", "provider": "Coursera", "url": "https://www.coursera.org/search?query=Building+Information+Modeling+BIM", "duration": "6 weeks"}]}, "Mechanical": {"title": "Introduction to Mechanical Engineering Design", "provider": "Georgia Tech / Coursera", "url": "https://www.coursera.org/search?query=Introduction+to+Mechanical+Engineering+Design", "duration": "9 weeks", "cost": "Free to audit", "next": [{"title": "CAD and Digital Manufacturing", "provider": "Autodesk / Coursera", "url": "https://www.coursera.org/search?query=CAD+and+Digital+Manufacturing", "duration": "6 months"}, {"title": "Mechanics of Materials", "provider": "Georgia Tech / Coursera", "url": "https://www.coursera.org/search?query=Mechanics+of+Materials", "duration": "8 weeks"}, {"title": "Introduction to Thermodynamics", "provider": "University of Michigan / Coursera", "url": "https://www.coursera.org/search?query=Introduction+to+Thermodynamics", "duration": "4 weeks"}]}, "Engineering and Technology": {"title": "Introduction to Engineering Mechanics", "provider": "Georgia Tech / Coursera", "url": "https://www.coursera.org/search?query=Introduction+to+Engineering+Mechanics", "duration": "8 weeks", "cost": "Free to audit", "next": [{"title": "Materials Science: 10 Things Every Engineer Should Know", "provider": "UC Davis / Coursera", "url": "https://www.coursera.org/search?query=Materials+Science%3A+10+Things+Every+Engineer+Should+Know", "duration": "5 weeks"}, {"title": "Introduction to Systems Engineering", "provider": "UNSW / Coursera", "url": "https://www.coursera.org/search?query=Introduction+to+Systems+Engineering", "duration": "4 weeks"}, {"title": "Engineering Project Management", "provider": "Rice University / Coursera", "url": "https://www.coursera.org/search?query=Engineering+Project+Management", "duration": "4 weeks"}]}, "Production and Processing": {"title": "Supply Chain Management Specialization", "provider": "Rutgers / Coursera", "url": "https://www.coursera.org/search?query=Supply+Chain+Management+Specialization", "duration": "4 months", "cost": "Free to audit", "next": [{"title": "Operations Management", "provider": "University of Pennsylvania / Coursera", "url": "https://www.coursera.org/search?query=Operations+Management", "duration": "4 weeks"}, {"title": "Lean Six Sigma", "provider": "University System of Georgia / Coursera", "url": "https://www.coursera.org/search?query=Lean+Six+Sigma", "duration": "4 months"}, {"title": "Global Procurement and Sourcing", "provider": "Rutgers / Coursera", "url": "https://www.coursera.org/search?query=Global+Procurement+and+Sourcing", "duration": "4 weeks"}]}, "Food Production": {"title": "Food Science", "provider": "Wageningen / edX", "url": "https://www.edx.org/search?q=Food+Science", "duration": "6 weeks", "cost": "Free to audit", "next": [{"title": "Food Safety and Toxicology", "provider": "Wageningen / edX", "url": "https://www.edx.org/search?q=Food+Safety+and+Toxicology", "duration": "6 weeks"}, {"title": "Nutrition and Health: Food Risks", "provider": "Wageningen / edX", "url": "https://www.edx.org/search?q=Nutrition+and+Health%3A+Food+Risks", "duration": "4 weeks"}, {"title": "Sustainable Food Production Through Livestock Health Management", "provider": "University of Illinois / Coursera", "url": "https://www.coursera.org/search?query=Sustainable+Food+Production+Through+Livestock+Health+Management", "duration": "5 weeks"}]}, "Telecommunications": {"title": "Computer Networking", "provider": "Google / Coursera", "url": "https://www.coursera.org/search?query=Computer+Networking", "duration": "5 weeks", "cost": "Free to audit", "next": [{"title": "The Bits and Bytes of Computer Networking", "provider": "Google / Coursera", "url": "https://www.coursera.org/search?query=The+Bits+and+Bytes+of+Computer+Networking", "duration": "6 weeks"}, {"title": "Introduction to TCP/IP", "provider": "Yonsei University / Coursera", "url": "https://www.coursera.org/search?query=Introduction+to+TCP%2FIP", "duration": "4 weeks"}, {"title": "Network Protocols and Architecture", "provider": "Cisco / Coursera", "url": "https://www.coursera.org/search?query=Network+Protocols+and+Architecture", "duration": "4 weeks"}]}, "Transportation": {"title": "Supply Chain Logistics", "provider": "Rutgers / Coursera", "url": "https://www.coursera.org/search?query=Supply+Chain+Logistics", "duration": "4 weeks", "cost": "Free to audit", "next": [{"title": "Supply Chain Operations", "provider": "Rutgers / Coursera", "url": "https://www.coursera.org/search?query=Supply+Chain+Operations", "duration": "4 weeks"}, {"title": "Warehouse Management", "provider": "Georgia Tech / edX", "url": "https://www.edx.org/search?q=Warehouse+Management", "duration": "6 weeks"}, {"title": "Transportation Network Analysis", "provider": "Coursera", "url": "https://www.coursera.org/search?query=Transportation+Network+Analysis", "duration": "5 weeks"}]}, "English Language": {"title": "Academic English: Writing Specialization", "provider": "UC Irvine / Coursera", "url": "https://www.coursera.org/search?query=Academic+English%3A+Writing+Specialization", "duration": "5 months", "cost": "Free to audit", "next": [{"title": "Writing Professional Emails and Memos", "provider": "UC Irvine / Coursera", "url": "https://www.coursera.org/search?query=Writing+Professional+Emails+and+Memos", "duration": "4 weeks"}, {"title": "Advanced Writing", "provider": "UC Irvine / Coursera", "url": "https://www.coursera.org/search?query=Advanced+Writing", "duration": "5 weeks"}, {"title": "Business English for Non-Native Speakers", "provider": "Hong Kong University / Coursera", "url": "https://www.coursera.org/search?query=Business+English+for+Non-Native+Speakers", "duration": "5 weeks"}]}, "Foreign Language": {"title": "First Step Korean", "provider": "Yonsei University / Coursera", "url": "https://www.coursera.org/search?query=First+Step+Korean", "duration": "5 weeks", "cost": "Free to audit", "next": [{"title": "Chinese for Beginners", "provider": "Peking University / Coursera", "url": "https://www.coursera.org/search?query=Chinese+for+Beginners", "duration": "7 weeks"}, {"title": "Spanish for Beginners", "provider": "UC Davis / Coursera", "url": "https://www.coursera.org/search?query=Spanish+for+Beginners", "duration": "5 weeks"}, {"title": "Japanese for Beginners", "provider": "Emory University / Coursera", "url": "https://www.coursera.org/search?query=Japanese+for+Beginners", "duration": "5 weeks"}]}, "History and Archeology": {"title": "The Ancient Greeks", "provider": "Wesleyan / Coursera", "url": "https://www.coursera.org/search?query=The+Ancient+Greeks", "duration": "8 weeks", "cost": "Free to audit", "next": [{"title": "A History of the World since 1300", "provider": "Princeton / Coursera", "url": "https://www.coursera.org/search?query=A+History+of+the+World+since+1300", "duration": "12 weeks"}, {"title": "Archaeology: From Dig to Lab and Beyond", "provider": "Emory University / Coursera", "url": "https://www.coursera.org/search?query=Archaeology%3A+From+Dig+to+Lab+and+Beyond", "duration": "6 weeks"}, {"title": "The Modern World: Global History since 1760", "provider": "University of Virginia / Coursera", "url": "https://www.coursera.org/search?query=The+Modern+World%3A+Global+History+since+1760", "duration": "10 weeks"}]}, "Philosophy and Theology": {"title": "Introduction to Philosophy", "provider": "University of Edinburgh / Coursera", "url": "https://www.coursera.org/search?query=Introduction+to+Philosophy", "duration": "5 weeks", "cost": "Free to audit", "next": [{"title": "Think Again: How to Reason and Argue", "provider": "Duke / Coursera", "url": "https://www.coursera.org/search?query=Think+Again%3A+How+to+Reason+and+Argue", "duration": "4 weeks"}, {"title": "Ancient Philosophy: Plato and His Predecessors", "provider": "University of Pennsylvania / Coursera", "url": "https://www.coursera.org/search?query=Ancient+Philosophy%3A+Plato+and+His+Predecessors", "duration": "5 weeks"}, {"title": "Philosophy of Science", "provider": "University of Pennsylvania / Coursera", "url": "https://www.coursera.org/search?query=Philosophy+of+Science", "duration": "5 weeks"}]}, "Administrative": {"title": "Google Project Management Certificate", "provider": "Google / Coursera", "url": "https://www.coursera.org/search?query=Google+Project+Management+Certificate", "duration": "6 months", "cost": "Free to audit", "next": [{"title": "Agile Project Management", "provider": "Google / Coursera", "url": "https://www.coursera.org/search?query=Agile+Project+Management", "duration": "5 weeks"}, {"title": "Foundations of Business Strategy", "provider": "University of Virginia / Coursera", "url": "https://www.coursera.org/search?query=Foundations+of+Business+Strategy", "duration": "4 weeks"}, {"title": "Project Execution: Running the Project", "provider": "Google / Coursera", "url": "https://www.coursera.org/search?query=Project+Execution%3A+Running+the+Project", "duration": "4 weeks"}]}, "Critical Thinking": {"title": "Mindware: Critical Thinking for the Information Age", "provider": "University of Michigan / Coursera", "url": "https://www.coursera.org/search?query=Mindware%3A+Critical+Thinking+for+the+Information+Age", "duration": "8 weeks", "cost": "Free to audit", "next": [{"title": "Think Again: How to Reason and Argue", "provider": "Duke / Coursera", "url": "https://www.coursera.org/search?query=Think+Again%3A+How+to+Reason+and+Argue", "duration": "4 weeks"}, {"title": "Introduction to Logic and Critical Thinking", "provider": "Duke / Coursera", "url": "https://www.coursera.org/search?query=Introduction+to+Logic+and+Critical+Thinking", "duration": "4 weeks"}, {"title": "Problem Solving Using Computational Thinking", "provider": "University of Michigan / Coursera", "url": "https://www.coursera.org/search?query=Problem+Solving+Using+Computational+Thinking", "duration": "4 weeks"}]}, "Complex Problem Solving": {"title": "Creative Problem Solving", "provider": "University of Minnesota / Coursera", "url": "https://www.coursera.org/search?query=Creative+Problem+Solving", "duration": "5 weeks", "cost": "Free to audit", "next": [{"title": "Design Thinking for Innovation", "provider": "University of Virginia / Coursera", "url": "https://www.coursera.org/search?query=Design+Thinking+for+Innovation", "duration": "5 weeks"}, {"title": "Problem Solving Using Computational Thinking", "provider": "University of Michigan / Coursera", "url": "https://www.coursera.org/search?query=Problem+Solving+Using+Computational+Thinking", "duration": "4 weeks"}, {"title": "Structured Decision Making", "provider": "University of Melbourne / Coursera", "url": "https://www.coursera.org/search?query=Structured+Decision+Making", "duration": "4 weeks"}]}, "Writing": {"title": "Writing in the Sciences", "provider": "Stanford / Coursera", "url": "https://www.coursera.org/search?query=Writing+in+the+Sciences", "duration": "8 weeks", "cost": "Free to audit", "next": [{"title": "Good with Words: Writing and Editing", "provider": "University of Michigan / Coursera", "url": "https://www.coursera.org/search?query=Good+with+Words%3A+Writing+and+Editing", "duration": "5 months"}, {"title": "Creative Writing Specialization", "provider": "Wesleyan / Coursera", "url": "https://www.coursera.org/search?query=Creative+Writing+Specialization", "duration": "6 months"}, {"title": "Business Writing", "provider": "University of Colorado / Coursera", "url": "https://www.coursera.org/search?query=Business+Writing", "duration": "4 weeks"}]}, "Speaking": {"title": "Introduction to Public Speaking", "provider": "University of Washington / Coursera", "url": "https://www.coursera.org/search?query=Introduction+to+Public+Speaking", "duration": "10 weeks", "cost": "Free to audit", "next": [{"title": "Dynamic Public Speaking Specialization", "provider": "University of Washington / Coursera", "url": "https://www.coursera.org/search?query=Dynamic+Public+Speaking+Specialization", "duration": "5 months"}, {"title": "Presentation Skills: Speechwriting and Storytelling", "provider": "National Research Tomsk State University / Coursera", "url": "https://www.coursera.org/search?query=Presentation+Skills%3A+Speechwriting+and+Storytelling", "duration": "4 weeks"}, {"title": "Successful Negotiation: Essential Strategies and Skills", "provider": "University of Michigan / Coursera", "url": "https://www.coursera.org/search?query=Successful+Negotiation%3A+Essential+Strategies+and+Skills", "duration": "7 weeks"}]}, "Reading Comprehension": {"title": "Learning How to Learn", "provider": "McMaster University / Coursera", "url": "https://www.coursera.org/search?query=Learning+How+to+Learn", "duration": "4 weeks", "cost": "Free to audit", "next": [{"title": "Mindshift: Break Through Obstacles to Learning", "provider": "McMaster University / Coursera", "url": "https://www.coursera.org/search?query=Mindshift%3A+Break+Through+Obstacles+to+Learning", "duration": "4 weeks"}, {"title": "Speed Reading Mastery", "provider": "Coursera", "url": "https://www.coursera.org/search?query=Speed+Reading+Mastery", "duration": "3 weeks"}, {"title": "Critical Reading and Writing", "provider": "edX", "url": "https://www.edx.org/search?q=Critical+Reading+and+Writing", "duration": "6 weeks"}]}, "Active Listening": {"title": "Improving Communication Skills", "provider": "University of Pennsylvania / Coursera", "url": "https://www.coursera.org/search?query=Improving+Communication+Skills", "duration": "4 weeks", "cost": "Free to audit", "next": [{"title": "Successful Negotiation: Essential Strategies and Skills", "provider": "University of Michigan / Coursera", "url": "https://www.coursera.org/search?query=Successful+Negotiation%3A+Essential+Strategies+and+Skills", "duration": "7 weeks"}, {"title": "Conflict Resolution Skills", "provider": "University of California / Coursera", "url": "https://www.coursera.org/search?query=Conflict+Resolution+Skills", "duration": "4 weeks"}, {"title": "Teamwork Skills: Communicating Effectively in Groups", "provider": "University of Colorado / Coursera", "url": "https://www.coursera.org/search?query=Teamwork+Skills%3A+Communicating+Effectively+in+Groups", "duration": "4 weeks"}]}, "Negotiation": {"title": "Introduction to Negotiation", "provider": "Yale / Coursera", "url": "https://www.coursera.org/search?query=Introduction+to+Negotiation", "duration": "9 weeks", "cost": "Free to audit", "next": [{"title": "Successful Negotiation: Essential Strategies and Skills", "provider": "University of Michigan / Coursera", "url": "https://www.coursera.org/search?query=Successful+Negotiation%3A+Essential+Strategies+and+Skills", "duration": "7 weeks"}, {"title": "Negotiation, Mediation, and Conflict Resolution", "provider": "ESSEC / Coursera", "url": "https://www.coursera.org/search?query=Negotiation%2C+Mediation%2C+and+Conflict+Resolution", "duration": "5 months"}, {"title": "International Business Negotiation", "provider": "University of London / Coursera", "url": "https://www.coursera.org/search?query=International+Business+Negotiation", "duration": "4 weeks"}]}, "Persuasion": {"title": "Influence: The Psychology of Persuasion", "provider": "University of Michigan / Coursera", "url": "https://www.coursera.org/search?query=Influence%3A+The+Psychology+of+Persuasion", "duration": "5 weeks", "cost": "Free to audit", "next": [{"title": "Rhetoric: The Art of Persuasive Writing and Public Speaking", "provider": "Harvard / edX", "url": "https://www.edx.org/search?q=Rhetoric%3A+The+Art+of+Persuasive+Writing+and+Public+Speaking", "duration": "8 weeks"}, {"title": "Marketing in a Digital World", "provider": "University of Illinois / Coursera", "url": "https://www.coursera.org/search?query=Marketing+in+a+Digital+World", "duration": "4 weeks"}, {"title": "Introduction to Negotiation", "provider": "Yale / Coursera", "url": "https://www.coursera.org/search?query=Introduction+to+Negotiation", "duration": "9 weeks"}]}, "Instructing": {"title": "Foundations of Teaching for Learning", "provider": "Commonwealth Education Trust / Coursera", "url": "https://www.coursera.org/search?query=Foundations+of+Teaching+for+Learning", "duration": "7 months", "cost": "Free to audit", "next": [{"title": "Instructional Design and Technology", "provider": "University of Maryland / Coursera", "url": "https://www.coursera.org/search?query=Instructional+Design+and+Technology", "duration": "4 months"}, {"title": "Learning to Teach Online", "provider": "UNSW / Coursera", "url": "https://www.coursera.org/search?query=Learning+to+Teach+Online", "duration": "5 weeks"}, {"title": "Blended Learning: Personalizing Education for Students", "provider": "New Teacher Center / Coursera", "url": "https://www.coursera.org/search?query=Blended+Learning%3A+Personalizing+Education+for+Students", "duration": "4 weeks"}]}, "Service Orientation": {"title": "Customer Service Fundamentals", "provider": "CVS Health / Coursera", "url": "https://www.coursera.org/search?query=Customer+Service+Fundamentals", "duration": "4 weeks", "cost": "Free to audit", "next": [{"title": "Customer Experience Management", "provider": "Coursera", "url": "https://www.coursera.org/search?query=Customer+Experience+Management", "duration": "4 weeks"}, {"title": "Hospitality Management", "provider": "Coursera", "url": "https://www.coursera.org/search?query=Hospitality+Management", "duration": "5 weeks"}, {"title": "Communication Strategies for a Virtual Age", "provider": "University of Toronto / Coursera", "url": "https://www.coursera.org/search?query=Communication+Strategies+for+a+Virtual+Age", "duration": "4 weeks"}]}, "Social Perceptiveness": {"title": "Emotional Intelligence", "provider": "University of Michigan / Coursera", "url": "https://www.coursera.org/search?query=Emotional+Intelligence", "duration": "4 weeks", "cost": "Free to audit", "next": [{"title": "Inspiring and Motivating Individuals", "provider": "University of Michigan / Coursera", "url": "https://www.coursera.org/search?query=Inspiring+and+Motivating+Individuals", "duration": "4 weeks"}, {"title": "Intercultural Communication and Conflict Resolution", "provider": "University of California / Coursera", "url": "https://www.coursera.org/search?query=Intercultural+Communication+and+Conflict+Resolution", "duration": "4 weeks"}, {"title": "The Science of Well-Being", "provider": "Yale / Coursera", "url": "https://www.coursera.org/search?query=The+Science+of+Well-Being", "duration": "10 weeks"}]}, "Coordination": {"title": "Google Project Management Certificate", "provider": "Google / Coursera", "url": "https://www.coursera.org/search?query=Google+Project+Management+Certificate", "duration": "6 months", "cost": "Free to audit", "next": [{"title": "Agile Project Management", "provider": "Google / Coursera", "url": "https://www.coursera.org/search?query=Agile+Project+Management", "duration": "5 weeks"}, {"title": "Leading Teams", "provider": "University of Michigan / Coursera", "url": "https://www.coursera.org/search?query=Leading+Teams", "duration": "4 weeks"}, {"title": "Organizational Behavior: How to Manage People", "provider": "IESE / Coursera", "url": "https://www.coursera.org/search?query=Organizational+Behavior%3A+How+to+Manage+People", "duration": "4 weeks"}]}, "Time Management": {"title": "Work Smarter, Not Harder: Time Management", "provider": "UC Irvine / Coursera", "url": "https://www.coursera.org/search?query=Work+Smarter%2C+Not+Harder%3A+Time+Management", "duration": "3 weeks", "cost": "Free to audit", "next": [{"title": "Getting Things Done: Practical Productivity", "provider": "Coursera", "url": "https://www.coursera.org/search?query=Getting+Things+Done%3A+Practical+Productivity", "duration": "3 weeks"}, {"title": "Productivity and Time Management for the Overwhelmed", "provider": "Coursera", "url": "https://www.coursera.org/search?query=Productivity+and+Time+Management+for+the+Overwhelmed", "duration": "3 weeks"}, {"title": "Agile Planning for Software Products", "provider": "University of Alberta / Coursera", "url": "https://www.coursera.org/search?query=Agile+Planning+for+Software+Products", "duration": "4 weeks"}]}, "Management of Personnel Resources": {"title": "Leading People and Teams", "provider": "University of Michigan / Coursera", "url": "https://www.coursera.org/search?query=Leading+People+and+Teams", "duration": "4 months", "cost": "Free to audit", "next": [{"title": "Talent Management and Succession Planning", "provider": "University of Michigan / Coursera", "url": "https://www.coursera.org/search?query=Talent+Management+and+Succession+Planning", "duration": "4 weeks"}, {"title": "Managing Employee Performance", "provider": "University of Minnesota / Coursera", "url": "https://www.coursera.org/search?query=Managing+Employee+Performance", "duration": "4 weeks"}, {"title": "Coaching Skills for Managers", "provider": "UC Davis / Coursera", "url": "https://www.coursera.org/search?query=Coaching+Skills+for+Managers", "duration": "4 weeks"}]}, "Management of Financial Resources": {"title": "Finance for Non-Finance Professionals", "provider": "Rice University / Coursera", "url": "https://www.coursera.org/search?query=Finance+for+Non-Finance+Professionals", "duration": "4 weeks", "cost": "Free to audit", "next": [{"title": "Financial Accounting", "provider": "University of Illinois / Coursera", "url": "https://www.coursera.org/search?query=Financial+Accounting", "duration": "4 weeks"}, {"title": "Corporate Finance Essentials", "provider": "IESE / Coursera", "url": "https://www.coursera.org/search?query=Corporate+Finance+Essentials", "duration": "4 weeks"}, {"title": "Financial Planning for Young Adults", "provider": "University of Illinois / Coursera", "url": "https://www.coursera.org/search?query=Financial+Planning+for+Young+Adults", "duration": "4 weeks"}]}, "Management of Material Resources": {"title": "Supply Chain Management Specialization", "provider": "Rutgers / Coursera", "url": "https://www.coursera.org/search?query=Supply+Chain+Management+Specialization", "duration": "4 months", "cost": "Free to audit", "next": [{"title": "Operations Management", "provider": "University of Pennsylvania / Coursera", "url": "https://www.coursera.org/search?query=Operations+Management", "duration": "4 weeks"}, {"title": "Lean Six Sigma", "provider": "University System of Georgia / Coursera", "url": "https://www.coursera.org/search?query=Lean+Six+Sigma", "duration": "4 months"}, {"title": "Global Procurement and Sourcing", "provider": "Rutgers / Coursera", "url": "https://www.coursera.org/search?query=Global+Procurement+and+Sourcing", "duration": "4 weeks"}]}, "Active Learning": {"title": "Learning How to Learn", "provider": "McMaster University / Coursera", "url": "https://www.coursera.org/search?query=Learning+How+to+Learn", "duration": "4 weeks", "cost": "Free to audit", "next": [{"title": "Mindshift: Break Through Obstacles to Learning", "provider": "McMaster University / Coursera", "url": "https://www.coursera.org/search?query=Mindshift%3A+Break+Through+Obstacles+to+Learning", "duration": "4 weeks"}, {"title": "How to Study and Improve Memory", "provider": "Coursera", "url": "https://www.coursera.org/search?query=How+to+Study+and+Improve+Memory", "duration": "3 weeks"}, {"title": "The Science of Well-Being", "provider": "Yale / Coursera", "url": "https://www.coursera.org/search?query=The+Science+of+Well-Being", "duration": "10 weeks"}]}, "Learning Strategies": {"title": "Learning How to Learn", "provider": "McMaster University / Coursera", "url": "https://www.coursera.org/search?query=Learning+How+to+Learn", "duration": "4 weeks", "cost": "Free to audit", "next": [{"title": "Mindshift: Break Through Obstacles to Learning", "provider": "McMaster University / Coursera", "url": "https://www.coursera.org/search?query=Mindshift%3A+Break+Through+Obstacles+to+Learning", "duration": "4 weeks"}, {"title": "Study Skills for Academic Success", "provider": "Coursera", "url": "https://www.coursera.org/search?query=Study+Skills+for+Academic+Success", "duration": "4 weeks"}, {"title": "Personal Productivity, Time Management and Prioritization", "provider": "Coursera", "url": "https://www.coursera.org/search?query=Personal+Productivity%2C+Time+Management+and+Prioritization", "duration": "3 weeks"}]}, "Monitoring": {"title": "Operations Management", "provider": "University of Pennsylvania / Coursera", "url": "https://www.coursera.org/search?query=Operations+Management", "duration": "4 weeks", "cost": "Free to audit", "next": [{"title": "Six Sigma Yellow Belt Specialization", "provider": "University System of Georgia / Coursera", "url": "https://www.coursera.org/search?query=Six+Sigma+Yellow+Belt+Specialization", "duration": "4 months"}, {"title": "Operations Analytics", "provider": "University of Pennsylvania / Coursera", "url": "https://www.coursera.org/search?query=Operations+Analytics", "duration": "4 weeks"}, {"title": "Business Metrics for Data-Driven Companies", "provider": "Duke / Coursera", "url": "https://www.coursera.org/search?query=Business+Metrics+for+Data-Driven+Companies", "duration": "4 weeks"}]}, "Judgment and Decision Making": {"title": "Model Thinking", "provider": "University of Michigan / Coursera", "url": "https://www.coursera.org/search?query=Model+Thinking", "duration": "12 weeks", "cost": "Free to audit", "next": [{"title": "Behavioral Economics in Action", "provider": "University of Toronto / Coursera", "url": "https://www.coursera.org/search?query=Behavioral+Economics+in+Action", "duration": "4 weeks"}, {"title": "Decision Making and Scenarios", "provider": "University of Pennsylvania / Coursera", "url": "https://www.coursera.org/search?query=Decision+Making+and+Scenarios", "duration": "4 weeks"}, {"title": "Structured Decision Making", "provider": "University of Melbourne / Coursera", "url": "https://www.coursera.org/search?query=Structured+Decision+Making", "duration": "4 weeks"}]}, "Science": {"title": "Understanding the Scientific Method", "provider": "University of Alberta / Coursera", "url": "https://www.coursera.org/search?query=Understanding+the+Scientific+Method", "duration": "5 weeks", "cost": "Free to audit", "next": [{"title": "Science Literacy", "provider": "University of Alberta / Coursera", "url": "https://www.coursera.org/search?query=Science+Literacy", "duration": "5 weeks"}, {"title": "Data Analysis and Statistical Inference", "provider": "Duke / Coursera", "url": "https://www.coursera.org/search?query=Data+Analysis+and+Statistical+Inference", "duration": "10 weeks"}, {"title": "Experimental Methods in Systems Biology", "provider": "Icahn School of Medicine / Coursera", "url": "https://www.coursera.org/search?query=Experimental+Methods+in+Systems+Biology", "duration": "5 weeks"}]}, "Systems Analysis": {"title": "Systems Thinking In Public Health", "provider": "Johns Hopkins / Coursera", "url": "https://www.coursera.org/search?query=Systems+Thinking+In+Public+Health", "duration": "6 weeks", "cost": "Free to audit", "next": [{"title": "Systems Engineering Fundamentals", "provider": "UNSW / Coursera", "url": "https://www.coursera.org/search?query=Systems+Engineering+Fundamentals", "duration": "4 weeks"}, {"title": "System Dynamics and Complexity", "provider": "MIT / edX", "url": "https://www.edx.org/search?q=System+Dynamics+and+Complexity", "duration": "14 weeks"}, {"title": "Healthcare Data Quality and Governance", "provider": "Johns Hopkins / Coursera", "url": "https://www.coursera.org/search?query=Healthcare+Data+Quality+and+Governance", "duration": "4 weeks"}]}, "Systems Evaluation": {"title": "Systems Thinking In Public Health", "provider": "Johns Hopkins / Coursera", "url": "https://www.coursera.org/search?query=Systems+Thinking+In+Public+Health", "duration": "6 weeks", "cost": "Free to audit", "next": [{"title": "Program Evaluation", "provider": "University of Melbourne / Coursera", "url": "https://www.coursera.org/search?query=Program+Evaluation", "duration": "5 weeks"}, {"title": "Systems Engineering Fundamentals", "provider": "UNSW / Coursera", "url": "https://www.coursera.org/search?query=Systems+Engineering+Fundamentals", "duration": "4 weeks"}, {"title": "Data-Driven Decision Making", "provider": "Google / Coursera", "url": "https://www.coursera.org/search?query=Data-Driven+Decision+Making", "duration": "5 weeks"}]}, "Operations Analysis": {"title": "Operations Analytics", "provider": "University of Pennsylvania / Coursera", "url": "https://www.coursera.org/search?query=Operations+Analytics", "duration": "4 weeks", "cost": "Free to audit", "next": [{"title": "Business Analytics Specialization", "provider": "University of Pennsylvania / Coursera", "url": "https://www.coursera.org/search?query=Business+Analytics+Specialization", "duration": "4 months"}, {"title": "Process Improvement with Six Sigma", "provider": "University System of Georgia / Coursera", "url": "https://www.coursera.org/search?query=Process+Improvement+with+Six+Sigma", "duration": "4 weeks"}, {"title": "Supply Chain Analytics", "provider": "Rutgers / Coursera", "url": "https://www.coursera.org/search?query=Supply+Chain+Analytics", "duration": "4 weeks"}]}, "Operations Monitoring": {"title": "Operations Management", "provider": "University of Pennsylvania / Coursera", "url": "https://www.coursera.org/search?query=Operations+Management", "duration": "4 weeks", "cost": "Free to audit", "next": [{"title": "Six Sigma Yellow Belt Specialization", "provider": "University System of Georgia / Coursera", "url": "https://www.coursera.org/search?query=Six+Sigma+Yellow+Belt+Specialization", "duration": "4 months"}, {"title": "Business Metrics for Data-Driven Companies", "provider": "Duke / Coursera", "url": "https://www.coursera.org/search?query=Business+Metrics+for+Data-Driven+Companies", "duration": "4 weeks"}, {"title": "Lean Production", "provider": "Coursera", "url": "https://www.coursera.org/search?query=Lean+Production", "duration": "4 weeks"}]}, "Quality Control Analysis": {"title": "Six Sigma Yellow Belt Specialization", "provider": "University System of Georgia / Coursera", "url": "https://www.coursera.org/search?query=Six+Sigma+Yellow+Belt+Specialization", "duration": "4 months", "cost": "Free to audit", "next": [{"title": "Six Sigma Green Belt Specialization", "provider": "University System of Georgia / Coursera", "url": "https://www.coursera.org/search?query=Six+Sigma+Green+Belt+Specialization", "duration": "5 months"}, {"title": "Total Quality Management", "provider": "Coursera", "url": "https://www.coursera.org/search?query=Total+Quality+Management", "duration": "4 weeks"}, {"title": "Statistical Process Control", "provider": "Coursera", "url": "https://www.coursera.org/search?query=Statistical+Process+Control", "duration": "4 weeks"}]}};
+const FORAGE = {"JPMorgan Chase": {"title": "Software Engineering Virtual Experience", "url": "https://www.theforage.com/simulations/jpmorgan-chase/software-engineering-hin5", "duration": "6 hours", "category": "Software Engineering"}, "Goldman Sachs": {"title": "Software Engineering Virtual Experience", "url": "https://www.theforage.com/simulations/goldman-sachs/software-engineering-ruo0", "duration": "5 hours", "category": "Software Engineering"}, "BCG": {"title": "Data Science & Analytics Virtual Experience", "url": "https://www.theforage.com/simulations/bcg/data-science-ccdz", "duration": "5 hours", "category": "Data Science"}, "McKinsey": {"title": "Imbellus Problem Solving Virtual Experience", "url": "https://www.theforage.com/simulations/mckinsey-company/forward-program-bxho", "duration": "5 hours", "category": "Consulting"}, "Deloitte": {"title": "Technology Consulting Virtual Experience", "url": "https://www.theforage.com/simulations/deloitte-australia/technology-consulting-lnp5", "duration": "5 hours", "category": "Consulting"}, "PwC": {"title": "Power BI Virtual Experience", "url": "https://www.theforage.com/simulations/pwc-ch/power-bi-cqxg", "duration": "4 hours", "category": "Data Analytics"}, "KPMG": {"title": "Data Analytics Consulting Virtual Experience", "url": "https://www.theforage.com/simulations/kpmg-au/data-analytics-vkwi", "duration": "5 hours", "category": "Data Analytics"}, "EY": {"title": "Technology Consulting Virtual Experience", "url": "https://www.theforage.com/simulations/ey/technology-consulting-ueqf", "duration": "4 hours", "category": "Consulting"}, "Accenture": {"title": "North America Data Analytics Virtual Experience", "url": "https://www.theforage.com/simulations/accenture-nam/data-analytics-mmlb", "duration": "4 hours", "category": "Data Analytics"}, "Walmart": {"title": "Advanced Software Engineering Virtual Experience", "url": "https://www.theforage.com/simulations/walmart/software-engineering-fceb", "duration": "5 hours", "category": "Software Engineering"}, "Mastercard": {"title": "Cybersecurity Virtual Experience", "url": "https://www.theforage.com/simulations/mastercard/cybersecurity-t8ye", "duration": "4 hours", "category": "Cybersecurity"}, "Visa": {"title": "Technology Job Simulation", "url": "https://www.theforage.com/simulations/visa/technology-hbzx", "duration": "4 hours", "category": "Technology"}, "Commonwealth Bank": {"title": "Introduction to Data Science", "url": "https://www.theforage.com/simulations/commonwealth-bank/intro-data-science-sd7g", "duration": "5 hours", "category": "Data Science"}, "ANZ": {"title": "Data@ANZ Virtual Experience", "url": "https://www.theforage.com/simulations/anz/data-analytics-nzrv", "duration": "4 hours", "category": "Data Analytics"}, "Tata": {"title": "Data Visualisation Virtual Experience", "url": "https://www.theforage.com/simulations/tata/data-visualisation-p5xo", "duration": "4 hours", "category": "Data Visualization"}, "British Airways": {"title": "Data Science Virtual Experience", "url": "https://www.theforage.com/simulations/british-airways/data-science-yqoz", "duration": "4 hours", "category": "Data Science"}, "Quantium": {"title": "Data Analytics Virtual Experience", "url": "https://www.theforage.com/simulations/quantium/data-analytics-rqkb", "duration": "5 hours", "category": "Data Analytics"}, "Cognizant": {"title": "Artificial Intelligence Virtual Experience", "url": "https://www.theforage.com/simulations/cognizant/artificial-intelligence-yyds", "duration": "5 hours", "category": "AI/ML"}, "Electronic Arts": {"title": "Software Engineering Virtual Experience", "url": "https://www.theforage.com/simulations/electronic-arts/software-engineering-hhar", "duration": "4 hours", "category": "Software Engineering"}, "Lyft": {"title": "Back-End Engineering Virtual Experience", "url": "https://www.theforage.com/simulations/lyft/back-end-engineering-cens", "duration": "5 hours", "category": "Software Engineering"}, "Salesforce": {"title": "Salesforce Developer Virtual Experience", "url": "https://www.theforage.com/simulations/salesforce/developer-yb2h", "duration": "4 hours", "category": "Software Engineering"}, "SAP": {"title": "Technology Consulting Virtual Experience", "url": "https://www.theforage.com/simulations/sap/technology-consulting-cnmt", "duration": "3 hours", "category": "Consulting"}, "Telstra": {"title": "Cybersecurity Virtual Experience", "url": "https://www.theforage.com/simulations/telstra/cybersecurity-cyyo", "duration": "4 hours", "category": "Cybersecurity"}, "AIG": {"title": "Shields Up: Cybersecurity Virtual Experience", "url": "https://www.theforage.com/simulations/aig/cybersecurity-ku1i", "duration": "3 hours", "category": "Cybersecurity"}, "Datacom": {"title": "Cybersecurity Job Simulation", "url": "https://www.theforage.com/simulations/datacom/cybersecurity-hplr", "duration": "3 hours", "category": "Cybersecurity"}, "Citi": {"title": "Technology Software Development", "url": "https://www.theforage.com/simulations/citi/technology-software-development-gfbr", "duration": "4 hours", "category": "Software Engineering"}, "Bank of America": {"title": "Investment Banking Virtual Experience", "url": "https://www.theforage.com/simulations/bank-of-america/investment-banking-gkfe", "duration": "4 hours", "category": "Investment Banking"}, "J.P. Morgan": {"title": "Investment Banking Virtual Experience", "url": "https://www.theforage.com/simulations/jpmorgan-chase/investment-banking-hbm0", "duration": "5 hours", "category": "Investment Banking"}, "Lululemon": {"title": "Product Management Virtual Experience", "url": "https://www.theforage.com/simulations/lululemon/product-management-e-commerce-vdql", "duration": "3 hours", "category": "Product Management"}, "GE Aerospace": {"title": "Digital Technology Virtual Experience", "url": "https://www.theforage.com/simulations/ge/digital-technology-rggn", "duration": "4 hours", "category": "Technology"}, "Google": {"title": "Cybersecurity Professional Certificate Practice", "url": "https://www.theforage.com/simulations/google/cybersecurity-x7fk", "duration": "5 hours", "category": "Cybersecurity"}, "Microsoft": {"title": "Software Engineering Virtual Experience", "url": "https://www.theforage.com/simulations/microsoft/software-engineering-gmbz", "duration": "4 hours", "category": "Software Engineering"}, "Amazon": {"title": "Software Development Engineer Virtual Experience", "url": "https://www.theforage.com/simulations/amazon/software-development-kqir", "duration": "5 hours", "category": "Software Engineering"}, "Meta": {"title": "Software Engineer Virtual Experience", "url": "https://www.theforage.com/simulations/meta/software-engineer-exzk", "duration": "4 hours", "category": "Software Engineering"}, "Verizon": {"title": "Cloud Platform Engineering Virtual Experience", "url": "https://www.theforage.com/simulations/verizon/cloud-platform-engineering-pmyp", "duration": "4 hours", "category": "Cloud Engineering"}, "Standard Bank": {"title": "Software Engineering Virtual Experience", "url": "https://www.theforage.com/simulations/standard-bank/software-engineering-nzde", "duration": "4 hours", "category": "Software Engineering"}, "Procter & Gamble": {"title": "Data Engineering Virtual Experience", "url": "https://www.theforage.com/simulations/procter-gamble/data-engineering-uatl", "duration": "4 hours", "category": "Data Engineering"}, "Unilever": {"title": "Digital Supply Chain Virtual Experience", "url": "https://www.theforage.com/simulations/unilever/digital-supply-chain-sifq", "duration": "3 hours", "category": "Supply Chain"}, "Johnson & Johnson": {"title": "Technology Virtual Experience", "url": "https://www.theforage.com/simulations/jnj/technology-fwhv", "duration": "4 hours", "category": "Technology"}, "Red Bull": {"title": "On-Premise Sales Virtual Experience", "url": "https://www.theforage.com/simulations/red-bull/on-premise-sales-gqkx", "duration": "3 hours", "category": "Sales"}};
+
+// All unique skill names from our database for matching
+const KNOWN_SKILLS = Object.keys(COURSES);
+
+async function analyze() {
+  var apiKey = document.getElementById("api-key").value.trim();
+  var jobDesc = document.getElementById("job-desc").value.trim();
+  var btn = document.getElementById("analyze-btn");
+  var errorEl = document.getElementById("error-msg");
+
+  errorEl.style.display = "none";
+
+  if (!apiKey) { showError("Please enter your Anthropic API key."); return; }
+  if (!jobDesc || jobDesc.length < 50) { showError("Please paste a full job description (at least a paragraph)."); return; }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Analyzing...';
+
+  try {
+    var result = await callClaude(apiKey, jobDesc);
+    renderResults(result);
+  } catch (e) {
+    showError(e.message || "Something went wrong. Check your API key and try again.");
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Analyze this job";
+  }
+}
+
+function showError(msg) {
+  var el = document.getElementById("error-msg");
+  el.textContent = msg;
+  el.style.display = "block";
+}
+
+async function callClaude(apiKey, jobDesc) {
+  var systemPrompt = `You are a job description analyzer. Given a job posting, extract structured information.
+
+Return ONLY valid JSON with this exact structure:
+{
+  "company": "Company Name or null if not found",
+  "job_title": "The job title",
+  "skills": [
+    {
+      "name": "Skill name - MUST match one from this list when possible: ${KNOWN_SKILLS.join(', ')}",
+      "importance": "required" or "preferred",
+      "context": "Brief 1-sentence explanation of why this job needs this skill"
+    }
+  ],
+  "summary": "A 2-3 sentence summary of what this role is about and what kind of candidate would thrive"
+}
+
+Rules:
+- Map skills to the provided list whenever there's a reasonable match. For example, "Excel" maps to "Computers and Electronics", "SQL" or "data analysis" maps to "Mathematics" or "Programming", "communication skills" maps to "Speaking" or "Writing", "project management" maps to "Administration and Management", etc.
+- Include 5-10 skills maximum, prioritizing the most important ones.
+- Mark skills explicitly listed as "required" or "must have" as "required". Everything else is "preferred".
+- Be specific in the context field - reference the actual job duties mentioned.
+- Return ONLY the JSON object, no markdown formatting.`;
+
+  var response = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": apiKey,
+      "anthropic-version": "2023-06-01",
+      "anthropic-dangerous-direct-browser-access": "true"
+    },
+    body: JSON.stringify({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 1024,
+      system: systemPrompt,
+      messages: [{ role: "user", content: "Analyze this job posting:\n\n" + jobDesc }]
+    })
+  });
+
+  if (!response.ok) {
+    var errBody = await response.text();
+    if (response.status === 401) throw new Error("Invalid API key. Please check and try again.");
+    if (response.status === 429) throw new Error("Rate limited. Please wait a moment and try again.");
+    throw new Error("API error (" + response.status + "): " + errBody.substring(0, 200));
+  }
+
+  var data = await response.json();
+  var text = data.content[0].text;
+
+  // Parse JSON from response (handle potential markdown code blocks)
+  text = text.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
+  return JSON.parse(text);
+}
+
+function renderResults(data) {
+  if (typeof SSProgress !== 'undefined') SSProgress.award('job_analyze', null);
+  var resultsEl = document.getElementById("results");
+  resultsEl.classList.remove("visible");
+
+  // Title
+  document.getElementById("result-title").textContent = data.job_title ? "Game plan for " + data.job_title : "Your game plan";
+
+  // Company badge
+  var badgeWrap = document.getElementById("company-badge-wrap");
+  if (data.company) {
+    badgeWrap.innerHTML = '<span class="company-badge">' + escapeHTML(data.company) + '</span>';
+  } else {
+    badgeWrap.innerHTML = '';
+  }
+
+  // Forage section
+  var forageSection = document.getElementById("forage-section");
+  var forageMatch = data.company ? findForage(data.company) : null;
+  if (forageMatch) {
+    forageSection.innerHTML =
+      '<h3 class="section-title">Simulate working there</h3>' +
+      '<div class="forage-card">' +
+        '<div class="forage-icon"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>' +
+        '<div class="forage-info">' +
+          '<h3>' + escapeHTML(forageMatch.title) + '</h3>' +
+          '<p>' + escapeHTML(forageMatch.category) + ' · ' + escapeHTML(forageMatch.duration) + ' · Free</p>' +
+          '<a href="' + escapeHTML(forageMatch.url) + '" target="_blank" rel="noopener" class="forage-link">Start simulation</a>' +
+        '</div>' +
+      '</div>';
+  } else {
+    forageSection.innerHTML =
+      '<div class="no-forage">No Forage simulation found for this company. <a href="https://www.theforage.com/simulations" target="_blank" rel="noopener">Browse all simulations</a></div>';
+  }
+
+  // Skills
+  var skillsHTML = "";
+  var requiredCount = 0;
+  var matchedCount = 0;
+
+  data.skills.forEach(function(skill) {
+    var course = COURSES[skill.name];
+    var isRequired = skill.importance === "required";
+    if (isRequired) requiredCount++;
+
+    skillsHTML += '<div class="skill-card">' +
+      '<div class="skill-card-header">' +
+        '<div class="skill-card-name">' + escapeHTML(skill.name) + '</div>' +
+        '<span class="skill-card-match ' + (isRequired ? 'match-required' : 'match-preferred') + '">' +
+          (isRequired ? 'Required' : 'Nice to have') +
+        '</span>' +
+      '</div>' +
+      '<div class="skill-card-context">' + escapeHTML(skill.context) + '</div>';
+
+    if (course) {
+      matchedCount++;
+      var nextHTML = '';
+      if (course.next && course.next.length) {
+        var stepLabels = ['Next','Then','Go deeper'];
+        var kgItems = '';
+        for (var ni = 0; ni < course.next.length; ni++) {
+          var nc = course.next[ni];
+          kgItems += '<div class="kg-item"><span class="kg-step">' + stepLabels[ni] + '</span><a href="' + escapeHTML(nc.url) + '" target="_blank" rel="noopener">' + escapeHTML(nc.title) + '</a><span class="kg-meta">' + escapeHTML(nc.provider) + ' &middot; ' + escapeHTML(nc.duration) + '</span></div>';
+        }
+        nextHTML = '<button class="btn-keep" onclick="var d=this.parentElement.nextElementSibling;d.classList.toggle(\'open\')">Keep going \u2192</button></div><div class="keep-going-dropdown">' + kgItems + '</div>';
+      } else {
+        nextHTML = '</div>';
+      }
+      skillsHTML +=
+        '<div class="skill-card-course">' +
+          '<div class="course-label">Recommended course</div>' +
+          '<div class="course-name">' + escapeHTML(course.title) + '</div>' +
+          '<div class="course-detail">' + escapeHTML(course.provider) + ' &middot; ' + escapeHTML(course.duration) + ' &middot; ' + escapeHTML(course.cost) + '</div>' +
+          '<div class="course-buttons">' +
+            '<a class="btn-start" href="' + escapeHTML(course.url) + '" target="_blank" rel="noopener">Start here</a>' +
+            nextHTML;
+    }
+
+    skillsHTML += '</div>';
+  });
+
+  document.getElementById("skills-grid").innerHTML = skillsHTML;
+  document.getElementById("skills-section-title").textContent =
+    data.skills.length + " skills to build (" + requiredCount + " required)";
+
+  // Summary
+  var summaryParts = [];
+  if (data.summary) summaryParts.push(data.summary);
+  summaryParts.push("We matched " + matchedCount + " of " + data.skills.length + " skills to free courses you can start today.");
+  document.getElementById("summary-text").textContent = summaryParts.join(" ");
+
+  // Show
+  requestAnimationFrame(function() {
+    resultsEl.classList.add("visible");
+    setTimeout(function() {
+      resultsEl.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 100);
+  });
+}
+
+function findForage(company) {
+  // Direct match
+  if (FORAGE[company]) return FORAGE[company];
+
+  // Fuzzy match: check if any Forage key is contained in the company name or vice versa
+  var companyLower = company.toLowerCase();
+  var keys = Object.keys(FORAGE);
+  for (var i = 0; i < keys.length; i++) {
+    var keyLower = keys[i].toLowerCase();
+    if (companyLower.indexOf(keyLower) !== -1 || keyLower.indexOf(companyLower) !== -1) {
+      return FORAGE[keys[i]];
+    }
+  }
+
+  // Handle common abbreviations
+  var aliases = {
+    "jp morgan": "JPMorgan Chase", "jpmorgan": "JPMorgan Chase",
+    "j.p. morgan": "J.P. Morgan", "bofa": "Bank of America",
+    "p&g": "Procter & Gamble", "j&j": "Johnson & Johnson",
+    "ge": "GE Aerospace", "pwc": "PwC", "ey": "EY", "kpmg": "KPMG",
+    "bcg": "BCG", "facebook": "Meta"
+  };
+  var aliasMatch = aliases[companyLower];
+  if (aliasMatch && FORAGE[aliasMatch]) return FORAGE[aliasMatch];
+
+  return null;
+}
+
+function escapeHTML(str) {
+  var div = document.createElement("div");
+  div.textContent = str;
+  return div.innerHTML;
+}
+</script>
+<script>
+function toggleMobileMenu(){var h=document.getElementById('navHamburger'),m=document.getElementById('mobileMenu');h.classList.toggle('open');m.classList.toggle('open');document.body.style.overflow=m.classList.contains('open')?'hidden':'';}
+</script>
+
+<script>
+// Track course clicks for progress
+document.addEventListener('click', function(e) {
+  var link = e.target.closest('a[href*="coursera.org"], a[href*="edx.org"], a[href*="skillshare.com"]');
+  if (link && typeof SSProgress !== 'undefined') {
+    var title = link.closest('.skill-course, .course-card, .keep-going-item');
+    var name = title ? title.textContent.trim().substring(0, 50) : 'unknown';
+    SSProgress.award('course', name);
+  }
+});
+</script>
+<!-- SS_PROGRESS_TRACKER -->
+<script>
+// ========== START SOMEWHERE PROGRESS TRACKER ==========
+// Self-contained gamified progress system using localStorage
+(function() {
+  var LEVELS = [
+    { name: "Curious", xp: 0, color: "#918E85" },
+    { name: "Explorer", xp: 25, color: "#534AB7" },
+    { name: "Builder", xp: 75, color: "#1D9E75" },
+    { name: "Momentum", xp: 150, color: "#C4652A" },
+    { name: "Unstoppable", xp: 300, color: "#B8336A" }
+  ];
+
+  var BADGES = {
+    first_step:     { icon: "🚀", name: "First Step",      desc: "Did something. That's the whole point.", check: function(s) { return s.totalActions >= 1; } },
+    sprint_star:    { icon: "⚡", name: "Sprint Star",      desc: "Completed 5 skill sprints.", check: function(s) { return s.sprintsCompleted >= 5; } },
+    scholar:        { icon: "📚", name: "Scholar",          desc: "Clicked through to 10 courses.", check: function(s) { return s.coursesClicked >= 10; } },
+    cartographer:   { icon: "🗺️", name: "Cartographer",    desc: "Explored the Skill Map.", check: function(s) { return s.visitedPages.indexOf("skill-map") >= 0; } },
+    deep_diver:     { icon: "🔍", name: "Deep Diver",       desc: "Checked out 3 different careers.", check: function(s) { return s.careersViewed >= 3; } },
+    full_send:      { icon: "🎯", name: "Full Send",        desc: "Visited Explore, Build, and Apply.", check: function(s) { var p = s.visitedPages; return p.indexOf("explore") >= 0 && p.indexOf("build") >= 0 && p.indexOf("apply") >= 0; } },
+    roulette:       { icon: "🎲", name: "Roulette Roller",  desc: "Spun the roulette 3 times.", check: function(s) { return s.rouletteSpins >= 3; } },
+    completionist:  { icon: "👑", name: "Completionist",    desc: "Finished all 18 sprints.", check: function(s) { return s.sprintsCompleted >= 18; } },
+    skill_hunter:   { icon: "🎪", name: "Skill Hunter",     desc: "Explored 10 different skills.", check: function(s) { return s.skillsExplored >= 10; } },
+    analyzer:       { icon: "🔬", name: "Analyzer",         desc: "Used the Job Analyzer.", check: function(s) { return s.jobsAnalyzed >= 1; } }
+  };
+
+  // ---- State management ----
+  function getState() {
+    try {
+      var raw = localStorage.getItem("ss_progress");
+      if (raw) return JSON.parse(raw);
+    } catch(e) {}
+    return {
+      xp: 0,
+      totalActions: 0,
+      sprintsCompleted: 0,
+      coursesClicked: 0,
+      careersViewed: 0,
+      skillsExplored: 0,
+      rouletteSpins: 0,
+      jobsAnalyzed: 0,
+      visitedPages: [],
+      earnedBadges: [],
+      completedSprintIds: [],
+      viewedCareerNames: [],
+      clickedCourseNames: [],
+      exploredSkillNames: []
+    };
+  }
+
+  function saveState(s) {
+    try { localStorage.setItem("ss_progress", JSON.stringify(s)); } catch(e) {}
+  }
+
+  function getLevel(xp) {
+    var level = LEVELS[0];
+    for (var i = 0; i < LEVELS.length; i++) {
+      if (xp >= LEVELS[i].xp) level = LEVELS[i];
+    }
+    return level;
+  }
+
+  function getNextLevel(xp) {
+    for (var i = 0; i < LEVELS.length; i++) {
+      if (xp < LEVELS[i].xp) return LEVELS[i];
+    }
+    return null;
+  }
+
+  function checkBadges(state) {
+    var newBadges = [];
+    var keys = Object.keys(BADGES);
+    for (var i = 0; i < keys.length; i++) {
+      var key = keys[i];
+      if (state.earnedBadges.indexOf(key) < 0 && BADGES[key].check(state)) {
+        state.earnedBadges.push(key);
+        newBadges.push(key);
+      }
+    }
+    return newBadges;
+  }
+
+  // ---- Public API ----
+  window.SSProgress = {
+    award: function(type, detail) {
+      var s = getState();
+      var xpGain = 0;
+
+      if (type === "sprint") {
+        if (detail && s.completedSprintIds.indexOf(detail) >= 0) return; // already done
+        if (detail) s.completedSprintIds.push(detail);
+        s.sprintsCompleted++;
+        xpGain = 15;
+      } else if (type === "course") {
+        if (detail && s.clickedCourseNames.indexOf(detail) < 0) {
+          s.clickedCourseNames.push(detail);
+        }
+        s.coursesClicked++;
+        xpGain = 5;
+      } else if (type === "career") {
+        if (detail && s.viewedCareerNames.indexOf(detail) < 0) {
+          s.viewedCareerNames.push(detail);
+          s.careersViewed++;
+          xpGain = 5;
+        }
+      } else if (type === "skill") {
+        if (detail && s.exploredSkillNames.indexOf(detail) < 0) {
+          s.exploredSkillNames.push(detail);
+          s.skillsExplored++;
+          xpGain = 3;
+        }
+      } else if (type === "roulette") {
+        s.rouletteSpins++;
+        xpGain = 5;
+      } else if (type === "job_analyze") {
+        s.jobsAnalyzed++;
+        xpGain = 10;
+      } else if (type === "page") {
+        if (detail && s.visitedPages.indexOf(detail) < 0) {
+          s.visitedPages.push(detail);
+          xpGain = 1;
+        }
+      }
+
+      if (xpGain > 0) {
+        s.xp += xpGain;
+        s.totalActions++;
+        var oldLevel = getLevel(s.xp - xpGain);
+        var newLevel = getLevel(s.xp);
+        var newBadges = checkBadges(s);
+        saveState(s);
+        updateWidget(s);
+
+        if (newLevel.name !== oldLevel.name) {
+          showToast("Level up! You're now " + newLevel.name + " 🎉", newLevel.color);
+        } else if (newBadges.length > 0) {
+          var b = BADGES[newBadges[0]];
+          showToast(b.icon + " " + b.name + " unlocked!", "#C4652A");
+        } else if (xpGain >= 10) {
+          showToast("+" + xpGain + " XP", "#1D9E75");
+        }
+      }
+    },
+
+    getState: getState,
+    getLevel: function() { return getLevel(getState().xp); },
+
+    reset: function() {
+      localStorage.removeItem("ss_progress");
+      updateWidget(getState());
+    }
+  };
+
+  // ---- Toast notification ----
+  function showToast(msg, color) {
+    var toast = document.createElement("div");
+    toast.className = "ss-toast";
+    toast.style.cssText = "position:fixed;bottom:80px;right:20px;z-index:10001;background:" + (color || "#C4652A") + ";color:white;padding:10px 18px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;opacity:0;transform:translateY(10px);transition:all 0.3s;box-shadow:0 4px 12px rgba(0,0,0,0.15);pointer-events:none;";
+    toast.textContent = msg;
+    document.body.appendChild(toast);
+    requestAnimationFrame(function() {
+      toast.style.opacity = "1";
+      toast.style.transform = "translateY(0)";
+    });
+    setTimeout(function() {
+      toast.style.opacity = "0";
+      toast.style.transform = "translateY(10px)";
+      setTimeout(function() { toast.remove(); }, 300);
+    }, 2500);
+  }
+
+  // ---- Widget ----
+  function createWidget() {
+    var css = document.createElement("style");
+    css.textContent = [
+      ".ss-widget{position:fixed;bottom:20px;right:20px;z-index:10000;font-family:'DM Sans',sans-serif;}",
+      ".ss-pill{display:flex;align-items:center;gap:8px;background:#FFFFFF;border:1px solid rgba(0,0,0,0.1);border-radius:40px;padding:6px 14px 6px 8px;cursor:pointer;box-shadow:0 2px 12px rgba(0,0,0,0.08);transition:all 0.2s;}",
+      ".ss-pill:hover{box-shadow:0 4px 20px rgba(0,0,0,0.12);transform:translateY(-1px);}",
+      ".ss-pill-xp{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:white;}",
+      ".ss-pill-info{display:flex;flex-direction:column;line-height:1.2;}",
+      ".ss-pill-level{font-size:11px;font-weight:600;color:#1A1A18;}",
+      ".ss-pill-bar{width:60px;height:4px;background:#F0EDE6;border-radius:2px;overflow:hidden;margin-top:2px;}",
+      ".ss-pill-fill{height:100%;border-radius:2px;transition:width 0.5s ease;}",
+      ".ss-panel{position:absolute;bottom:50px;right:0;width:300px;background:#FFFFFF;border:1px solid rgba(0,0,0,0.1);border-radius:16px;box-shadow:0 8px 30px rgba(0,0,0,0.12);padding:20px;display:none;max-height:70vh;overflow-y:auto;}",
+      ".ss-panel.open{display:block;animation:ss-fadeIn 0.2s ease;}",
+      "@keyframes ss-fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}",
+      ".ss-panel-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}",
+      ".ss-panel-title{font-family:'DM Serif Display',Georgia,serif;font-size:20px;}",
+      ".ss-panel-xp{font-size:13px;color:#6B6860;font-weight:500;}",
+      ".ss-progress-bar{width:100%;height:8px;background:#F0EDE6;border-radius:4px;overflow:hidden;margin-bottom:4px;}",
+      ".ss-progress-fill{height:100%;border-radius:4px;transition:width 0.5s ease;}",
+      ".ss-progress-label{display:flex;justify-content:space-between;font-size:11px;color:#918E85;margin-bottom:20px;}",
+      ".ss-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px;}",
+      ".ss-stat{background:#FAF9F6;border-radius:8px;padding:10px;text-align:center;}",
+      ".ss-stat-num{font-size:20px;font-weight:700;color:#1A1A18;}",
+      ".ss-stat-label{font-size:11px;color:#6B6860;margin-top:2px;}",
+      ".ss-badges-title{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:#918E85;margin-bottom:10px;}",
+      ".ss-badge{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(0,0,0,0.04);}",
+      ".ss-badge:last-child{border-bottom:none;}",
+      ".ss-badge-icon{font-size:20px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;background:#FAF9F6;border-radius:8px;flex-shrink:0;}",
+      ".ss-badge-locked .ss-badge-icon{filter:grayscale(1);opacity:0.3;}",
+      ".ss-badge-info{flex:1;min-width:0;}",
+      ".ss-badge-name{font-size:13px;font-weight:600;color:#1A1A18;}",
+      ".ss-badge-locked .ss-badge-name{color:#918E85;}",
+      ".ss-badge-desc{font-size:11px;color:#918E85;line-height:1.3;}",
+      "@media(max-width:480px){.ss-panel{width:280px;right:-5px;}.ss-widget{bottom:12px;right:12px;}}"
+    ].join("
+");
+    document.head.appendChild(css);
+
+    var widget = document.createElement("div");
+    widget.className = "ss-widget";
+    widget.id = "ss-widget";
+    widget.innerHTML = '<div class="ss-pill" id="ss-pill">' +
+      '<div class="ss-pill-xp" id="ss-pill-icon"></div>' +
+      '<div class="ss-pill-info">' +
+        '<div class="ss-pill-level" id="ss-pill-level"></div>' +
+        '<div class="ss-pill-bar"><div class="ss-pill-fill" id="ss-pill-fill"></div></div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="ss-panel" id="ss-panel"></div>';
+    document.body.appendChild(widget);
+
+    document.getElementById("ss-pill").addEventListener("click", function(e) {
+      e.stopPropagation();
+      var panel = document.getElementById("ss-panel");
+      panel.classList.toggle("open");
+      if (panel.classList.contains("open")) renderPanel(getState());
+    });
+
+    document.addEventListener("click", function(e) {
+      var panel = document.getElementById("ss-panel");
+      if (panel && panel.classList.contains("open") && !e.target.closest(".ss-widget")) {
+        panel.classList.remove("open");
+      }
+    });
+  }
+
+  function updateWidget(state) {
+    var level = getLevel(state.xp);
+    var next = getNextLevel(state.xp);
+    var pct = 100;
+    if (next) {
+      pct = Math.round(((state.xp - level.xp) / (next.xp - level.xp)) * 100);
+    }
+
+    var icon = document.getElementById("ss-pill-icon");
+    var levelEl = document.getElementById("ss-pill-level");
+    var fill = document.getElementById("ss-pill-fill");
+
+    if (icon) {
+      icon.style.background = level.color;
+      icon.textContent = state.xp;
+    }
+    if (levelEl) levelEl.textContent = level.name;
+    if (fill) {
+      fill.style.width = pct + "%";
+      fill.style.background = level.color;
+    }
+  }
+
+  function renderPanel(state) {
+    var level = getLevel(state.xp);
+    var next = getNextLevel(state.xp);
+    var pct = 100;
+    var nextLabel = "Max level!";
+    if (next) {
+      pct = Math.round(((state.xp - level.xp) / (next.xp - level.xp)) * 100);
+      nextLabel = next.xp + " XP to " + next.name;
+    }
+
+    var badgesHTML = "";
+    var badgeKeys = Object.keys(BADGES);
+    for (var i = 0; i < badgeKeys.length; i++) {
+      var key = badgeKeys[i];
+      var b = BADGES[key];
+      var earned = state.earnedBadges.indexOf(key) >= 0;
+      badgesHTML += '<div class="ss-badge ' + (earned ? "" : "ss-badge-locked") + '">' +
+        '<div class="ss-badge-icon">' + b.icon + '</div>' +
+        '<div class="ss-badge-info">' +
+          '<div class="ss-badge-name">' + b.name + '</div>' +
+          '<div class="ss-badge-desc">' + (earned ? b.desc : "???") + '</div>' +
+        '</div>' +
+      '</div>';
+    }
+
+    document.getElementById("ss-panel").innerHTML =
+      '<div class="ss-panel-header">' +
+        '<div class="ss-panel-title">Your Progress</div>' +
+        '<div class="ss-panel-xp">' + state.xp + ' XP</div>' +
+      '</div>' +
+      '<div class="ss-progress-bar"><div class="ss-progress-fill" style="width:' + pct + '%;background:' + level.color + '"></div></div>' +
+      '<div class="ss-progress-label"><span>' + level.name + '</span><span>' + nextLabel + '</span></div>' +
+      '<div class="ss-stats">' +
+        '<div class="ss-stat"><div class="ss-stat-num">' + state.sprintsCompleted + '</div><div class="ss-stat-label">Sprints</div></div>' +
+        '<div class="ss-stat"><div class="ss-stat-num">' + state.coursesClicked + '</div><div class="ss-stat-label">Courses</div></div>' +
+        '<div class="ss-stat"><div class="ss-stat-num">' + state.careersViewed + '</div><div class="ss-stat-label">Careers</div></div>' +
+        '<div class="ss-stat"><div class="ss-stat-num">' + state.earnedBadges.length + '/' + badgeKeys.length + '</div><div class="ss-stat-label">Badges</div></div>' +
+      '</div>' +
+      '<div class="ss-badges-title">Badges</div>' +
+      badgesHTML;
+  }
+
+  // ---- Auto-detect page and track visit ----
+  function detectPage() {
+    var path = window.location.pathname.split("/").pop().replace(".html", "");
+    var pageMap = {
+      "start-somewhere": "home",
+      "explore": "explore",
+      "build": "build",
+      "apply": "apply",
+      "skill-explorer-production": "skill-explorer",
+      "job-analyzer": "job-analyzer",
+      "skill-roulette": "skill-roulette",
+      "skill-sprints": "skill-sprints",
+      "skill-map": "skill-map",
+      "career": "career"
+    };
+    return pageMap[path] || path;
+  }
+
+  // ---- Init ----
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
+
+  function init() {
+    createWidget();
+    var state = getState();
+
+    // Track page visit
+    var page = detectPage();
+    if (page) {
+      SSProgress.award("page", page);
+    }
+
+    // Auto-track career page views
+    if (page === "career") {
+      var params = new URLSearchParams(window.location.search);
+      var job = params.get("job");
+      if (job) SSProgress.award("career", job);
+    }
+
+    updateWidget(getState());
+  }
+})();
+</script>
+
+</body>
+</html>
