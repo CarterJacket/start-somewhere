@@ -7,3 +7,5 @@ __pycache__/
 evals/results.json
 evals/results.md
 .DS_Store
+.env
+evals/.env

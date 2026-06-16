@@ -89,9 +89,14 @@ export default {
       body: JSON.stringify(payload),
     });
 
-    const text = await upstream.text();
-    // Pass the Anthropic response straight through; the client reads
-    // data.content[0].text exactly as it did with the direct call.
+    let text = await upstream.text();
+    // Guardrail: the model follows "copy a name from the list" ~88% of the time
+    // (measured in evals/), so for analyze mode we deterministically snap each
+    // skill name to the taxonomy (fixing typos/plurals) and drop any invented
+    // name with no close match. This guarantees every skill maps to a course.
+    if (mode === "analyze" && upstream.ok) {
+      text = sanitizeAnalyze(text, body.skills);
+    }
     return new Response(text, {
       status: upstream.status,
       headers: { ...cors, "Content-Type": "application/json" },
@@ -106,7 +111,7 @@ function buildAnalyzePayload(jobDesc, skills) {
     ? skills.filter((s) => typeof s === "string").slice(0, MAX_SKILLS)
     : [];
   const skillLine = known.length
-    ? `\n- "name": Skill name. MUST match one from this list when possible: ${known.join(", ")}`
+    ? `\n- "name": Skill name copied EXACTLY from this list: ${known.join(", ")}`
     : `\n- "name": Skill name`;
 
   const systemPrompt =
@@ -124,7 +129,7 @@ function buildAnalyzePayload(jobDesc, skills) {
 }
 
 Rules:
-- Map skills to the provided list whenever there is a reasonable match (e.g. "Excel" maps to "Computers and Electronics"; "SQL" or "data analysis" maps to "Mathematics" or "Programming"; "communication skills" maps to "Speaking" or "Writing"; "project management" maps to "Administration and Management").
+- Every skill name MUST be one of the list items above, copied verbatim. Never invent or rephrase a name (e.g. "Excel" maps to "Computers and Electronics"; "SQL" or "data analysis" maps to "Mathematics" or "Programming"; "communication skills" maps to "Speaking" or "Writing"; "project management" maps to "Administration and Management"; "attention to detail" maps to "Quality Control Analysis"; "troubleshooting" maps to "Critical Thinking"; "patience" maps to "Service Orientation"). If no item fits well, pick the single closest one.
 - Include 5-10 skills maximum, prioritizing the most important ones.
 - Mark skills explicitly listed as "required" or "must have" as "required". Everything else is "preferred".
 - Be specific in the context field; reference the actual job duties mentioned.
@@ -163,6 +168,60 @@ How to respond:
     system: systemPrompt,
     messages: [...turns, { role: "user", content: question }],
   };
+}
+
+// --- Taxonomy guardrail -------------------------------------------------------
+
+function normalize(s) {
+  return s.toLowerCase().replace(/[^a-z0-9]/g, "");
+}
+
+function levenshtein(a, b) {
+  const m = a.length, n = b.length;
+  const d = Array.from({ length: m + 1 }, (_, i) => [i, ...Array(n).fill(0)]);
+  for (let j = 0; j <= n; j++) d[0][j] = j;
+  for (let i = 1; i <= m; i++) {
+    for (let j = 1; j <= n; j++) {
+      const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+      d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + cost);
+    }
+  }
+  return d[m][n];
+}
+
+// Return the taxonomy name to use, or null to drop the skill.
+function snapName(name, known, normMap) {
+  const nn = normalize(name);
+  if (normMap.has(nn)) return normMap.get(nn);
+  let best = null, bestD = Infinity;
+  for (const k of known) {
+    const d = levenshtein(nn, normalize(k));
+    if (d < bestD) { bestD = d; best = k; }
+  }
+  return bestD <= 2 ? best : null;  // near match (typo/plural) snaps; invented names drop
+}
+
+function sanitizeAnalyze(upstreamText, skills) {
+  const known = Array.isArray(skills) ? skills.filter((s) => typeof s === "string") : [];
+  if (!known.length) return upstreamText;
+  let resp;
+  try { resp = JSON.parse(upstreamText); } catch { return upstreamText; }
+  try {
+    const inner = JSON.parse(resp.content[0].text.replace(/```json/gi, "").replace(/```/g, "").trim());
+    if (Array.isArray(inner.skills)) {
+      const normMap = new Map(known.map((k) => [normalize(k), k]));
+      inner.skills = inner.skills
+        .map((s) => {
+          if (!s || typeof s.name !== "string") return null;
+          const fixed = snapName(s.name, known, normMap);
+          return fixed ? { ...s, name: fixed } : null;
+        })
+        .filter(Boolean);
+      resp.content[0].text = JSON.stringify(inner);
+      return JSON.stringify(resp);
+    }
+  } catch { /* malformed model output; pass through untouched */ }
+  return upstreamText;
 }
 
 // --- Helpers -----------------------------------------------------------------

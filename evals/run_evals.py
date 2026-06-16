@@ -46,7 +46,7 @@ ANALYZE_SYSTEM = (
     '  "job_title": "The job title",\n'
     '  "skills": [\n'
     "    {\n"
-    '      "name": "Skill name. MUST match one from this list when possible: '
+    '      "name": "Skill name copied EXACTLY from this list: '
     + ", ".join(KNOWN_SKILLS) + '",\n'
     '      "importance": "required" or "preferred",\n'
     '      "context": "Brief 1-sentence explanation of why this job needs this skill"\n'
@@ -55,7 +55,9 @@ ANALYZE_SYSTEM = (
     '  "summary": "A 2-3 sentence summary of what this role is about and what kind of candidate would thrive"\n'
     "}\n\n"
     "Rules:\n"
-    "- Map skills to the provided list whenever there is a reasonable match.\n"
+    "- Every skill name MUST be one of the list items above, copied verbatim. Never invent or rephrase a name. "
+    "If a real-world skill is not on the list, choose the closest item (e.g. attention to detail -> 'Quality Control Analysis'; "
+    "troubleshooting -> 'Critical Thinking'; patience -> 'Service Orientation'; assessing students -> 'Education and Training').\n"
     "- Include 5-10 skills maximum, prioritizing the most important ones.\n"
     '- Mark skills explicitly listed as "required" or "must have" as "required". Everything else is "preferred".\n'
     "- Be specific in the context field; reference the actual job duties mentioned.\n"
@@ -76,12 +78,59 @@ def strip_fences(text):
     return text.replace("```json", "").replace("```", "").strip()
 
 
+def _normalize(s):
+    return "".join(c for c in s.lower() if c.isalnum())
+
+
+def _levenshtein(a, b):
+    m, n = len(a), len(b)
+    prev = list(range(n + 1))
+    for i in range(1, m + 1):
+        cur = [i] + [0] * n
+        for j in range(1, n + 1):
+            cost = 0 if a[i - 1] == b[j - 1] else 1
+            cur[j] = min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + cost)
+        prev = cur
+    return prev[n]
+
+
+def _snap_name(name, norm_map):
+    nn = _normalize(name)
+    if nn in norm_map:
+        return norm_map[nn]
+    best, best_d = None, 1e9
+    for k in KNOWN_SKILLS:
+        d = _levenshtein(nn, _normalize(k))
+        if d < best_d:
+            best_d, best = d, k
+    return best if best_d <= 2 else None  # near match snaps; invented names drop
+
+
+def sanitize(raw):
+    """Deterministic taxonomy guardrail; mirrors sanitizeAnalyze in worker.js."""
+    try:
+        data = json.loads(raw)
+    except json.JSONDecodeError:
+        return raw
+    if isinstance(data, dict) and isinstance(data.get("skills"), list):
+        norm_map = {_normalize(k): k for k in KNOWN_SKILLS}
+        fixed = []
+        for s in data["skills"]:
+            if isinstance(s, dict) and isinstance(s.get("name"), str):
+                snapped = _snap_name(s["name"], norm_map)
+                if snapped:
+                    fixed.append({**s, "name": snapped})
+        data["skills"] = fixed
+        return json.dumps(data)
+    return raw
+
+
 def analyze(client, desc):
     msg = client.messages.create(
         model=MODEL_ANALYZE, max_tokens=1024, system=ANALYZE_SYSTEM,
         messages=[{"role": "user", "content": "Analyze this job posting:\n\n" + desc}],
     )
-    return strip_fences(msg.content[0].text)
+    return sanitize(strip_fences(msg.content[0].text))
 
 
 def score_analyzer(raw, case):
