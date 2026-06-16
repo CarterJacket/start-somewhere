@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Start Somewhere: Ask a Career Question</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<script src="ss-ai-config.js"></script>
+<style>
+:root {
+  --bg: #FAF9F6; --bg-warm: #F5F0E8;
+  --accent: #C4652A; --accent-hover: #A8521F;
+  --teal: #1D9E75; --purple: #534AB7; --blue: #2D7DD2;
+  --text: #1A1A18; --text-muted: #6B6860; --text-soft: #918E85;
+  --border: #E8E4DC; --card-bg: #FFFFFF;
+  --radius: 12px;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); }
+
+/* Nav */
+nav { position: sticky; top: 0; z-index: 100; background: rgba(250,249,246,0.95); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(0,0,0,0.08); }
+.nav-inner { display: flex; align-items: center; justify-content: space-between; padding: 14px 2rem; max-width: 1200px; margin: 0 auto; }
+.nav-logo { font-family: 'DM Serif Display', Georgia, serif; font-size: 20px; text-decoration: none; }
+.nav-logo .s { color: #1A1A18; }
+.nav-logo .sw { color: #C4652A; }
+.nav-links { display: flex; gap: 1.5rem; align-items: center; }
+.nav-links a { font-size: 14px; color: #6B6860; text-decoration: none; font-weight: 500; transition: color 0.2s; }
+.nav-links a:hover { color: #1A1A18; }
+.nav-links a.active { color: #C4652A; font-weight: 600; }
+.nav-hamburger { display: none; flex-direction: column; gap: 5px; background: none; border: none; cursor: pointer; padding: 4px; }
+.nav-hamburger span { display: block; width: 24px; height: 2px; background: #1A1A18; transition: all 0.3s; }
+.nav-hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.nav-hamburger.open span:nth-child(2) { opacity: 0; }
+.nav-hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+.mobile-menu { display: none; position: fixed; top: 53px; left: 0; right: 0; bottom: 0; background: rgba(250,249,246,0.98); backdrop-filter: blur(20px); z-index: 99; padding: 2rem 1.5rem; overflow-y: auto; }
+.mobile-menu.open { display: flex; flex-direction: column; gap: 0; }
+.mobile-menu a { display: block; padding: 14px 0; font-size: 16px; color: #6B6860; text-decoration: none; font-weight: 500; border-bottom: 1px solid rgba(0,0,0,0.08); transition: color 0.2s; }
+.mobile-menu a:hover, .mobile-menu a.active { color: #C4652A; }
+@media (max-width: 768px) { .nav-hamburger { display: flex; } .nav-links { display: none !important; } }
+
+/* Hero */
+.hero { text-align: center; padding: 56px 24px 24px; max-width: 720px; margin: 0 auto; }
+.hero h1 { font-family: 'DM Serif Display', serif; font-size: 42px; line-height: 1.2; margin-bottom: 14px; }
+.hero h1 em { font-style: normal; color: var(--accent); }
+.hero p { font-size: 17px; color: var(--text-muted); line-height: 1.6; }
+
+/* Chat */
+.chat-wrap { max-width: 720px; margin: 0 auto; padding: 0 24px 40px; }
+.thread { display: flex; flex-direction: column; gap: 16px; margin-bottom: 20px; }
+.msg { max-width: 88%; padding: 14px 18px; border-radius: var(--radius); font-size: 15px; line-height: 1.6; }
+.msg.user { align-self: flex-end; background: var(--accent); color: #fff; border-bottom-right-radius: 4px; }
+.msg.bot { align-self: flex-start; background: var(--card-bg); border: 1px solid var(--border); color: var(--text); border-bottom-left-radius: 4px; }
+.msg.bot strong { color: var(--text); }
+.msg.bot ul { margin: 8px 0 8px 18px; }
+.msg.bot li { margin-bottom: 4px; }
+.msg.bot p { margin-bottom: 10px; }
+.msg.bot p:last-child { margin-bottom: 0; }
+.msg.thinking { color: var(--text-soft); font-style: italic; }
+.dot-flash::after { content: '...'; animation: dots 1.2s steps(4, end) infinite; }
+@keyframes dots { 0% { content: ''; } 25% { content: '.'; } 50% { content: '..'; } 75% { content: '...'; } }
+
+/* Suggestions */
+.suggestions { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 18px; }
+.chip { background: var(--bg-warm); border: 1px solid var(--border); border-radius: 999px; padding: 8px 14px; font-size: 13px; color: var(--text-muted); cursor: pointer; font-family: 'DM Sans', sans-serif; transition: border-color 0.2s, color 0.2s; }
+.chip:hover { border-color: var(--accent); color: var(--accent); }
+
+/* Input */
+.input-row { display: flex; gap: 10px; align-items: flex-end; }
+.input-row textarea { flex: 1; min-height: 54px; max-height: 180px; padding: 14px 16px; border: 1px solid var(--border); border-radius: var(--radius); font-family: 'DM Sans', sans-serif; font-size: 15px; line-height: 1.5; background: var(--card-bg); resize: none; transition: border-color 0.2s; }
+.input-row textarea:focus { outline: none; border-color: var(--accent); }
+.send-btn { padding: 14px 22px; background: var(--accent); color: #fff; border: none; border-radius: var(--radius); font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; transition: background 0.2s; white-space: nowrap; }
+.send-btn:hover { background: var(--accent-hover); }
+.send-btn:disabled { background: var(--text-soft); cursor: not-allowed; }
+.disclaimer { font-size: 11px; color: var(--text-soft); text-align: center; margin-top: 12px; line-height: 1.5; }
+.error-msg { margin-top: 12px; padding: 12px 16px; background: #FEF2F2; border: 1px solid #FECACA; border-radius: 8px; color: #991B1B; font-size: 13px; display: none; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="start-somewhere.html" class="nav-logo"><span class="s">start</span><span class="sw">somewhere.</span></a>
+    <button class="nav-hamburger" id="navHamburger" onclick="toggleMobileMenu()"><span></span><span></span><span></span></button>
+    <div class="nav-links">
+      <a href="start-somewhere.html">Home</a>
+      <a href="explore.html">Explore</a>
+      <a href="build.html">Build</a>
+      <a href="apply.html">Apply</a>
+      <a href="skill-explorer-production.html">Skill Explorer</a>
+      <a href="job-analyzer.html">Job Analyzer</a>
+      <a href="ask.html" class="active">Ask AI</a>
+      <a href="skill-roulette.html">Skill Roulette</a>
+      <a href="skill-sprints.html">Skill Sprints</a>
+      <a href="skill-map.html">Skill Map</a>
+    </div>
+  </div>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="start-somewhere.html">Home</a>
+  <a href="explore.html">Explore</a>
+  <a href="build.html">Build</a>
+  <a href="apply.html">Apply</a>
+  <a href="skill-explorer-production.html">Skill Explorer</a>
+  <a href="job-analyzer.html">Job Analyzer</a>
+  <a href="ask.html" class="active">Ask AI</a>
+  <a href="skill-roulette.html">Skill Roulette</a>
+  <a href="skill-sprints.html">Skill Sprints</a>
+  <a href="skill-map.html">Skill Map</a>
+</div>
+
+<div class="hero">
+  <h1>Stuck? <em>Ask away.</em></h1>
+  <p>Tell the coach where you are and what is on your mind. You will get a clear, encouraging next step, not a lecture.</p>
+</div>
+
+<div class="chat-wrap">
+  <div class="suggestions" id="suggestions">
+    <button class="chip">I just graduated and have no idea what to do.</button>
+    <button class="chip">How do I get into data analysis with no experience?</button>
+    <button class="chip">I want to switch into UX design. Where do I start?</button>
+    <button class="chip">What should I put on a resume with no work history?</button>
+  </div>
+
+  <div class="thread" id="thread"></div>
+
+  <div class="input-row">
+    <textarea id="question" placeholder="Ask anything about careers, skills, or getting started..." rows="1"></textarea>
+    <button class="send-btn" id="send-btn" onclick="ask()">Ask</button>
+  </div>
+  <div class="error-msg" id="error-msg"></div>
+  <p class="disclaimer">An AI coach for general guidance, not professional, financial, legal, or mental-health advice. It can make mistakes; verify anything important.</p>
+</div>
+
+<script>
+function toggleMobileMenu(){var h=document.getElementById('navHamburger'),m=document.getElementById('mobileMenu');h.classList.toggle('open');m.classList.toggle('open');document.body.style.overflow=m.classList.contains('open')?'hidden':'';}
+
+var chatHistory = [];
+var thread = document.getElementById("thread");
+var qEl = document.getElementById("question");
+var btn = document.getElementById("send-btn");
+var errorEl = document.getElementById("error-msg");
+
+// Auto-grow the textarea
+qEl.addEventListener("input", function() {
+  qEl.style.height = "auto";
+  qEl.style.height = Math.min(qEl.scrollHeight, 180) + "px";
+});
+// Enter sends, Shift+Enter makes a newline
+qEl.addEventListener("keydown", function(e) {
+  if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); ask(); }
+});
+// Suggestion chips
+document.getElementById("suggestions").addEventListener("click", function(e) {
+  if (e.target.classList.contains("chip")) { qEl.value = e.target.textContent; ask(); }
+});
+
+function showError(msg) { errorEl.textContent = msg; errorEl.style.display = "block"; }
+
+// Minimal, safe formatter: escape HTML, then apply **bold**, bullet lists, paragraphs.
+function format(text) {
+  var esc = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  esc = esc.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+  var blocks = esc.split(/\n{2,}/).map(function(block) {
+    var lines = block.split("\n");
+    var isList = lines.every(function(l) { return /^\s*[-*]\s+/.test(l) || l.trim() === ""; });
+    if (isList) {
+      var items = lines.filter(function(l) { return l.trim(); })
+        .map(function(l) { return "<li>" + l.replace(/^\s*[-*]\s+/, "") + "</li>"; }).join("");
+      return "<ul>" + items + "</ul>";
+    }
+    return "<p>" + block.replace(/\n/g, "<br>") + "</p>";
+  });
+  return blocks.join("");
+}
+
+function addMsg(role, html) {
+  var div = document.createElement("div");
+  div.className = "msg " + (role === "user" ? "user" : "bot");
+  div.innerHTML = html;
+  thread.appendChild(div);
+  div.scrollIntoView({ behavior: "smooth", block: "end" });
+  return div;
+}
+
+async function ask() {
+  var q = qEl.value.trim();
+  errorEl.style.display = "none";
+
+  if (!window.SS_AI_PROXY || window.SS_AI_PROXY.indexOf("YOUR-WORKER") !== -1) {
+    showError("The coach is not configured yet. Add the Worker URL in ss-ai-config.js.");
+    return;
+  }
+  if (q.length < 5) { showError("Try a slightly longer question so the coach can help."); return; }
+
+  document.getElementById("suggestions").style.display = "none";
+  addMsg("user", format(q));
+  qEl.value = ""; qEl.style.height = "auto";
+  btn.disabled = true;
+
+  var thinking = addMsg("bot", '<span class="thinking dot-flash">Thinking</span>');
+
+  try {
+    var res = await fetch(window.SS_AI_PROXY, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ mode: "ask", input: q, history: chatHistory })
+    });
+    if (!res.ok) {
+      if (res.status === 429) throw new Error("A lot of people are asking right now. Please wait a moment and try again.");
+      throw new Error("Service error (" + res.status + "). Please try again shortly.");
+    }
+    var data = await res.json();
+    var answer = (data.content && data.content[0] && data.content[0].text) || "Sorry, I could not generate an answer. Try rephrasing.";
+    thinking.classList.remove("bot");
+    thinking.className = "msg bot";
+    thinking.innerHTML = format(answer);
+
+    chatHistory.push({ role: "user", content: q });
+    chatHistory.push({ role: "assistant", content: answer });
+    if (typeof SSProgress !== "undefined") SSProgress.award("ask", null);
+  } catch (e) {
+    thinking.remove();
+    showError(e.message || "Something went wrong. Please try again in a moment.");
+  } finally {
+    btn.disabled = false;
+    qEl.focus();
+  }
+}
+</script>
+
+<script src="ss-progress.js"></script>
+
+<footer style="padding:2.5rem 2rem;text-align:center;border-top:1px solid rgba(0,0,0,0.08);margin-top:3rem;"><p style="font-size:13px;color:#918E85;font-family:DM Sans,-apple-system,sans-serif;">Built by <a href="https://carterjacket.github.io" style="color:#C4652A;text-decoration:none;font-weight:500;">Carter Jaquette</a> &middot; <a href="start-somewhere.html" style="color:#C4652A;text-decoration:none;font-weight:500;">Start Somewhere</a></p></footer>
+</body>
+</html>

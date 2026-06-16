@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Start Somewhere: Job Analyzer</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<script src="ss-ai-config.js"></script>
 <style>
 nav { position: sticky; top: 0; z-index: 100; background: rgba(250,249,246,0.95); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(0,0,0,0.08); }
 .nav-inner { display: flex; align-items: center; justify-content: space-between; padding: 14px 2rem; max-width: 1200px; margin: 0 auto; }
@@ -242,7 +243,7 @@ textarea::placeholder { color: var(--text-soft); }
       <a href="apply.html">Apply</a>
       <a href="skill-explorer-production.html">Skill Explorer</a>
       <a href="job-analyzer.html" class="active">Job Analyzer</a>
-      <a href="skill-roulette.html">Skill Roulette</a>
+      <a href="ask.html">Ask AI</a>      <a href="skill-roulette.html">Skill Roulette</a>
       <a href="skill-sprints.html">Skill Sprints</a>
       <a href="skill-map.html">Skill Map</a>
     </div>
@@ -255,7 +256,7 @@ textarea::placeholder { color: var(--text-soft); }
   <a href="apply.html">Apply</a>
   <a href="skill-explorer-production.html">Skill Explorer</a>
   <a href="job-analyzer.html" class="active">Job Analyzer</a>
-  <a href="skill-roulette.html">Skill Roulette</a>
+  <a href="ask.html">Ask AI</a>  <a href="skill-roulette.html">Skill Roulette</a>
   <a href="skill-sprints.html">Skill Sprints</a>
   <a href="skill-map.html">Skill Map</a>
 </div>
@@ -266,14 +267,6 @@ textarea::placeholder { color: var(--text-soft); }
 </div>
 
 <div class="input-section">
-  <div class="api-key-row">
-    <label for="api-key">Anthropic API Key</label>
-    <input type="password" id="api-key" placeholder="sk-ant-..." autocomplete="off">
-  </div>
-  <div class="api-key-help">
-    Your key stays in your browser and is never stored. Need one? <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">Get a key here</a>
-  </div>
-
   <textarea id="job-desc" placeholder="Paste the full job description here. Title, requirements, qualifications, everything. The more detail, the better the analysis."></textarea>
 
   <button class="analyze-btn" id="analyze-btn" onclick="analyze()">Analyze this job</button>
@@ -305,24 +298,26 @@ const FORAGE = {"JPMorgan Chase": {"title": "Software Engineering Virtual Experi
 const KNOWN_SKILLS = Object.keys(COURSES);
 
 async function analyze() {
-  var apiKey = document.getElementById("api-key").value.trim();
   var jobDesc = document.getElementById("job-desc").value.trim();
   var btn = document.getElementById("analyze-btn");
   var errorEl = document.getElementById("error-msg");
 
   errorEl.style.display = "none";
 
-  if (!apiKey) { showError("Please enter your Anthropic API key."); return; }
+  if (!window.SS_AI_PROXY || window.SS_AI_PROXY.indexOf("YOUR-WORKER") !== -1) {
+    showError("The analyzer is not configured yet. Add the Worker URL in ss-ai-config.js.");
+    return;
+  }
   if (!jobDesc || jobDesc.length < 50) { showError("Please paste a full job description (at least a paragraph)."); return; }
 
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span>Analyzing...';
 
   try {
-    var result = await callClaude(apiKey, jobDesc);
+    var result = await callClaude(jobDesc);
     renderResults(result);
   } catch (e) {
-    showError(e.message || "Something went wrong. Check your API key and try again.");
+    showError(e.message || "Something went wrong. Please try again in a moment.");
   } finally {
     btn.disabled = false;
     btn.textContent = "Analyze this job";
@@ -335,51 +330,23 @@ function showError(msg) {
   el.style.display = "block";
 }
 
-async function callClaude(apiKey, jobDesc) {
-  var systemPrompt = `You are a job description analyzer. Given a job posting, extract structured information.
-
-Return ONLY valid JSON with this exact structure:
-{
-  "company": "Company Name or null if not found",
-  "job_title": "The job title",
-  "skills": [
-    {
-      "name": "Skill name - MUST match one from this list when possible: ${KNOWN_SKILLS.join(', ')}",
-      "importance": "required" or "preferred",
-      "context": "Brief 1-sentence explanation of why this job needs this skill"
-    }
-  ],
-  "summary": "A 2-3 sentence summary of what this role is about and what kind of candidate would thrive"
-}
-
-Rules:
-- Map skills to the provided list whenever there's a reasonable match. For example, "Excel" maps to "Computers and Electronics", "SQL" or "data analysis" maps to "Mathematics" or "Programming", "communication skills" maps to "Speaking" or "Writing", "project management" maps to "Administration and Management", etc.
-- Include 5-10 skills maximum, prioritizing the most important ones.
-- Mark skills explicitly listed as "required" or "must have" as "required". Everything else is "preferred".
-- Be specific in the context field - reference the actual job duties mentioned.
-- Return ONLY the JSON object, no markdown formatting.`;
-
-  var response = await fetch("https://api.anthropic.com/v1/messages", {
+async function callClaude(jobDesc) {
+  // The system prompt lives server-side in the Worker (proxy/worker.js); the
+  // page only sends the job text plus the known-skills list to map against.
+  var response = await fetch(window.SS_AI_PROXY, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-api-key": apiKey,
-      "anthropic-version": "2023-06-01",
-      "anthropic-dangerous-direct-browser-access": "true"
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 1024,
-      system: systemPrompt,
-      messages: [{ role: "user", content: "Analyze this job posting:\n\n" + jobDesc }]
+      mode: "analyze",
+      input: jobDesc,
+      skills: KNOWN_SKILLS
     })
   });
 
   if (!response.ok) {
     var errBody = await response.text();
-    if (response.status === 401) throw new Error("Invalid API key. Please check and try again.");
-    if (response.status === 429) throw new Error("Rate limited. Please wait a moment and try again.");
-    throw new Error("API error (" + response.status + "): " + errBody.substring(0, 200));
+    if (response.status === 429) throw new Error("A lot of people are using this right now. Please wait a moment and try again.");
+    throw new Error("Service error (" + response.status + "). Please try again shortly.");
   }
 
   var data = await response.json();

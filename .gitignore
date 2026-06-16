@@ -1,3 +1,9 @@
 .DS_Store
 **/.DS_Store
 onet_data/
+__pycache__/
+*.pyc
+.venv/
+evals/results.json
+evals/results.md
+.DS_Store
