@@ -125,6 +125,11 @@ section { padding: 80px 2rem; }
 }
 .truth-card h3 { font-size: 16px; font-weight: 600; margin-bottom: 0.75rem; }
 .truth-card p { font-size: 14px; color: var(--text-muted); line-height: 1.65; }
+.truth-card .icon-chip { margin-bottom: 14px; }
+.truth-card::before { font-size: 76px; top: -6px; }
+.truth-card[data-number="01"]::before { color: rgba(196,101,42,0.10); }
+.truth-card[data-number="02"]::before { color: rgba(29,158,117,0.10); }
+.truth-card[data-number="03"]::before { color: rgba(83,74,183,0.12); }
 
 /* STORY */
 .story-container {
@@ -311,6 +316,8 @@ footer .footer-logo { font-family: var(--serif); font-size: 18px; color: var(--a
 .mobile-menu a:hover, .mobile-menu a.active { color: #C4652A; }
 @media (max-width: 768px) { .nav-hamburger { display: flex; } .nav-links { display: none !important; } }
 </style>
+<link rel="stylesheet" href="ss-theme.css">
+<script src="ss-ui.js" defer></script>
 </head>
 <body>
 
@@ -324,11 +331,17 @@ footer .footer-logo { font-family: var(--serif); font-size: 18px; color: var(--a
       <a href="explore.html">Explore</a>
       <a href="build.html">Build</a>
       <a href="apply.html">Apply</a>
-      <a href="skill-explorer-production.html">Skill Explorer</a>
-      <a href="job-analyzer.html">Job Analyzer</a>
-      <a href="ask.html">Ask AI</a>      <a href="skill-roulette.html">Skill Roulette</a>
-      <a href="skill-sprints.html">Skill Sprints</a>
-      <a href="skill-map.html">Skill Map</a>
+      <div class="nav-tools">
+        <button class="nav-tools-btn" type="button" aria-haspopup="true" aria-expanded="false">Tools <svg class="chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
+        <div class="nav-tools-menu" role="menu">
+          <a href="skill-explorer-production.html" role="menuitem"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>Skill Explorer</a>
+          <a href="job-analyzer.html" role="menuitem"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h4"/></svg>Job Analyzer</a>
+          <a href="skill-roulette.html" role="menuitem"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5"/><path d="M4 20L21 3"/><path d="M21 16v5h-5"/><path d="M15 15l6 6"/><path d="M4 4l5 5"/></svg>Skill Roulette</a>
+          <a href="skill-sprints.html" role="menuitem"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5"/><path d="M9 2h6"/></svg>Skill Sprints</a>
+          <a href="skill-map.html" role="menuitem"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="6" r="2.2"/><circle cx="19" cy="6" r="2.2"/><circle cx="12" cy="18" r="2.2"/><path d="M7 7.4L10.4 16M17 7.4L13.6 16M7.2 6h9.6"/></svg>Skill Map</a>
+        </div>
+      </div>
+      <a href="ask.html" class="nav-cta"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.9 5.7a2 2 0 0 0 1.3 1.3L21 11l-5.8 2a2 2 0 0 0-1.3 1.3L12 20l-1.9-5.7a2 2 0 0 0-1.3-1.3L3 11l5.8-2a2 2 0 0 0 1.3-1.3z"/></svg>Ask AI</a>
     </div>
   </div>
   <div class="nav-row2" style="display:flex;align-items:center;padding:6px 2rem 8px;border-top:1px solid var(--border);background:rgba(245,240,232,0.5);gap:1.5rem;max-width:1200px;margin:0 auto;justify-content:center;flex-wrap:wrap;">
@@ -354,7 +367,7 @@ footer .footer-logo { font-family: var(--serif); font-size: 18px; color: var(--a
 <!-- HERO -->
 <div class="hero">
   <div class="hero-eyebrow">a career momentum engine</div>
-  <h1>You don't need a plan.<br>You need <em>momentum.</em></h1>
+  <h1>You don't need a plan.<br>You need <span class="squig"><em>momentum.</em><svg viewBox="0 0 200 12" preserveAspectRatio="none" aria-hidden="true"><path d="M4 8 Q 30 2, 60 7 T 116 6 T 196 5"/></svg></span></h1>
   <p class="hero-sub">
     Everyone says figure out your path first, then start moving. That's backwards. Start building something, anything, and the path shows up on its own.
   </p>
@@ -374,24 +387,34 @@ footer .footer-logo { font-family: var(--serif); font-size: 18px; color: var(--a
   </div>
 </div>
 
+<!-- SKILL TICKER -->
+<div class="tick-strip" aria-hidden="true">
+  <div class="tick-track">
+    <span>SQL</span><span>Public speaking</span><span>UX writing</span><span>Bookkeeping</span><span>Python</span><span>Video editing</span><span>Figma</span><span>Negotiation</span><span>Data visualization</span><span>Carpentry</span><span>Copywriting</span><span>First aid</span><span>Project management</span><span>Photography</span>
+  </div>
+</div>
+
 <!-- TRUTH SECTION -->
 <section class="truth" id="truth">
   <div class="section-inner">
-    <div class="section-label">What nobody tells you</div>
-    <h2 class="section-title">Action creates motivation.<br>Not the other way around.</h2>
+    <div class="section-label reveal">What nobody tells you</div>
+    <h2 class="section-title reveal" style="--d:0.08s">Action creates motivation.<br>Not the other way around.</h2>
     <p style="font-size: 16px; color: var(--text-muted); max-width: 640px; margin-bottom: 1rem;">
       You're waiting to feel ready. To find your passion. To know for sure. But that certainty you're looking for? It only comes after you start, not before. The people with fulfilling careers didn't have it figured out. They just moved first.
     </p>
-    <div class="truth-grid">
-      <div class="truth-card" data-number="01">
+    <div class="truth-grid" data-reveal-group>
+      <div class="truth-card lift reveal" data-number="01">
+        <span class="icon-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></span>
         <h3>The readiness trap</h3>
         <p>You think you need to decide before you begin. So you take quizzes, read articles, ask advice. Nothing feels certain. That's not a failure of research. You just can't know what you like until you've tried it.</p>
       </div>
-      <div class="truth-card" data-number="02">
+      <div class="truth-card lift reveal" data-number="02">
+        <span class="icon-chip teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 4.5-8 4.5-8-4.5z"/><path d="M4 12.5L12 17l8-4.5"/><path d="M4 17l8 4.5 8-4.5"/></svg></span>
         <h3>There are no wrong skills</h3>
         <p>That "irrelevant" course you're eyeing? Every skill you build changes how you think. It gives you an angle nobody else in the room has. The most interesting people in any field got there by combining things that didn't obviously go together.</p>
       </div>
-      <div class="truth-card" data-number="03">
+      <div class="truth-card lift reveal" data-number="03">
+        <span class="icon-chip purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg></span>
         <h3>Pivoting is the feature</h3>
         <p>Changing directions isn't quitting. It's iterating. Every pivot carries forward everything you've already learned. You're not starting over. You're starting from a better spot than last time.</p>
       </div>
@@ -402,8 +425,8 @@ footer .footer-logo { font-family: var(--serif); font-size: 18px; color: var(--a
 <!-- STORY -->
 <section id="story">
   <div class="section-inner">
-    <div class="section-label">Proof it works</div>
-    <h2 class="section-title">Electric vehicles → Case competition winner.<br>Nobody saw that coming.</h2>
+    <div class="section-label reveal">Proof it works</div>
+    <h2 class="section-title reveal" style="--d:0.08s">Electric vehicles → Case competition winner.<br>Nobody saw that coming.</h2>
     <div class="story-container">
       <div class="story-timeline">
         <div class="story-step">
@@ -433,13 +456,13 @@ footer .footer-logo { font-family: var(--serif); font-size: 18px; color: var(--a
 <!-- WHERE ARE YOU -->
 <section class="where" id="where">
   <div class="section-inner">
-    <div class="section-label">No wrong answers</div>
-    <h2 class="section-title">Where are you right now?</h2>
+    <div class="section-label reveal">No wrong answers</div>
+    <h2 class="section-title reveal" style="--d:0.08s">Where are you right now?</h2>
     <p style="font-size: 16px; color: var(--text-muted); max-width: 560px; margin-bottom: 1rem;">
       Don't overthink it. Pick what feels closest.
     </p>
-    <div class="stage-grid" >
-      <a class="stage-card" href="explore.html" style="border-top: 3px solid var(--accent);">
+    <div class="stage-grid" data-reveal-group>
+      <a class="stage-card lift reveal" href="explore.html" style="border-top: 3px solid var(--accent);">
         <h3 style="font-size: 18px; margin-bottom: 0.5rem;">Explore</h3>
         <p style="font-size: 14px;">I have no idea what I want, or I have some interests but no clear direction. I need to figure out what's out there.</p>
         <div style="margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--border);">
@@ -448,7 +471,7 @@ footer .footer-logo { font-family: var(--serif); font-size: 18px; color: var(--a
         </div>
         <span class="stage-arrow">Start exploring &#8594;</span>
       </a>
-      <a class="stage-card" href="build.html" style="border-top: 3px solid var(--teal);">
+      <a class="stage-card lift reveal" href="build.html" style="border-top: 3px solid var(--teal);">
         <h3 style="font-size: 18px; margin-bottom: 0.5rem;">Build</h3>
         <p style="font-size: 14px;">I know my general direction, or I'm pivoting to something new. I need to build the right skills.</p>
         <div style="margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--border);">
@@ -457,7 +480,7 @@ footer .footer-logo { font-family: var(--serif); font-size: 18px; color: var(--a
         </div>
         <span class="stage-arrow" style="color: var(--teal);">Start building &#8594;</span>
       </a>
-      <a class="stage-card" href="apply.html" style="border-top: 3px solid var(--purple);">
+      <a class="stage-card lift reveal" href="apply.html" style="border-top: 3px solid var(--purple);">
         <h3 style="font-size: 18px; margin-bottom: 0.5rem;">Apply</h3>
         <p style="font-size: 14px;">I'm ready to go after roles, or I need to sharpen my resume, interview skills, and job search strategy.</p>
         <div style="margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--border);">
@@ -473,7 +496,7 @@ footer .footer-logo { font-family: var(--serif); font-size: 18px; color: var(--a
 <!-- LUCKY -->
 <section class="lucky-section" id="lucky">
   <div class="lucky-box">
-    <div class="section-label">Zero stakes, maximum curiosity</div>
+    <div class="section-label reveal">Zero stakes, maximum curiosity</div>
     <h2 class="section-title" style="margin-bottom: 1rem;">Can't decide? Let fate choose.</h2>
     <p>Some of the best career moves start with random curiosity. Click the button. Learn something you weren't planning to. The point isn't to find your calling. It's to start moving.</p>
     <button class="lucky-btn" onclick="spinLucky()">✦ &nbsp;I'm feeling lucky</button>
@@ -484,25 +507,25 @@ footer .footer-logo { font-family: var(--serif); font-size: 18px; color: var(--a
 <!-- RESOURCE DIRECTORY -->
 <section class="directory" id="directory">
   <div class="section-inner">
-    <div class="section-label">Your starting points</div>
-    <h2 class="section-title">Resources that meet you where you are</h2>
+    <div class="section-label reveal">Your starting points</div>
+    <h2 class="section-title reveal" style="--d:0.08s">Resources that meet you where you are</h2>
     <p style="font-size: 15px; color: var(--text-muted); max-width: 560px; margin-bottom: 1rem;">
       Real tools, not another listicle. Each one gets you doing something within minutes.
     </p>
 
     <h3 style="font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-soft); margin-top: 1.25rem; margin-bottom: 0.75rem;">Discover what fits</h3>
-    <div class="dir-grid">
-      <a class="dir-card" href="https://www.mynextmove.org/explore/ip" target="_blank">
+    <div class="dir-grid" data-reveal-group>
+      <a class="dir-card lift reveal" href="https://www.mynextmove.org/explore/ip" target="_blank">
         <h4>O*NET Interest Profiler</h4>
         <p>900+ careers matched to your interests. Takes 10 minutes. No sign-up.</p>
         <span class="dir-tag dir-tag-free">Free</span>
       </a>
-      <a class="dir-card" href="https://www.truity.com/test/career-personality-profiler-test" target="_blank">
+      <a class="dir-card lift reveal" href="https://www.truity.com/test/career-personality-profiler-test" target="_blank">
         <h4>Truity Career Profiler</h4>
         <p>Combines personality science with career matching. Better than most quizzes out there.</p>
         <span class="dir-tag dir-tag-free">Free tier</span>
       </a>
-      <a class="dir-card" href="https://www.theforage.com" target="_blank">
+      <a class="dir-card lift reveal" href="https://www.theforage.com" target="_blank">
         <h4>Forage</h4>
         <p>Free virtual work experience at real companies. Try a career before you commit.</p>
         <span class="dir-tag dir-tag-free">Free</span>
@@ -510,18 +533,18 @@ footer .footer-logo { font-family: var(--serif); font-size: 18px; color: var(--a
     </div>
 
     <h3 style="font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-soft); margin-top: 2rem; margin-bottom: 0.75rem;">Build something new</h3>
-    <div class="dir-grid">
-      <a class="dir-card" href="https://www.coursera.org" target="_blank">
+    <div class="dir-grid" data-reveal-group>
+      <a class="dir-card lift reveal" href="https://www.coursera.org" target="_blank">
         <h4>Coursera</h4>
         <p>University-backed courses in anything from Python to philosophy. Free to audit.</p>
         <span class="dir-tag dir-tag-free">Free to audit</span>
       </a>
-      <a class="dir-card" href="https://www.skillshare.com" target="_blank">
+      <a class="dir-card lift reveal" href="https://www.skillshare.com" target="_blank">
         <h4>Skillshare</h4>
         <p>Creative skills: design, photography, writing, animation. Great for exploring.</p>
         <span class="dir-tag dir-tag-paid">Free trial</span>
       </a>
-      <a class="dir-card" href="https://www.edx.org" target="_blank">
+      <a class="dir-card lift reveal" href="https://www.edx.org" target="_blank">
         <h4>edX</h4>
         <p>MIT, Harvard, and more. MicroMasters programs if you want to go deep.</p>
         <span class="dir-tag dir-tag-free">Free to audit</span>
@@ -529,18 +552,18 @@ footer .footer-logo { font-family: var(--serif); font-size: 18px; color: var(--a
     </div>
 
     <h3 style="font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-soft); margin-top: 2rem; margin-bottom: 0.75rem;">Get hired</h3>
-    <div class="dir-grid">
-      <a class="dir-card" href="https://www.jobscan.co" target="_blank">
+    <div class="dir-grid" data-reveal-group>
+      <a class="dir-card lift reveal" href="https://www.jobscan.co" target="_blank">
         <h4>Jobscan</h4>
         <p>AI that matches your resume to job descriptions. Shows you exactly what to fix.</p>
         <span class="dir-tag dir-tag-free">Free tier</span>
       </a>
-      <a class="dir-card" href="https://interviewing.io" target="_blank">
+      <a class="dir-card lift reveal" href="https://interviewing.io" target="_blank">
         <h4>Interviewing.io</h4>
         <p>Anonymous mock interviews with engineers at top companies. Tough but effective.</p>
         <span class="dir-tag dir-tag-free">Free tier</span>
       </a>
-      <a class="dir-card" href="https://joinhandshake.com" target="_blank">
+      <a class="dir-card lift reveal" href="https://joinhandshake.com" target="_blank">
         <h4>Handshake</h4>
         <p>Built for early-career job seekers. Employers come to you.</p>
         <span class="dir-tag dir-tag-free">Free</span>

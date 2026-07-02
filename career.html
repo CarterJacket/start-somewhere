@@ -224,6 +224,8 @@ body { font-family: var(--sans); background: var(--bg); color: var(--text); line
 .mobile-menu a:hover, .mobile-menu a.active { color: #C4652A; }
 @media (max-width: 768px) { .nav-hamburger { display: flex; } .nav-links { display: none !important; } }
 </style>
+<link rel="stylesheet" href="ss-theme.css">
+<script src="ss-ui.js" defer></script>
 </head>
 <body>
 
@@ -236,11 +238,17 @@ body { font-family: var(--sans); background: var(--bg); color: var(--text); line
       <a href="explore.html">Explore</a>
       <a href="build.html">Build</a>
       <a href="apply.html">Apply</a>
-      <a href="skill-explorer-production.html">Skill Explorer</a>
-      <a href="job-analyzer.html">Job Analyzer</a>
-      <a href="ask.html">Ask AI</a>      <a href="skill-roulette.html">Skill Roulette</a>
-      <a href="skill-sprints.html">Skill Sprints</a>
-      <a href="skill-map.html">Skill Map</a>
+      <div class="nav-tools">
+        <button class="nav-tools-btn" type="button" aria-haspopup="true" aria-expanded="false">Tools <svg class="chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
+        <div class="nav-tools-menu" role="menu">
+          <a href="skill-explorer-production.html" role="menuitem"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>Skill Explorer</a>
+          <a href="job-analyzer.html" role="menuitem"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h4"/></svg>Job Analyzer</a>
+          <a href="skill-roulette.html" role="menuitem"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5"/><path d="M4 20L21 3"/><path d="M21 16v5h-5"/><path d="M15 15l6 6"/><path d="M4 4l5 5"/></svg>Skill Roulette</a>
+          <a href="skill-sprints.html" role="menuitem"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5"/><path d="M9 2h6"/></svg>Skill Sprints</a>
+          <a href="skill-map.html" role="menuitem"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="6" r="2.2"/><circle cx="19" cy="6" r="2.2"/><circle cx="12" cy="18" r="2.2"/><path d="M7 7.4L10.4 16M17 7.4L13.6 16M7.2 6h9.6"/></svg>Skill Map</a>
+        </div>
+      </div>
+      <a href="ask.html" class="nav-cta"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.9 5.7a2 2 0 0 0 1.3 1.3L21 11l-5.8 2a2 2 0 0 0-1.3 1.3L12 20l-1.9-5.7a2 2 0 0 0-1.3-1.3L3 11l5.8-2a2 2 0 0 0 1.3-1.3z"/></svg>Ask AI</a>
     </div>
   </div>
 </nav>

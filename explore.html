@@ -123,6 +123,8 @@ body { font-family: var(--sans); background: var(--bg); color: var(--text); line
 .mobile-menu a:hover, .mobile-menu a.active { color: #C4652A; }
 @media (max-width: 768px) { .nav-hamburger { display: flex; } .nav-links { display: none !important; } }
 </style>
+<link rel="stylesheet" href="ss-theme.css">
+<script src="ss-ui.js" defer></script>
 </head>
 <body>
 
@@ -135,11 +137,17 @@ body { font-family: var(--sans); background: var(--bg); color: var(--text); line
       <a href="explore.html" class="active">Explore</a>
       <a href="build.html">Build</a>
       <a href="apply.html">Apply</a>
-      <a href="skill-explorer-production.html">Skill Explorer</a>
-      <a href="job-analyzer.html">Job Analyzer</a>
-      <a href="ask.html">Ask AI</a>      <a href="skill-roulette.html">Skill Roulette</a>
-      <a href="skill-sprints.html">Skill Sprints</a>
-      <a href="skill-map.html">Skill Map</a>
+      <div class="nav-tools">
+        <button class="nav-tools-btn" type="button" aria-haspopup="true" aria-expanded="false">Tools <svg class="chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
+        <div class="nav-tools-menu" role="menu">
+          <a href="skill-explorer-production.html" role="menuitem"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>Skill Explorer</a>
+          <a href="job-analyzer.html" role="menuitem"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h4"/></svg>Job Analyzer</a>
+          <a href="skill-roulette.html" role="menuitem"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5"/><path d="M4 20L21 3"/><path d="M21 16v5h-5"/><path d="M15 15l6 6"/><path d="M4 4l5 5"/></svg>Skill Roulette</a>
+          <a href="skill-sprints.html" role="menuitem"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5"/><path d="M9 2h6"/></svg>Skill Sprints</a>
+          <a href="skill-map.html" role="menuitem"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="6" r="2.2"/><circle cx="19" cy="6" r="2.2"/><circle cx="12" cy="18" r="2.2"/><path d="M7 7.4L10.4 16M17 7.4L13.6 16M7.2 6h9.6"/></svg>Skill Map</a>
+        </div>
+      </div>
+      <a href="ask.html" class="nav-cta"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.9 5.7a2 2 0 0 0 1.3 1.3L21 11l-5.8 2a2 2 0 0 0-1.3 1.3L12 20l-1.9-5.7a2 2 0 0 0-1.3-1.3L3 11l5.8-2a2 2 0 0 0 1.3-1.3z"/></svg>Ask AI</a>
     </div>
   </div>
 </nav>
@@ -157,39 +165,39 @@ body { font-family: var(--sans); background: var(--bg); color: var(--text); line
 
 <div class="page-hero">
   <div class="eyebrow">No idea? No problem.</div>
-  <h1>Figure out what <em>interests you.</em></h1>
+  <h1>Figure out what <span class="squig"><em>interests you.</em><svg viewBox="0 0 200 12" preserveAspectRatio="none" aria-hidden="true"><path d="M4 8 Q 30 2, 60 7 T 116 6 T 196 5"/></svg></span></h1>
   <p>You don't need a five-year plan. You need to try things. These tools help you figure out what you're drawn to, through questions, quizzes, and real data about what's out there.</p>
 </div>
 
 <div class="content">
 
-  <div class="section-label">Start here</div>
+  <div class="section-label reveal">Start here</div>
   <h2 class="section-heading">Self-assessment tools</h2>
   <p class="section-desc">Answer some questions, get real insights. These tools find patterns in your interests, personality, and strengths that you might not notice on your own.</p>
 
-  <div class="resource-grid">
-    <a class="resource-card" href="https://www.mynextmove.org/explore/ip" target="_blank" rel="noopener">
+  <div class="resource-grid" data-reveal-group>
+    <a class="resource-card lift reveal" href="https://www.mynextmove.org/explore/ip" target="_blank" rel="noopener">
       <span class="tag tag-free">Free</span>
       <h3>O*NET Interest Profiler</h3>
       <div class="provider">U.S. Department of Labor</div>
       <p>60 questions that map your interests to real career clusters. Backed by the largest occupational database in the world. This is the gold standard.</p>
       <span class="arrow">Take the assessment &#8594;</span>
     </a>
-    <a class="resource-card" href="https://www.truity.com/test/holland-code-career-test" target="_blank" rel="noopener">
+    <a class="resource-card lift reveal" href="https://www.truity.com/test/holland-code-career-test" target="_blank" rel="noopener">
       <span class="tag tag-free">Free</span>
       <h3>Holland Code Career Test</h3>
       <div class="provider">Truity</div>
       <p>Based on the RIASEC model. Maps you to one of six personality types (Realistic, Investigative, Artistic, Social, Enterprising, Conventional) and shows matching careers.</p>
       <span class="arrow">Take the test &#8594;</span>
     </a>
-    <a class="resource-card" href="https://www.16personalities.com/" target="_blank" rel="noopener">
+    <a class="resource-card lift reveal" href="https://www.16personalities.com/" target="_blank" rel="noopener">
       <span class="tag tag-assessment">Assessment</span>
       <h3>16Personalities (MBTI-style)</h3>
       <div class="provider">NERIS Analytics</div>
       <p>Not a career tool directly, but really useful for understanding how you process information, make decisions, and work with others.</p>
       <span class="arrow">Discover your type &#8594;</span>
     </a>
-    <a class="resource-card" href="https://www.careeronestop.org/ExploreCareers/Assessments/interests.aspx" target="_blank" rel="noopener">
+    <a class="resource-card lift reveal" href="https://www.careeronestop.org/ExploreCareers/Assessments/interests.aspx" target="_blank" rel="noopener">
       <span class="tag tag-free">Free</span>
       <h3>CareerOneStop Interest Assessment</h3>
       <div class="provider">U.S. Department of Labor</div>
@@ -203,33 +211,33 @@ body { font-family: var(--sans); background: var(--bg); color: var(--text); line
     <p>No single assessment captures the full picture. Take two or three and look for overlapping themes. If "Investigative" shows up on the Holland Code and you keep landing on analytical roles in O*NET, that's a signal worth paying attention to.</p>
   </div>
 
-  <div class="section-label">Go deeper</div>
+  <div class="section-label reveal">Go deeper</div>
   <h2 class="section-heading">Career exploration</h2>
   <p class="section-desc">Once you have a general direction (or even just a vague sense), use these to see what actual jobs look like. Day to day, salary, growth, and what skills you'd need.</p>
 
-  <div class="resource-grid">
-    <a class="resource-card" href="https://www.onetonline.org/" target="_blank" rel="noopener">
+  <div class="resource-grid" data-reveal-group>
+    <a class="resource-card lift reveal" href="https://www.onetonline.org/" target="_blank" rel="noopener">
       <span class="tag tag-free">Free</span>
       <h3>O*NET Online</h3>
       <div class="provider">U.S. Department of Labor</div>
       <p>Search any job title and get the full breakdown: tasks, skills, salary, education, job outlook. The biggest career database out there.</p>
       <span class="arrow">Explore careers &#8594;</span>
     </a>
-    <a class="resource-card" href="https://www.bls.gov/ooh/" target="_blank" rel="noopener">
+    <a class="resource-card lift reveal" href="https://www.bls.gov/ooh/" target="_blank" rel="noopener">
       <span class="tag tag-free">Free</span>
       <h3>Occupational Outlook Handbook</h3>
       <div class="provider">Bureau of Labor Statistics</div>
       <p>What's actually growing? What pays well? Real salary data and 10-year job outlook projections for hundreds of occupations.</p>
       <span class="arrow">Browse occupations &#8594;</span>
     </a>
-    <a class="resource-card" href="https://www.careervillage.org/" target="_blank" rel="noopener">
+    <a class="resource-card lift reveal" href="https://www.careervillage.org/" target="_blank" rel="noopener">
       <span class="tag tag-free">Free</span>
       <h3>CareerVillage</h3>
       <div class="provider">CareerVillage.org</div>
       <p>Ask real professionals about their careers. What's their day actually like? How did they get started? Answers from people who've been there.</p>
       <span class="arrow">Ask a question &#8594;</span>
     </a>
-    <a class="resource-card" href="https://www.glassdoor.com/Explore" target="_blank" rel="noopener">
+    <a class="resource-card lift reveal" href="https://www.glassdoor.com/Explore" target="_blank" rel="noopener">
       <span class="tag tag-tool">Tool</span>
       <h3>Glassdoor Career Explorer</h3>
       <div class="provider">Glassdoor</div>
@@ -244,7 +252,7 @@ body { font-family: var(--sans); background: var(--bg); color: var(--text); line
     <a href="skill-explorer-production.html">Open Skill Explorer &#8594;</a>
   </div>
 
-  <div class="section-label">Just curious</div>
+  <div class="section-label reveal">Just curious</div>
   <h2 class="section-heading">Try something random</h2>
   <p class="section-desc">Can't decide? Don't. Hit the button on the home page and we'll pick a random skill for you. Zero stakes, maximum curiosity.</p>
 

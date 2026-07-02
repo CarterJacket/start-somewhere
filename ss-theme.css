@@ -1,0 +1,148 @@
+/* Start Somewhere - shared visual theme (editorial + warm studio hybrid).
+   Loaded by every page after its inline styles; page styles stay untouched,
+   this layer adds the nav dropdown, icons, motion, and hover polish. */
+
+:root {
+  --ss-bg: #FAF9F6;
+  --ss-warm: #F5F0E8;
+  --ss-ink: #1A1A18;
+  --ss-muted: #6B6860;
+  --ss-soft: #918E85;
+  --ss-accent: #C4652A;
+  --ss-accent-hover: #A8521F;
+  --ss-teal: #1D9E75;
+  --ss-purple: #534AB7;
+  --ss-gold: #E8B04B;
+  --ss-border: #E8E4DC;
+  --ss-card: #FFFFFF;
+  --ss-serif: 'DM Serif Display', Georgia, serif;
+  --ss-sans: 'DM Sans', -apple-system, sans-serif;
+}
+
+/* ---------- Nav: consolidated Tools dropdown + Ask AI pill ---------- */
+
+.nav-links { gap: 1.4rem !important; }
+.nav-links > a { position: relative; white-space: nowrap; }
+.nav-links > a:not(.nav-cta)::after {
+  content: ''; position: absolute; left: 0; bottom: -4px; height: 2px; width: 100%;
+  background: var(--ss-accent); border-radius: 1px;
+  transform: scaleX(0); transform-origin: left; transition: transform 0.22s ease;
+}
+.nav-links > a:not(.nav-cta):hover::after,
+.nav-links > a.active:not(.nav-cta)::after { transform: scaleX(1); }
+
+.nav-tools { position: relative; display: flex; align-items: center; }
+.nav-tools-btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: none; border: 1px solid transparent; cursor: pointer;
+  font-family: var(--ss-sans); font-size: 14px; font-weight: 500;
+  color: var(--ss-muted); padding: 4px 10px; border-radius: 999px;
+  transition: color 0.2s, border-color 0.2s, background 0.2s;
+}
+.nav-tools-btn:hover { color: var(--ss-ink); border-color: var(--ss-border); }
+.nav-tools-btn.active { color: var(--ss-accent); }
+.nav-tools-btn .chev { transition: transform 0.2s ease; }
+.nav-tools.open .nav-tools-btn .chev { transform: rotate(180deg); }
+.nav-tools-menu {
+  position: absolute; top: calc(100% + 10px); left: 50%; transform: translateX(-50%) translateY(-6px);
+  min-width: 208px; background: var(--ss-card); border: 1px solid var(--ss-border);
+  border-radius: 14px; padding: 8px; box-shadow: 0 12px 32px rgba(26,26,24,0.10);
+  opacity: 0; visibility: hidden; transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s;
+  z-index: 200;
+}
+.nav-tools.open .nav-tools-menu { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+.nav-tools-menu a {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 12px; border-radius: 9px; text-decoration: none;
+  font-size: 13.5px; font-weight: 500; color: var(--ss-muted);
+  transition: background 0.15s, color 0.15s;
+}
+.nav-tools-menu a:hover { background: var(--ss-warm); color: var(--ss-ink); }
+.nav-tools-menu a.active { color: var(--ss-accent); background: rgba(196,101,42,0.07); }
+.nav-tools-menu a svg { flex: none; }
+
+.nav-cta {
+  background: var(--ss-ink); color: #fff !important; border-radius: 999px;
+  padding: 6px 15px !important; font-weight: 600 !important;
+  display: inline-flex; align-items: center; gap: 6px;
+  transition: background 0.2s, transform 0.15s;
+}
+.nav-cta:hover { background: var(--ss-accent); transform: translateY(-1px); }
+.nav-cta.active { background: var(--ss-accent); }
+.nav-cta svg { flex: none; }
+
+/* ---------- Motion: scroll reveals (respects reduced motion) ---------- */
+
+.reveal { opacity: 0; transform: translateY(18px); transition: opacity 0.6s ease, transform 0.6s ease; transition-delay: var(--d, 0s); }
+.reveal.in { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; transition: none; }
+  .tick-track { animation: none !important; }
+}
+
+/* ---------- Cards: hover lift ---------- */
+
+.lift { transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease; }
+.lift:hover { transform: translateY(-4px); box-shadow: 0 14px 30px rgba(26,26,24,0.08); border-color: rgba(196,101,42,0.35) !important; }
+
+/* ---------- Editorial: ghost numerals, icon chips, rules ---------- */
+
+.ghost-num {
+  font-family: var(--ss-serif); font-size: 54px; line-height: 0.9;
+  color: rgba(196,101,42,0.16); user-select: none;
+}
+.ghost-num.teal { color: rgba(29,158,117,0.16); }
+.ghost-num.purple { color: rgba(83,74,183,0.16); }
+
+.icon-chip {
+  width: 38px; height: 38px; border-radius: 11px;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: rgba(196,101,42,0.09); color: var(--ss-accent);
+}
+.icon-chip.teal { background: rgba(29,158,117,0.10); color: var(--ss-teal); }
+.icon-chip.purple { background: rgba(83,74,183,0.10); color: var(--ss-purple); }
+.icon-chip.gold { background: rgba(232,176,75,0.16); color: #A97817; }
+.icon-chip svg { width: 19px; height: 19px; }
+
+.rule { width: 44px; height: 2px; background: var(--ss-accent); border-radius: 1px; opacity: 0.85; }
+
+.link-und { text-decoration: none; background-image: linear-gradient(currentColor, currentColor); background-size: 0% 1.5px; background-repeat: no-repeat; background-position: left bottom; transition: background-size 0.25s ease; padding-bottom: 2px; }
+.link-und:hover { background-size: 100% 1.5px; }
+
+/* ---------- Warm studio: squiggle underline + skill ticker ---------- */
+
+.squig { position: relative; display: inline-block; }
+.squig svg { position: absolute; left: 0; right: 0; bottom: -0.14em; width: 100%; height: 0.22em; overflow: visible; }
+.squig svg path { stroke: var(--ss-accent); stroke-width: 3.2; fill: none; stroke-linecap: round; }
+
+.tick-strip {
+  overflow: hidden; border-top: 1px solid var(--ss-border); border-bottom: 1px solid var(--ss-border);
+  background: var(--ss-card); padding: 13px 0; position: relative;
+}
+.tick-strip::before, .tick-strip::after {
+  content: ''; position: absolute; top: 0; bottom: 0; width: 70px; z-index: 2; pointer-events: none;
+}
+.tick-strip::before { left: 0; background: linear-gradient(90deg, var(--ss-bg), transparent); }
+.tick-strip::after { right: 0; background: linear-gradient(270deg, var(--ss-bg), transparent); }
+.tick-track { display: flex; gap: 2.4rem; width: max-content; animation: ss-tick 46s linear infinite; }
+.tick-strip:hover .tick-track { animation-play-state: paused; }
+.tick-track span {
+  font-size: 13.5px; font-weight: 500; color: var(--ss-soft); white-space: nowrap;
+  display: inline-flex; align-items: center; gap: 2.4rem;
+}
+.tick-track span::after { content: ''; width: 5px; height: 5px; border-radius: 50%; background: var(--ss-accent); opacity: 0.45; }
+@keyframes ss-tick { to { transform: translateX(-50%); } }
+
+/* ---------- Buttons: subtle press ---------- */
+
+button, .btn { transition: transform 0.12s ease; }
+button:active, .btn:active { transform: scale(0.985); }
+
+/* ---------- Focus visibility ---------- */
+
+a:focus-visible, button:focus-visible { outline: 2px solid var(--ss-accent); outline-offset: 3px; border-radius: 4px; }
+
+@media (max-width: 768px) {
+  .nav-tools { display: none; }
+  .nav-cta { display: none !important; }
+}
